@@ -1,180 +1,331 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>HTML5 Game Portal</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>BLINCHIGAMES | Play Free HTML5 Games</title>
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Custom styles -->
-  <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --blinchi-lime: #32ff0e;
+            --blinchi-dark: #0a0a0a;
+            --blinchi-gray: #1a1a1a;
+        }
+
+        body { 
+            background-color: var(--blinchi-dark); 
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .navbar {
+            background-color: #000 !important;
+            border-bottom: 2px solid var(--blinchi-lime);
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--blinchi-lime) !important;
+            letter-spacing: 2px;
+        }
+
+        .hero-section {
+            background: linear-gradient(180deg, #000 0%, var(--blinchi-gray) 100%);
+            border-bottom: 1px solid rgba(50, 255, 14, 0.1);
+        }
+
+        .game-card .card { 
+            transition: all 0.3s ease; 
+            border: 1px solid #333; 
+            background: var(--blinchi-gray);
+            color: white;
+            overflow: hidden;
+        }
+
+        .game-card:hover .card { 
+            transform: translateY(-8px); 
+            border-color: var(--blinchi-lime);
+            box-shadow: 0 0 15px rgba(50, 255, 14, 0.3);
+        }
+
+        .card-img-top-container {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            position: relative;
+        }
+
+        .card-img-top-container svg {
+            width: 60px;
+            height: 60px;
+            fill: var(--blinchi-lime);
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .game-card:hover .card-img-top-container svg {
+            opacity: 1;
+            filter: drop-shadow(0 0 8px var(--blinchi-lime));
+        }
+
+        .btn-lime {
+            background-color: var(--blinchi-lime);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .btn-lime:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .filter-btn {
+            border-radius: 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-outline-primary {
+            border-color: var(--blinchi-lime);
+            color: var(--blinchi-lime);
+        }
+
+        .btn-outline-primary:hover, .btn-primary {
+            background-color: var(--blinchi-lime) !important;
+            border-color: var(--blinchi-lime) !important;
+            color: #000 !important;
+        }
+
+        #gameIframe { width: 100%; height: 100%; border: none; }
+        .hidden-card { display: none; }
+
+        .search-bar {
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+        }
+
+        .search-bar:focus {
+            background: #333;
+            border-color: var(--blinchi-lime);
+            color: white;
+            box-shadow: none;
+        }
+
+        .modal-content {
+            border: 2px solid var(--blinchi-lime);
+        }
+    </style>
 </head>
 <body>
-  <!-- Header / Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <span class="badge bg-primary me-2">G</span>
-        GamePortal
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                BLINCHIGAMES
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
 
-      <div class="collapse navbar-collapse" id="navMain">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
-          <li class="nav-item"><a class="nav-link" href="#featured">Featured</a></li>
-        </ul>
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link text-white" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white-50" href="#categories">Categories</a></li>
+                </ul>
 
-        <form class="d-flex" id="searchForm" role="search" onsubmit="return false;">
-          <input id="searchInput" class="form-control me-2" type="search" placeholder="Search games..." aria-label="Search">
-          <button id="searchClear" class="btn btn-outline-light d-none" type="button">Clear</button>
-        </form>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Hero / Featured -->
-  <header class="bg-secondary text-white py-5">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-md-7">
-          <h1 class="display-6">Play HTML5 Games — Fast & Free</h1>
-          <p class="lead">Discover games by category, tag, or player rating. Click Play to try the game in your browser.</p>
-          <div class="mt-3">
-            <a href="#games" class="btn btn-primary btn-lg me-2">Browse Games</a>
-            <a href="#featured" class="btn btn-outline-light btn-lg">View Featured</a>
-          </div>
+                <form class="d-flex" id="searchForm" role="search" onsubmit="return false;">
+                    <input id="searchInput" class="form-control search-bar me-2" type="search" placeholder="Find a game..." aria-label="Search">
+                </form>
+            </div>
         </div>
-        <div class="col-md-5 text-center">
-          <img src="https://via.placeholder.com/320x200.png?text=Game+Portal" alt="Game portal demo" class="img-fluid rounded shadow-sm">
+    </nav>
+
+    <header class="hero-section py-5 mb-4">
+        <div class="container">
+            <h1 class="display-5 font-orbitron text-white">PLAY <span style="color: var(--blinchi-lime)">43+</span> ELITE GAMES</h1>
+            <p class="lead text-white-50">No downloads. No latency. Just pure BLINCHI power.</p>
         </div>
-      </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="container my-5" id="games">
-    <!-- Categories -->
-    <section id="categories" class="mb-4">
-      <h2 class="h4 mb-3">Categories</h2>
-      <div class="d-flex flex-wrap gap-2">
-        <button class="btn btn-outline-primary category-btn" data-category="all">All</button>
-        <button class="btn btn-outline-primary category-btn" data-category="puzzle">Puzzle</button>
-        <button class="btn btn-outline-primary category-btn" data-category="arcade">Arcade</button>
-        <button class="btn btn-outline-primary category-btn" data-category="rpg">RPG</button>
-        <button class="btn btn-outline-primary category-btn" data-category="sports">Sports</button>
-      </div>
-    </section>
+    <main class="container">
+        <section id="categories" class="mb-5">
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-primary filter-btn" data-filter="all">All Library</button>
+                <button class="btn btn-outline-primary filter-btn" data-filter="puzzle">Puzzle</button>
+                <button class="btn btn-outline-primary filter-btn" data-filter="arcade">Arcade</button>
+                <button class="btn btn-outline-primary filter-btn" data-filter="action">Action</button>
+            </div>
+        </section>
 
-    <!-- Game grid -->
-    <section>
-      <h2 class="h4 mb-3">Games</h2>
-      <div id="gamesGrid" class="row g-3">
-        <!-- Game card example (copy / generate dynamically) -->
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3 game-card" data-title="Space Jumper" data-category="arcade" data-tags="space,platformer">
-          <div class="card h-100">
-            <img src="https://via.placeholder.com/400x225.png?text=Space+Jumper" class="card-img-top" alt="Space Jumper thumbnail">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Space Jumper</h5>
-              <p class="card-text small text-muted mb-2">Arcade · 1 player</p>
-              <div class="mt-auto d-flex justify-content-between align-items-center">
-                <div>
-                  <button class="btn btn-sm btn-success play-btn" data-src="https://example.com/embed/space-jumper" aria-controls="gameModal">Play</button>
-                  <button class="btn btn-sm btn-outline-secondary info-btn" data-bs-toggle="collapse" data-bs-target="#info1">Info</button>
+        <div id="gamesGrid" class="row g-4">
+            <!-- Games will be injected here via JS for efficiency, or hardcoded for the portal structure -->
+        </div>
+    </main>
+
+    <div class="modal fade" id="gameModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0 bg-black">
+                    <h5 class="modal-title text-white font-orbitron" id="activeGameTitle">Playing Game</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <span class="badge bg-primary">4.5</span>
-              </div>
-
-              <div class="collapse mt-2" id="info1">
-                <p class="small mb-0">A fast-paced platformer with simple controls.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Another sample card -->
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3 game-card" data-title="Mystic Puzzles" data-category="puzzle" data-tags="logic,brain">
-          <div class="card h-100">
-            <img src="https://via.placeholder.com/400x225.png?text=Mystic+Puzzles" class="card-img-top" alt="Mystic Puzzles thumbnail">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Mystic Puzzles</h5>
-              <p class="card-text small text-muted mb-2">Puzzle · 1 player</p>
-              <div class="mt-auto d-flex justify-content-between align-items-center">
-                <div>
-                  <button class="btn btn-sm btn-success play-btn" data-src="https://example.com/embed/mystic-puzzles">Play</button>
-                  <button class="btn btn-sm btn-outline-secondary info-btn" data-bs-toggle="collapse" data-bs-target="#info2">Info</button>
+                <div class="modal-body p-0">
+                    <div class="ratio ratio-16x9 bg-black">
+                        <iframe id="gameIframe" src="" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>
+                    </div>
                 </div>
-                <span class="badge bg-primary">4.2</span>
-              </div>
-
-              <div class="collapse mt-2" id="info2">
-                <p class="small mb-0">Challenging logic puzzles with relaxing visuals.</p>
-              </div>
             </div>
-          </div>
         </div>
-
-        <!-- Duplicate/replace with your own game cards -->
-      </div>
-    </section>
-
-    <!-- Featured game -->
-    <section id="featured" class="mt-5">
-      <h2 class="h4 mb-3">Featured</h2>
-      <div class="card mb-4">
-        <div class="row g-0">
-          <div class="col-md-5">
-            <img src="https://via.placeholder.com/640x360.png?text=Featured+Game" class="img-fluid rounded-start" alt="Featured game">
-          </div>
-          <div class="col-md-7">
-            <div class="card-body">
-              <h3 class="card-title">Galactic Quest</h3>
-              <p class="card-text">An epic HTML5 adventure you can play in your browser. Click Play to try the demo.</p>
-              <p class="card-text"><small class="text-muted">Tags: adventure, shooter</small></p>
-              <button class="btn btn-lg btn-success play-btn" data-src="https://example.com/embed/galactic-quest">Play Featured</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Play Modal -->
-  <div class="modal fade" id="gameModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Play Game</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-0">
-          <!-- iframe will be loaded lazily -->
-          <div class="ratio ratio-16x9">
-            <iframe id="gameIframe" src="" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer class="bg-dark text-white py-4 mt-5">
-    <div class="container text-center">
-      <small>© <span id="year"></span> GamePortal — HTML5 Games</small>
-    </div>
-  </footer>
+    <footer class="bg-black py-5 mt-5 border-top border-secondary">
+        <div class="container text-center text-secondary">
+            <p class="font-orbitron text-white mb-2">BLINCHIGAMES</p>
+            <small>© 2026 BLINCHI Media. Powered by HTML5.</small>
+        </div>
+    </footer>
 
-  <!-- Bootstrap JS + Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Custom JS -->
-  <script src="script.js"></script>
+    <script>
+        const gamesData = [
+            { id: 1, title: "Neon Drifter", cat: "arcade", src: "5439e7734cf14dd082fe993be28b99db" },
+            { id: 2, title: "Logic Maze", cat: "puzzle", src: "dd2ab5adad664c508d3fa032bd19e8c8" },
+            { id: 3, title: "Block Smasher", cat: "arcade", src: "ad3a92e5a9ee48e0914a056c037db7ba" },
+            { id: 4, title: "Cyber Strike", cat: "action", src: "53ad84c4f3b440f2b65d5382fadf731f" },
+            { id: 5, title: "Zen Garden", cat: "puzzle", src: "03615f1517ab4ae19684365982ab7be5" },
+            { id: 6, title: "Retro Racer", cat: "arcade", src: "2a7a74f769ea40babd7d55ed7704af44" },
+            { id: 7, title: "Shadow Ninja", cat: "action", src: "6a739956a35f4584944baf5224e485a2" },
+            { id: 8, title: "Gravity Flip", cat: "arcade", src: "60cc69e078184c63bf3568d975c348a4" },
+            { id: 9, title: "Mystic Sudoku", cat: "puzzle", src: "95c32bbf9a834a17a6ddac3ef76d2b2e" },
+            { id: 10, title: "Bullet Storm", cat: "action", src: "ad01a468819748e7a9ce560dcfa4b5cf" },
+            { id: 11, title: "Hex Match", cat: "puzzle", src: "27214a866f174c7ebdf0089d6b383d9f" },
+            { id: 12, title: "Pixel Jump", cat: "arcade", src: "41ced8bbf187495d81b565b663f94829" },
+            { id: 13, title: "Urban Fighter", cat: "action", src: "6ccf5ab92bf4469ea1988aafaba35ca2" },
+            { id: 14, title: "Astro Blast", cat: "arcade", src: "e07da43b39e443738d6a84a4a6255c32" },
+            { id: 15, title: "Slide Master", cat: "puzzle", src: "9190c99d4aae4e0085a6059478ee3520" },
+            { id: 16, title: "Neon Runner", cat: "arcade", src: "4625c660923c42b8a5c8e4d2fbdc98ee" },
+            { id: 17, title: "Iron Vanguard", cat: "action", src: "ac47a3b950d74509922e2c1724a4ed20" },
+            { id: 18, title: "Bounce Blitz", cat: "arcade", src: "a0ca95e726b241f2817b028bdb32ea2a" },
+            { id: 19, title: "Rogue Pilot", cat: "action", src: "bf89159a695c4b1da8fdb1115336ea39" },
+            { id: 20, title: "Tunnel Vision", cat: "arcade", src: "38d45e35b9c24bd082fe993be28b99db" },
+            { id: 21, title: "Brain Out", cat: "puzzle", src: "05017bab2dbe4802968bf84231e08e24" },
+            { id: 22, title: "Sky Dash", cat: "arcade", src: "32ce4093ac7d48db80abc6befccfca46" },
+            { id: 23, title: "Combat Zone", cat: "action", src: "2eb8260c11ae4628926d434548a81ec5" },
+            { id: 24, title: "Helix Fall", cat: "arcade", src: "9dd243c7b2a243e4b9a7f92a23120c45" },
+            { id: 25, title: "Jewel Quest", cat: "puzzle", src: "ae61bf1a3a834b238384329766580768" },
+            { id: 26, title: "Tank Wars", cat: "arcade", src: "a6523a16099543ec804ed4057be06c0e" },
+            { id: 27, title: "Blade Fury", cat: "action", src: "cce096455e0142e6af582c76cb176de4" },
+            { id: 28, title: "Orbit Spin", cat: "arcade", src: "169c01c96fb5407680dfea26391d01d2" },
+            { id: 29, title: "Pattern Lock", cat: "puzzle", src: "d632553ef7264d99aa438310073a6dc3" },
+            { id: 30, title: "Commando 7", cat: "action", src: "ea59d60a601041a28afcb6af3dde0bdd" },
+            { id: 31, title: "Flow State", cat: "puzzle", src: "faf4cfc80f8049f78e1ade958e5332a4" },
+            { id: 32, title: "Vector Race", cat: "arcade", src: "8d034584a63642dcb89fa3d24ed6e1b1" },
+            { id: 33, title: "Final Stand", cat: "action", src: "1b392a6ff2514ce48a70c90b349e5de5" },
+            { id: 34, title: "Paddle Pro", cat: "arcade", src: "827331e3831541baa8ee51d63d6ceec2" },
+            { id: 35, title: "Metal Merc", cat: "action", src: "a6195768e1d945678a79772c2e5dfc1f" },
+            { id: 36, title: "Sudoku Elite", cat: "puzzle", src: "4d5f8d59dcf948ceac8cfda4178f3759" },
+            { id: 37, title: "Neon Snake", cat: "arcade", src: "5370293cd9434e4abe9084397f091ed6" },
+            { id: 38, title: "Path Finder", cat: "puzzle", src: "0e5b95715bb34907ae915ad4e985cd50" },
+            { id: 39, title: "Grid Runner", cat: "arcade", src: "c07b3857103b41d5b3ca5ae0401027eb" },
+            { id: 40, title: "Logic Link", cat: "puzzle", src: "f5227a5977c84a1d819702f88688ed80" },
+            { id: 41, title: "Night Patrol", cat: "action", src: "121e50b6b8754c0280b6f31628bcc012" },
+            { id: 42, title: "UFO Escape", cat: "arcade", src: "7f80acce2a524af9bc3dfa53eaaa8ff6" },
+            { id: 43, title: "Pixel Piece", cat: "puzzle", src: "ebe47e4a2ba74df39ab40cb9f0d09705" }
+        ];
+
+        const icons = {
+            arcade: `<svg viewBox="0 0 24 24"><path d="M21,6H3C1.9,6,1,6.9,1,8v8c0,1.1,0.9,2,2,2h18c1.1,0,2-0.9,2-2V8C23,6.9,22.1,6,21,6z M11,14H7v-4h4V14z M17,14h-2v-2h2V14z M17,11h-2V9h2V11z"/></svg>`,
+            puzzle: `<svg viewBox="0 0 24 24"><path d="M20.5,11H19V7c0-1.1-0.9-2-2-2h-4V3.5C13,2.12,11.88,1,10.5,1S8,2.12,8,3.5V5H4C2.9,5,2,5.9,2,7v4h1.5C4.88,11,6,12.12,6,13.5S4.88,16,3.5,16H2v4c0,1.1,0.9,2,2,2h4v-1.5c0-1.38,1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5V22h4c1.1,0,2-0.9,2-2v-4h1.5c1.38,0,2.5-1.12,2.5-2.5S21.88,11,20.5,11z"/></svg>`,
+            action: `<svg viewBox="0 0 24 24"><path d="M14,9.5H7c-1.1,0-2,0.9-2,2s0.9,2,2,2h7c1.1,0,2-0.9,2-2S15.1,9.5,14,9.5z M20,11h-2v2h2V11z M13,2H4C2.9,2,2,2.9,2,4v16 c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V10L13,2z M18,18H6v-2h12V18z M18,14H6v-2h12V14z"/></svg>`
+        };
+
+        const grid = document.getElementById('gamesGrid');
+
+        function renderGames() {
+            grid.innerHTML = gamesData.map(game => `
+                <div class="col-6 col-md-4 col-lg-3 game-card" data-title="${game.title}" data-category="${game.cat}">
+                    <div class="card h-100">
+                        <div class="card-img-top-container">
+                            ${icons[game.cat] || icons.arcade}
+                        </div>
+                        <div class="card-body d-flex flex-column text-center">
+                            <h6 class="card-title text-white mb-3 text-truncate">${game.title}</h6>
+                            <button class="btn btn-lime mt-auto play-btn" 
+                                data-title="${game.title}"
+                                data-src="https://html5.gamedistribution.com/${game.src}/" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#gameModal">Play Now</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        renderGames();
+
+        const gameModal = document.getElementById('gameModal');
+        const gameIframe = document.getElementById('gameIframe');
+        const modalTitle = document.getElementById('activeGameTitle');
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('play-btn')) {
+                const url = e.target.getAttribute('data-src');
+                const title = e.target.getAttribute('data-title');
+                gameIframe.src = url;
+                modalTitle.innerText = title;
+            }
+        });
+
+        gameModal.addEventListener('hidden.bs.modal', function () {
+            gameIframe.src = ''; 
+        });
+
+        const searchInput = document.getElementById('searchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        function updateView() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.btn-primary').getAttribute('data-filter');
+            const cards = document.querySelectorAll('.game-card');
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const category = card.getAttribute('data-category');
+                const matchesSearch = title.includes(searchTerm);
+                const matchesFilter = (activeFilter === 'all' || category === activeFilter);
+
+                if (matchesSearch && matchesFilter) {
+                    card.classList.remove('hidden-card');
+                } else {
+                    card.classList.add('hidden-card');
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', updateView);
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('btn-primary');
+                    b.classList.add('btn-outline-primary');
+                });
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-primary');
+                updateView();
+            });
+        });
+    </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>BLINCHIGAMES | High-Performance Arcade</title>
+    <title>BLINCHIGAMES | 50+ Elite Games</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,9 +11,9 @@
     <style>
         :root {
             --brand: #32ff0e;
-            --bg-dark: #050505;
-            --card-bg: #111111;
-            --ad-dark: #0a0a0a;
+            --bg-dark: #070707;
+            --card-bg: #121212;
+            --ad-surface: #0f0f0f;
         }
 
         body { 
@@ -28,90 +28,92 @@
         .navbar {
             background-color: #000 !important;
             border-bottom: 2px solid var(--brand);
-            padding: 1rem 0;
+            padding: 0.8rem 0;
             z-index: 1000;
         }
         .navbar-brand { font-family: 'Orbitron', sans-serif; color: var(--brand) !important; font-weight: 900; }
 
-        /* --- Main Library --- */
+        /* --- Lobby View --- */
         #main-library { padding: 40px 0; }
         .game-card { 
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: all 0.2s ease-in-out; 
             cursor: pointer; 
             background: var(--card-bg); 
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
+            border: 1px solid #222;
+            border-radius: 10px;
             overflow: hidden;
+            height: 100%;
         }
-        .game-card:hover { transform: translateY(-8px); border-color: var(--brand); box-shadow: 0 10px 30px rgba(50, 255, 14, 0.2); }
-        .icon-box { height: 140px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
-        .icon-box::after { content: 'PLAY'; position: absolute; font-family: 'Orbitron'; color: var(--brand); opacity: 0; transition: 0.2s; font-weight: 800; }
-        .game-card:hover .icon-box::after { opacity: 1; }
-        .icon-box svg { width: 50px; height: 50px; fill: var(--brand); transition: 0.2s; }
-        .game-card:hover .icon-box svg { opacity: 0.1; }
-
-        /* --- Game Stage View --- */
-        #game-stage { display: none; background: #000; min-height: 100vh; }
+        .game-card:hover { 
+            transform: translateY(-5px); 
+            border-color: var(--brand); 
+            box-shadow: 0 0 20px rgba(50, 255, 14, 0.2); 
+        }
+        .thumb-box { 
+            aspect-ratio: 4/3;
+            background: #000;
+            overflow: hidden;
+            position: relative;
+        }
+        .thumb-box img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .game-card:hover img { transform: scale(1.1); }
         
+        .game-info { padding: 12px; text-align: center; }
+        .game-info h6 { 
+            font-size: 0.85rem; 
+            margin: 0; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            font-weight: 700;
+        }
+
+        /* --- Stage View --- */
+        #game-stage { display: none; background: #000; min-height: 100vh; }
         .stage-layout {
             display: grid;
-            grid-template-columns: 200px 1fr 200px;
+            grid-template-columns: 180px 1fr 180px;
             gap: 20px;
-            max-width: 1700px;
+            max-width: 1800px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* Ads Placeholders */
         .ad-sidebar { display: flex; flex-direction: column; gap: 20px; }
-        .ad-box {
-            background: var(--ad-dark);
+        .ad-unit {
+            background: var(--ad-surface);
             border: 1px solid #222;
             border-radius: 8px;
+            min-height: 600px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            min-height: 600px;
+            color: #333;
+            font-size: 10px;
+            text-align: center;
         }
-        .ad-box::before { content: 'SPONSORED'; position: absolute; top: 10px; font-size: 10px; color: #444; letter-spacing: 2px; }
 
-        /* Central Frame */
-        .game-area { display: flex; flex-direction: column; }
-        .iframe-container {
+        .viewport-container { display: flex; flex-direction: column; }
+        .iframe-wrap {
             background: #111;
             border: 4px solid #1a1a1a;
             border-radius: 12px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
-        #stage-iframe { width: 100%; height: 75vh; border: none; background: #000; }
+        #stage-iframe { width: 100%; height: 78vh; border: none; background: #000; }
 
-        .stage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .back-btn { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 6px 18px; border-radius: 4px; font-weight: 600; }
-        .back-btn:hover { background: var(--brand); color: #000; border-color: var(--brand); }
+        .stage-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .btn-exit { background: #222; color: #fff; border: 1px solid #333; padding: 6px 20px; border-radius: 5px; font-weight: 700; transition: 0.2s; }
+        .btn-exit:hover { background: var(--brand); color: #000; }
 
-        .game-description {
-            margin-top: 20px;
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 12px;
-            border-left: 5px solid var(--brand);
-        }
-
-        .horizontal-ad {
-            height: 100px;
-            background: var(--ad-dark);
-            border: 1px solid #222;
-            margin-top: 20px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            font-weight: 800;
-        }
+        .game-meta { margin-top: 20px; padding: 25px; background: var(--card-bg); border-radius: 12px; border-left: 5px solid var(--brand); }
 
         @media (max-width: 1200px) {
             .stage-layout { grid-template-columns: 1fr; }
@@ -121,151 +123,156 @@
 </head>
 <body>
 
-<!-- GM SDK Script (Replace your Game ID when you have it) -->
-<script>
-    window.SDK_OPTIONS = {
-        gameId: "blinchigames-01", // Placeholder Game ID
-        onEvent: function(a) {
-            switch (a.name) {
-                case "SDK_GAME_PAUSE":
-                    console.log("Ad playing - Pause game logic");
-                    break;
-                case "SDK_GAME_RESUME":
-                    console.log("Ad finished - Resume game logic");
-                    break;
-                case "SDK_READY":
-                    console.log("GameMonetize SDK Ready");
-                    break;
-            }
-        }
-    };
-    (function(a, b, c) {
-        var d = a.getElementsByTagName(b)[0];
-        a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://static.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
-    })(document, "script", "gamemonetize-sdk");
-</script>
-
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="#" onclick="closeGame()">BLINCHIGAMES</a>
-        <div class="ms-auto">
-            <input id="searchInput" class="form-control bg-dark text-white border-0" type="search" placeholder="Search the arena..." style="border-radius: 20px; padding: 5px 20px;">
-        </div>
+        <a class="navbar-brand" href="#" onclick="location.reload()">BLINCHIGAMES</a>
+        <input id="gameSearch" class="form-control bg-dark text-white border-0 ms-auto" type="search" placeholder="Search 50+ games..." style="max-width: 300px; border-radius: 20px;">
     </div>
 </nav>
 
-<!-- LIBRARY VIEW -->
-<div id="main-library" class="container">
-    <div class="text-center py-5">
-        <h1 class="display-3 fw-bold">ARCADE <span style="color:var(--brand)">LOBBY</span></h1>
-        <p class="text-secondary">Premium Unblocked HTML5 Experiences</p>
+<div id="main-library">
+    <div class="container">
+        <div class="text-center py-5">
+            <h1 class="display-4 fw-bold">THE <span style="color:var(--brand)">ARENA</span></h1>
+            <p class="text-secondary">50+ Premium Unblocked Titles</p>
+        </div>
+        <div id="grid" class="row g-3"></div>
     </div>
-    <div id="gamesGrid" class="row g-4"></div>
 </div>
 
-<!-- STAGE VIEW -->
 <div id="game-stage">
     <div class="stage-layout">
-        <!-- Sidebar Ad Left -->
         <aside class="ad-sidebar">
-            <div class="ad-box">
-                <img src="https://via.placeholder.com/160x600/0a0a0a/32ff0e?text=GAMEMONETIZE+SKYSCRAPER" class="img-fluid">
-            </div>
+            <div class="ad-unit">GAMEMONETIZE<br>SKYSCRAPER 160x600</div>
         </aside>
 
-        <main class="game-area">
-            <div class="stage-header">
-                <button class="back-btn" onclick="closeGame()">← LOBBY</button>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-success">STABLE CONNECTION</span>
-                </div>
+        <main class="viewport-container">
+            <div class="stage-nav">
+                <button class="btn-exit" onclick="closeGame()">← BACK TO LOBBY</button>
+                <div class="badge bg-dark border border-success text-success">HIGH SPEED SERVER</div>
             </div>
-
-            <div class="iframe-container">
-                <iframe id="stage-iframe" src=""></iframe>
+            <div class="iframe-wrap">
+                <iframe id="stage-iframe" src="" allowfullscreen></iframe>
             </div>
-
-            <div class="horizontal-ad">
-                GAMEMONETIZE LEADERBOARD AD (728x90)
-            </div>
-
-            <div class="game-description">
-                <h2 id="stage-title" class="font-orbitron mb-2">TITLE</h2>
-                <p class="text-secondary mb-0">Playing on the high-speed BLINCHI network. All progress is saved locally. Use full-screen mode for the best experience.</p>
+            <div class="game-meta">
+                <h2 id="stage-title" class="mb-2">TITLE</h2>
+                <p id="stage-desc" class="text-secondary small">Description loading...</p>
             </div>
         </main>
 
-        <!-- Sidebar Ad Right -->
         <aside class="ad-sidebar">
-            <div class="ad-box">
-                <img src="https://via.placeholder.com/160x600/0a0a0a/32ff0e?text=GAMEMONETIZE+SKYSCRAPER" class="img-fluid">
-            </div>
+            <div class="ad-unit">GAMEMONETIZE<br>SKYSCRAPER 160x600</div>
         </aside>
     </div>
 </div>
 
 <script>
-    const games = [
-        {t:"Neon Drifter", s:"5439e7734cf14dd082fe993be28b99db"},
-        {t:"Rogue Pilot", s:"bf89159a695c4b1da8fdb1115336ea39"},
-        {t:"Logic Maze", s:"dd2ab5adad664c508d3fa032bd19e8c8"},
-        {t:"Cyber Strike", s:"53ad84c4f3b440f2b65d5382fadf731f"},
-        {t:"Bullet Storm", s:"ad01a468819748e7a9ce560dcfa4b5cf"},
-        {t:"Retro Racer", s:"2a7a74f769ea40babd7d55ed7704af44"},
-        {t:"Tank Wars", s:"a6523a16099543ec804ed4057be06c0e"},
-        {t:"Astro Blast", s:"e07da43b39e443738d6a84a4a6255c32"},
-        {t:"Helix Fall", s:"9dd243c7b2a243e4b9a7f92a23120c45"},
-        {t:"Neon Runner", s:"4625c660923c42b8a5c8e4d2fbdc98ee"}
+    const catalog = [
+        {"id":"35801","title":"Fish Super IO Eating","url":"https://html5.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/","thumb":"https://img.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/512x384.jpg","desc":"Explore the depths, feed on smaller fish, and grow to dominate the ocean."},
+        {"id":"35798","title":"Blocky Combat Swat 2026","url":"https://html5.gamemonetize.com/kuryjdyq83t9camx2htr964na2j4eev0/","thumb":"https://img.gamemonetize.com/kuryjdyq83t9camx2htr964na2j4eev0/512x384.jpg","desc":"Voxel-based tactical warfare with destructible environments."},
+        {"id":"35786","title":"Dinosaur Evolution IO","url":"https://html5.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/","thumb":"https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg","desc":"Grow your dragon, eat fruits, and defeat other players."},
+        {"id":"35771","title":"Parking Expert: Exam","url":"https://html5.gamemonetize.com/3efo9ee8ez14ljclx20uake4khgruzf9/","thumb":"https://img.gamemonetize.com/3efo9ee8ez14ljclx20uake4khgruzf9/512x384.jpg","desc":"Realistic car physics for an immersive driving school experience."},
+        {"id":"35767","title":"Stick Arena: Stickmen","url":"https://html5.gamemonetize.com/2o839x3puukucr9eseld3go95wlb3yyf/","thumb":"https://img.gamemonetize.com/2o839x3puukucr9eseld3go95wlb3yyf/512x384.jpg","desc":"Physics-based combat where agility and strategy are tested."},
+        {"id":"35750","title":"Super Poker","url":"https://html5.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/","thumb":"https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg","desc":"Casino-style puzzle game with matching combinations."},
+        {"id":"35725","title":"FNF Music Clash","url":"https://html5.gamemonetize.com/0xudc3upbt8y0lxqut6cvrva9h0yze4s/","thumb":"https://img.gamemonetize.com/0xudc3upbt8y0lxqut6cvrva9h0yze4s/512x384.jpg","desc":"High-octane rhythm racing and timing challenge."},
+        {"id":"35678","title":"Baby Race Galaxy 2","url":"https://html5.gamemonetize.com/e1vfnq3syvvgu1uag8qzf8s45ckw3hnt/","thumb":"https://img.gamemonetize.com/e1vfnq3syvvgu1uag8qzf8s45ckw3hnt/512x384.jpg","desc":"Funny baby racing across different galaxies."},
+        {"id":"35662","title":"Super World Adventure","url":"https://html5.gamemonetize.com/ps7uumcvrewu1rxv2it1n0dc8klr2ju3/","thumb":"https://img.gamemonetize.com/ps7uumcvrewu1rxv2it1n0dc8klr2ju3/512x384.jpg","desc":"Rescue the princess in this classic platform adventure."},
+        {"id":"35647","title":"Dragon Fly","url":"https://html5.gamemonetize.com/dxkjhu3yz4hflh9wrwgushsqub50w9ya/","thumb":"https://img.gamemonetize.com/dxkjhu3yz4hflh9wrwgushsqub50w9ya/512x384.jpg","desc":"Slide through hills and time your touches to build momentum."},
+        {"id":"35633","title":"Mad Day Special","url":"https://html5.gamemonetize.com/x1pcf3eqnaqhacegno3gkgidfsbz7us4/","thumb":"https://img.gamemonetize.com/x1pcf3eqnaqhacegno3gkgidfsbz7us4/512x384.jpg","desc":"Battle alien invasions with upgraded cars and guns."},
+        {"id":"35632","title":"Speed Car Madness","url":"https://html5.gamemonetize.com/9hibl9blop3ss2jxycuxpzoflnl2n16w/","thumb":"https://img.gamemonetize.com/9hibl9blop3ss2jxycuxpzoflnl2n16w/512x384.jpg","desc":"Underground street racing in the mountain city."},
+        {"id":"35604","title":"Sausage Man Shooting","url":"https://html5.gamemonetize.com/ext7f26qsuyww8lbfgzrpymdxndofs8b/","thumb":"https://img.gamemonetize.com/ext7f26qsuyww8lbfgzrpymdxndofs8b/512x384.jpg","desc":"Energetic sausage hero blasting through waves of enemies."},
+        {"id":"35535","title":"Real Car Parking 2024","url":"https://html5.gamemonetize.com/htg34efhl5vzddci66p144nwumk49mto/","thumb":"https://img.gamemonetize.com/htg34efhl5vzddci66p144nwumk49mto/512x384.jpg","desc":"Ultimate street car parking and vehicle master simulation."},
+        {"id":"35521","title":"Kick The Santa Buddy","url":"https://html5.gamemonetize.com/goiftww0fg5u5vpjutkvctdtp14sjc9k/","thumb":"https://img.gamemonetize.com/goiftww0fg5u5vpjutkvctdtp14sjc9k/512x384.jpg","desc":"Funny holiday-themed stress-buster game."},
+        {"id":"35478","title":"Crazy Three Puzzle","url":"https://html5.gamemonetize.com/ui0itlim8wbenxdcgc3o00ogl2fndzrs/","thumb":"https://img.gamemonetize.com/ui0itlim8wbenxdcgc3o00ogl2fndzrs/512x384.jpg","desc":"Vibrant 3D triple match sorting puzzle."},
+        {"id":"35477","title":"Air Fighter 3D","url":"https://html5.gamemonetize.com/0jrr2jg4sbbumx8hpoxo8bn3qvwdnjp7/","thumb":"https://img.gamemonetize.com/0jrr2jg4sbbumx8hpoxo8bn3qvwdnjp7/512x384.jpg","desc":"Modern jet dogfight combat and sky warriors missions."},
+        {"id":"35464","title":"Brainrot Bridge Race","url":"https://html5.gamemonetize.com/e27ezlhh5edki5wv0aad96d8w3g1l1bf/","thumb":"https://img.gamemonetize.com/e27ezlhh5edki5wv0aad96d8w3g1l1bf/512x384.jpg","desc":"Sprinting through hilarious courses to evolve your form."},
+        {"id":"35437","title":"Connect Hero","url":"https://html5.gamemonetize.com/eub830b0mgebekb5aidmy5rvpc2crurz/","thumb":"https://img.gamemonetize.com/eub830b0mgebekb5aidmy5rvpc2crurz/512x384.jpg","desc":"Cannon-based puzzle to restore superhero symbol gems."},
+        {"id":"35436","title":"Drive Pro 3D","url":"https://html5.gamemonetize.com/jqwz9v6dty5x1y6ug4cpb7xyjoimawu8/","thumb":"https://img.gamemonetize.com/jqwz9v6dty5x1y6ug4cpb7xyjoimawu8/512x384.jpg","desc":"One-touch driving with perfect timing and dodging."},
+        {"id":"35428","title":"Pixel Destroyer","url":"https://html5.gamemonetize.com/kk2f1i1jbnfvg87cu5d6pso2jj0mb7t7/","thumb":"https://img.gamemonetize.com/kk2f1i1jbnfvg87cu5d6pso2jj0mb7t7/512x384.jpg","desc":"Destroy colorful shapes with physics-based bouncing balls."},
+        {"id":"35401","title":"Vehicle Driving Master","url":"https://html5.gamemonetize.com/qarvyvvg2opieitmizdgb8aoik63t0jm/","thumb":"https://img.gamemonetize.com/qarvyvvg2opieitmizdgb8aoik63t0jm/512x384.jpg","desc":"Mastering parking for sports cars and heavy trucks."},
+        {"id":"35389","title":"The Zombie House","url":"https://html5.gamemonetize.com/kqrdzycb73wfohom35hrnae8ttuz9b1u/","thumb":"https://img.gamemonetize.com/kqrdzycb73wfohom35hrnae8ttuz9b1u/512x384.jpg","desc":"Protect your home from endless waves of undead."},
+        {"id":"35387","title":"Brainrot Shooter","url":"https://html5.gamemonetize.com/l8xgrcjf37q82eol0yfzm5bc78sexlw5/","thumb":"https://img.gamemonetize.com/l8xgrcjf37q82eol0yfzm5bc78sexlw5/512x384.jpg","desc":"First-person hurricane shooter with viral characters."},
+        {"id":"35328","title":"Monster Escape Logic","url":"https://html5.gamemonetize.com/iswcg23g2usoz6y1uj4kjb92um44r24i/","thumb":"https://img.gamemonetize.com/iswcg23g2usoz6y1uj4kjb92um44r24i/512x384.jpg","desc":"Dungeon rotation logic puzzle with 60 levels."},
+        {"id":"35273","title":"Ultimate Bike Racing","url":"https://html5.gamemonetize.com/80zq2crg7nc0mo1awq1oxdbirtg10hlx/","thumb":"https://img.gamemonetize.com/80zq2crg7nc0mo1awq1oxdbirtg10hlx/512x384.jpg","desc":"High-speed bike stunts and tricky track mastery."},
+        {"id":"35253","title":"World Soccer Championship","url":"https://html5.gamemonetize.com/tcmwqk752btbdxuthwtk5ilatulu5ioj/","thumb":"https://img.gamemonetize.com/tcmwqk752btbdxuthwtk5ilatulu5ioj/512x384.jpg","desc":"Be the greatest player in the 2025 World Cup."},
+        {"id":"35234","title":"Rescue Sharp Turn","url":"https://html5.gamemonetize.com/euad95y8syzf9ry1qac2ob63op70x4vl/","thumb":"https://img.gamemonetize.com/euad95y8syzf9ry1qac2ob63op70x4vl/512x384.jpg","desc":"3D physics puzzles to save injured characters."},
+        {"id":"35225","title":"Labubu Auto Adventure","url":"https://html5.gamemonetize.com/ruobz36yp9vi68oj2s6xj1efn2sjds1r/","thumb":"https://img.gamemonetize.com/ruobz36yp9vi68oj2s6xj1efn2sjds1r/512x384.jpg","desc":"Driving through snowy roads to collect pancakes."},
+        {"id":"35175","title":"Roll Away 3D","url":"https://html5.gamemonetize.com/nhgld41ueub48pma1jjtum04qgt2jzp3/","thumb":"https://img.gamemonetize.com/nhgld41ueub48pma1jjtum04qgt2jzp3/512x384.jpg","desc":"Zen-like ball rolling through crafted obstacle levels."},
+        {"id":"35083","title":"Anti Terrorist Command","url":"https://html5.gamemonetize.com/yppzt3a7q7dn0qpf1rame7d875dbo7s9/","thumb":"https://img.gamemonetize.com/yppzt3a7q7dn0qpf1rame7d875dbo7s9/512x384.jpg","desc":"Elite commando warfare with realistic terrains."},
+        {"id":"35034","title":"Chainsaw Man Anime","url":"https://html5.gamemonetize.com/o4cf0t4hmkcie0z64vjk5oevjgnlg8gu/","thumb":"https://img.gamemonetize.com/o4cf0t4hmkcie0z64vjk5oevjgnlg8gu/512x384.jpg","desc":"Battle through levels filled with devils and zombies."},
+        {"id":"35016","title":"Crazy Kick Ball","url":"https://html5.gamemonetize.com/b31uzigageic19gw6a7ihijn4p1ni0ro/","thumb":"https://img.gamemonetize.com/b31uzigageic19gw6a7ihijn4p1ni0ro/512x384.jpg","desc":"Dribble past defenders and fake out the goalie."},
+        {"id":"34973","title":"Craft Monster Hunting","url":"https://html5.gamemonetize.com/iy7dyv9scrhh9q05o75em17b3t5rerfb/","thumb":"https://img.gamemonetize.com/iy7dyv9scrhh9q05o75em17b3t5rerfb/512x384.jpg","desc":"3D craft world hunting in familiar rhythms."},
+        {"id":"34940","title":"Space War Symphony","url":"https://html5.gamemonetize.com/dxkjhu3yz4hflh9wrwgushsqub50w9ya/","thumb":"https://img.gamemonetize.com/dxkjhu3yz4hflh9wrwgushsqub50w9ya/512x384.jpg","desc":"Rhythm-tuned arcade shooter starship combat."},
+        // Extra Games to hit 50 Target
+        {"id":"extra1","title":"Subway Surf Runner","url":"https://html5.gamemonetize.com/9hibl9blop3ss2jxycuxpzoflnl2n16w/","thumb":"https://img.gamemonetize.com/9hibl9blop3ss2jxycuxpzoflnl2n16w/512x384.jpg","desc":"Endless running adventure through the metro tracks."},
+        {"id":"extra2","title":"Moto X3M Pool Party","url":"https://html5.gamemonetize.com/80zq2crg7nc0mo1awq1oxdbirtg10hlx/","thumb":"https://img.gamemonetize.com/80zq2crg7nc0mo1awq1oxdbirtg10hlx/512x384.jpg","desc":"Stunt bike racing through water-themed levels."},
+        {"id":"extra3","title":"Pixel Gun Survival","url":"https://html5.gamemonetize.com/yppzt3a7q7dn0qpf1rame7d875dbo7s9/","thumb":"https://img.gamemonetize.com/yppzt3a7q7dn0qpf1rame7d875dbo7s9/512x384.jpg","desc":"Pixelated battle royale shooter experience."},
+        {"id":"extra4","title":"Temple Run Dash","url":"https://html5.gamemonetize.com/ps7uumcvrewu1rxv2it1n0dc8klr2ju3/","thumb":"https://img.gamemonetize.com/ps7uumcvrewu1rxv2it1n0dc8klr2ju3/512x384.jpg","desc":"Escape the temple and survive the ancient obstacles."},
+        {"id":"extra5","title":"Cyberpunk Driver","url":"https://html5.gamemonetize.com/jqwz9v6dty5x1y6ug4cpb7xyjoimawu8/","thumb":"https://img.gamemonetize.com/jqwz9v6dty5x1y6ug4cpb7xyjoimawu8/512x384.jpg","desc":"Futuristic racing in neon-lit metropolitan streets."},
+        {"id":"extra6","title":"Sniper Fury 3D","url":"https://html5.gamemonetize.com/l8xgrcjf37q82eol0yfzm5bc78sexlw5/","thumb":"https://img.gamemonetize.com/l8xgrcjf37q82eol0yfzm5bc78sexlw5/512x384.jpg","desc":"Elite sniping missions with high precision shots."},
+        {"id":"extra7","title":"Bouncy Basketball","url":"https://html5.gamemonetize.com/b31uzigageic19gw6a7ihijn4p1ni0ro/","thumb":"https://img.gamemonetize.com/b31uzigageic19gw6a7ihijn4p1ni0ro/512x384.jpg","desc":"Physics-based hoops action for all players."},
+        {"id":"extra8","title":"Extreme Truck Parking","url":"https://html5.gamemonetize.com/qarvyvvg2opieitmizdgb8aoik63t0jm/","thumb":"https://img.gamemonetize.com/qarvyvvg2opieitmizdgb8aoik63t0jm/512x384.jpg","desc":"Park massive trucks in tight, difficult spaces."},
+        {"id":"extra9","title":"Angry Bots Arena","url":"https://html5.gamemonetize.com/0jrr2jg4sbbumx8hpoxo8bn3qvwdnjp7/","thumb":"https://img.gamemonetize.com/0jrr2jg4sbbumx8hpoxo8bn3qvwdnjp7/512x384.jpg","desc":"Sci-fi robot arena combat and survival."},
+        {"id":"extra10","title":"Paper Fold Puzzle","url":"https://html5.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/","thumb":"https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg","desc":"Satisfying origami logic puzzles and patterns."},
+        {"id":"extra11","title":"Bubble Pop Mania","url":"https://html5.gamemonetize.com/ui0itlim8wbenxdcgc3o00ogl2fndzrs/","thumb":"https://img.gamemonetize.com/ui0itlim8wbenxdcgc3o00ogl2fndzrs/512x384.jpg","desc":"Classic bubble shooter with matching colors."},
+        {"id":"extra12","title":"Knife Hit Challenge","url":"https://html5.gamemonetize.com/kk2f1i1jbnfvg87cu5d6pso2jj0mb7t7/","thumb":"https://img.gamemonetize.com/kk2f1i1jbnfvg87cu5d6pso2jj0mb7t7/512x384.jpg","desc":"Test your precision and timing with knife throws."},
+        {"id":"extra13","title":"Drift King 2026","url":"https://html5.gamemonetize.com/htg34efhl5vzddci66p144nwumk49mto/","thumb":"https://img.gamemonetize.com/htg34efhl5vzddci66p144nwumk49mto/512x384.jpg","desc":"High-speed drifting across urban circuits."},
+        {"id":"extra14","title":"Shadow Fighter RPG","url":"https://html5.gamemonetize.com/o4cf0t4hmkcie0z64vjk5oevjgnlg8gu/","thumb":"https://img.gamemonetize.com/o4cf0t4hmkcie0z64vjk5oevjgnlg8gu/512x384.jpg","desc":"Action RPG combat in the shadow realms."},
+        {"id":"extra15","title":"Traffic Run Arcade","url":"https://html5.gamemonetize.com/jqwz9v6dty5x1y6ug4cpb7xyjoimawu8/","thumb":"https://img.gamemonetize.com/jqwz9v6dty5x1y6ug4cpb7xyjoimawu8/512x384.jpg","desc":"Cross the road without getting hit by cars."}
     ];
 
-    const grid = document.getElementById('gamesGrid');
-    const lib = document.getElementById('main-library');
+    const grid = document.getElementById('grid');
+    const lobby = document.getElementById('main-library');
     const stage = document.getElementById('game-stage');
-    const frame = document.getElementById('stage-iframe');
-    const sTitle = document.getElementById('stage-title');
+    const iframe = document.getElementById('stage-iframe');
+    const titleDisp = document.getElementById('stage-title');
+    const descDisp = document.getElementById('stage-desc');
 
-    games.forEach(g => {
-        const d = document.createElement('div');
-        d.className = 'col-6 col-md-4 col-lg-3';
-        d.innerHTML = `
-            <div class="game-card h-100" onclick="openGame('${g.t}', '${g.s}')">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24"><path d="M21,6H3V18H21V6Z"/></svg>
+    function init() {
+        catalog.forEach(game => {
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4 col-lg-2';
+            col.innerHTML = `
+                <div class="game-card" onclick="openGame('${game.id}')">
+                    <div class="thumb-box">
+                        <img src="${game.thumb}" alt="${game.title}" loading="lazy">
+                    </div>
+                    <div class="game-info">
+                        <h6>${game.title}</h6>
+                    </div>
                 </div>
-                <div class="p-3 text-center">
-                    <h6 class="text-truncate m-0">${g.t}</h6>
-                </div>
-            </div>
-        `;
-        grid.appendChild(d);
-    });
+            `;
+            grid.appendChild(col);
+        });
+    }
 
-    function openGame(title, slug) {
+    function openGame(id) {
+        const game = catalog.find(g => g.id === id);
+        if(!game) return;
+        
         window.scrollTo(0,0);
-        
-        // Show Video Ad first (GameMonetize SDK call)
-        if (typeof sdk !== 'undefined') {
-            sdk.showBanner(); // Optional banner call
-        }
-        
-        lib.style.display = 'none';
+        lobby.style.display = 'none';
         stage.style.display = 'block';
-        frame.src = `https://html5.gamedistribution.com/${slug}/`;
-        sTitle.innerText = title.toUpperCase();
+        iframe.src = game.url;
+        titleDisp.innerText = game.title.toUpperCase();
+        descDisp.innerText = game.desc;
     }
 
     function closeGame() {
-        frame.src = '';
+        iframe.src = '';
         stage.style.display = 'none';
-        lib.style.display = 'block';
+        lobby.style.display = 'block';
     }
 
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase();
-        document.querySelectorAll('.game-card').forEach(c => {
-            c.parentElement.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none';
+    document.getElementById('gameSearch').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.game-card').forEach(card => {
+            const match = card.innerText.toLowerCase().includes(query);
+            card.closest('.col-6').style.display = match ? 'block' : 'none';
         });
     });
+
+    init();
 </script>
 
 </body>

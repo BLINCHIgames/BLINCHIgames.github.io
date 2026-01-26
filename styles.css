@@ -1,38 +1,129 @@
-:root{
-  --brand: #0d6efd;
-  --muted: #6c757d;
+/* BLINCHIGAMES | Elite Portal Stylesheet
+Refined for high-contrast gaming UI
+*/
+
+:root {
+--brand: #32ff0e;         /* BLINCHI Lime /
+--muted: #666666;         / Subtle Gray /
+--bg-dark: #0a0a0a;       / Deep Black /
+--card-bg: #151515;       / Card Surface */
+--font-main: 'Inter', -apple-system, system-ui, sans-serif;
+--font-display: 'Orbitron', sans-serif;
 }
 
-body{
-  background: #f8f9fa;
-  color: #212529;
-  font-family: system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+body {
+background: var(--bg-dark);
+color: #ffffff;
+font-family: var(--font-main);
+margin: 0;
+-webkit-font-smoothing: antialiased;
 }
 
-.navbar-brand .badge{
-  font-weight:700;
-  padding: .45rem .5rem;
+/* Navbar & Brand */
+.navbar-brand {
+font-family: var(--font-display);
+letter-spacing: 1px;
 }
 
-.card .card-title{
-  margin-bottom:.3rem;
+.navbar-brand .badge {
+font-weight: 800;
+padding: .45rem .6rem;
+background-color: var(--brand);
+color: #000;
+text-transform: uppercase;
+border-radius: 4px;
 }
 
-/* small highlight for search results */
-.game-card.highlight{
-  box-shadow: 0 0 0 3px rgba(13,110,253,0.12);
-  transform: translateY(-2px);
-  transition: transform .12s ease, box-shadow .12s ease;
+/* Card Typography & Layout */
+.card {
+background: var(--card-bg);
+border: 1px solid #222;
+border-radius: 8px;
+overflow: hidden;
+}
+
+.card .card-title {
+margin-bottom: .3rem;
+font-weight: 700;
+font-size: 0.95rem;
+color: #ffffff;
+}
+
+/* Search Highlight & Hover State */
+.game-card {
+transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+/* The .highlight class logic you requested, updated for the brand */
+.game-card.highlight,
+.game-card:hover {
+box-shadow: 0 0 20px rgba(50, 255, 14, 0.25);
+transform: translateY(-4px);
+border-color: var(--brand);
+z-index: 10;
+}
+
+/* Icon Box for game placeholders */
+.icon-box {
+height: 130px;
+background: #000;
+display: flex;
+align-items: center;
+justify-content: center;
+border-bottom: 1px solid #222;
+}
+
+.icon-box svg {
+width: 45px;
+height: 45px;
+fill: var(--brand);
+filter: drop-shadow(0 0 5px rgba(50, 255, 14, 0.4));
+}
+
+/* Action Buttons */
+.btn-lime {
+background-color: var(--brand);
+color: #000;
+font-weight: 800;
+border: none;
+border-radius: 4px;
+padding: 10px;
+text-transform: uppercase;
+font-size: 0.75rem;
+transition: background 0.2s;
+}
+
+.btn-lime:hover {
+background-color: #ffffff;
+color: #000;
 }
 
 /* Responsive adjustments */
-@media (max-width:576px){
-  header .display-6{ font-size:1.4rem; }
+@media (max-width: 576px) {
+header .display-6 {
+font-size: 1.4rem;
+}
+
+.container {
+padding-left: 15px;
+padding-right: 15px;
+}
 }
 
 /* Ensure iframe fills modal nicely */
-.modal .ratio iframe{
-  width:100%;
-  height:100%;
-  border:0;
+.modal-content {
+background-color: #000;
+border: 1px solid var(--brand);
+}
+
+.modal .ratio iframe {
+width: 100%;
+height: 100%;
+border: 0;
+background: #000; /* Prevent white flash while loading */
+}
+
+/* Utility */
+.hidden-card {
+display: none !important;
 }

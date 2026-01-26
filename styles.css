@@ -1,0 +1,38 @@
+:root{
+  --brand: #0d6efd;
+  --muted: #6c757d;
+}
+
+body{
+  background: #f8f9fa;
+  color: #212529;
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+}
+
+.navbar-brand .badge{
+  font-weight:700;
+  padding: .45rem .5rem;
+}
+
+.card .card-title{
+  margin-bottom:.3rem;
+}
+
+/* small highlight for search results */
+.game-card.highlight{
+  box-shadow: 0 0 0 3px rgba(13,110,253,0.12);
+  transform: translateY(-2px);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width:576px){
+  header .display-6{ font-size:1.4rem; }
+}
+
+/* Ensure iframe fills modal nicely */
+.modal .ratio iframe{
+  width:100%;
+  height:100%;
+  border:0;
+}

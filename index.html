@@ -23,6 +23,7 @@
             color: #ffffff;
             font-family: var(--font-main);
             margin: 0;
+            padding: 0;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
@@ -40,6 +41,8 @@
             font-weight: 900; 
             letter-spacing: 2px;
             text-shadow: 0 0 10px rgba(50, 255, 14, 0.3);
+            cursor: pointer;
+            text-decoration: none;
         }
 
         #gameSearch {
@@ -48,6 +51,7 @@
             color: #fff;
             border-radius: 4px;
             font-size: 0.9rem;
+            max-width: 300px;
         }
 
         #main-library { padding: 40px 0; }
@@ -132,10 +136,19 @@
             border: 2px solid #1a1a1a;
             border-radius: 8px;
             overflow: hidden;
-            margin-top: 15px;
+            margin-top: 5px;
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
         }
 
-        #stage-iframe { width: 100%; height: 70vh; border: none; }
+        #stage-iframe { 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
 
         .btn-exit { 
             background: #1a1a1a; 
@@ -151,15 +164,6 @@
             color: #000;
         }
 
-        #gamemonetize-video {
-            width: 100%;
-            background: #000;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            overflow: hidden;
-            border: 1px solid #3f007e;
-        }
-
         @media (max-width: 1100px) {
             .stage-layout { grid-template-columns: 1fr; }
             .ad-sidebar { display: none; }
@@ -168,20 +172,20 @@
 </head>
 <body>
 
-<!-- GAME SDK INITIALIZATION -->
+<!-- CORE GAME SDK INITIALIZATION ONLY -->
 <script type="text/javascript">
    window.SDK_OPTIONS = {
       gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
       onEvent: function (a) {
          switch (a.name) {
             case "SDK_GAME_PAUSE":
-               console.log("SDK: Pause for Ad");
+               // Game should pause during ads
                break;
             case "SDK_GAME_START":
-               console.log("SDK: Resume Game");
+               // Resume game
                break;
             case "SDK_READY":
-               console.log("SDK: Ready");
+               console.log("GameMonetize SDK Ready");
                break;
          }
       }
@@ -199,7 +203,7 @@
 
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="#" onclick="location.reload()">BLINCHIGAMES</a>
+        <a class="navbar-brand" onclick="closeGame()">BLINCHIGAMES</a>
         <input id="gameSearch" class="form-control ms-auto" type="search" placeholder="Search games...">
     </div>
 </nav>
@@ -208,7 +212,7 @@
     <div class="container">
         <div class="text-center py-5">
             <h1 class="display-4 fw-bold">ELITE <span style="color:var(--brand)">LOBBY</span></h1>
-            <p id="lib-subtitle" class="text-secondary text-uppercase" style="letter-spacing: 2px; font-size: 0.8rem;">Loading Library...</p>
+            <p id="lib-subtitle" class="text-secondary text-uppercase" style="letter-spacing: 2px; font-size: 0.8rem;">Accessing Library...</p>
         </div>
         <div id="grid" class="row g-2 g-md-3"></div>
     </div>
@@ -222,15 +226,12 @@
 
         <main class="viewport-container">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <button class="btn-exit" onclick="closeGame()">EXIT GAME</button>
-                <div class="small text-uppercase text-secondary">Cinema Experience</div>
+                <button class="btn-exit" onclick="closeGame()">EXIT TO LOBBY</button>
+                <div class="small text-uppercase text-secondary" id="active-title">Playing...</div>
             </div>
-            
-            <!-- VIDEO PLAYER UNIT -->
-            <div id="gamemonetize-video"></div>
 
             <div class="iframe-wrap">
-                <iframe id="stage-iframe" src="" allowfullscreen></iframe>
+                <iframe id="stage-iframe" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
             </div>
             
             <div class="mt-4 p-3 bg-dark rounded border-start border-success">
@@ -244,30 +245,6 @@
         </aside>
     </div>
 </div>
-
-<!-- VIDEO AD API INITIALIZATION - MOVED TO BOTTOM AND WRAPPED IN LOAD CHECK -->
-<script type="text/javascript">
-   window.VIDEO_OPTIONS = {
-       gameid : "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
-       width  : "100%",
-       height : "480px",
-       color  : "#3f007e",
-       getAds  : "true"
-   };
-   
-   window.addEventListener('load', function() {
-       (function (a, b, c) {
-          var d = a.getElementsByTagName(b)[0];
-          if (!a.getElementById(c)) {
-              var s = a.createElement(b);
-              s.id = c;
-              s.async = true;
-              s.src = "https://api.gamemonetize.com/video.js";
-              d.parentNode.insertBefore(s, d);
-          }
-       })(document, "script", "gamemonetize-video-api");
-   });
-</script>
 
 <script>
     let catalog = [
@@ -285,7 +262,7 @@
             col.className = 'col-6 col-md-3 col-lg-2';
             col.innerHTML = `
                 <div class="game-card" onclick="openGame('${game.id}')">
-                    <div class="thumb-box"><img src="${game.thumb}" loading="lazy"></div>
+                    <div class="thumb-box"><img src="${game.thumb}" alt="${game.title}" loading="lazy"></div>
                     <div class="game-info"><h6>${game.title}</h6></div>
                 </div>
             `;
@@ -295,32 +272,44 @@
     }
 
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
-    Promise.all(feeds.map(f => fetch(f).then(r => r.json()).catch(() => [])))
-    .then(results => {
-        results.forEach(data => {
-            if(Array.isArray(data)) {
-                data.forEach(g => {
-                    if(!catalog.find(existing => existing.id === g.id)) {
-                        catalog.push({
-                            id: g.id,
-                            title: g.title,
-                            url: g.url,
-                            thumb: g.thumb,
-                            desc: g.description
-                        });
-                    }
-                });
+    
+    // Improved feed loading with error handling
+    async function loadFeeds() {
+        for (const feed of feeds) {
+            try {
+                const response = await fetch(feed);
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    data.forEach(g => {
+                        if(!catalog.find(existing => existing.id === g.id)) {
+                            catalog.push({
+                                id: g.id,
+                                title: g.title,
+                                url: g.url,
+                                thumb: g.thumb,
+                                desc: g.description
+                            });
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn("Feed failed to load:", feed);
             }
-        });
+        }
         renderGames(catalog);
-    });
+    }
 
     function openGame(id) {
         const game = catalog.find(g => g.id === id);
         if(!game) return;
         
-        if (typeof sdk !== 'undefined') {
-            sdk.showBanner();
+        // Show Ad Banner via SDK if ready
+        if (typeof sdk !== 'undefined' && sdk.showBanner) {
+            try {
+                sdk.showBanner();
+            } catch(e) {
+                console.error("Ad failed to show", e);
+            }
         }
 
         document.getElementById('main-library').style.display = 'none';
@@ -328,6 +317,7 @@
         document.getElementById('stage-iframe').src = game.url;
         document.getElementById('stage-title').innerText = game.title;
         document.getElementById('stage-desc').innerText = game.desc;
+        document.getElementById('active-title').innerText = `Playing: ${game.title}`;
         window.scrollTo(0,0);
     }
 
@@ -335,6 +325,7 @@
         document.getElementById('stage-iframe').src = '';
         document.getElementById('game-stage').style.display = 'none';
         document.getElementById('main-library').style.display = 'block';
+        window.scrollTo(0,0);
     }
 
     document.getElementById('gameSearch').addEventListener('input', (e) => {
@@ -345,7 +336,10 @@
         });
     });
 
-    window.onload = () => renderGames(catalog);
+    window.onload = () => {
+        renderGames(catalog);
+        loadFeeds();
+    };
 </script>
 
 </body>

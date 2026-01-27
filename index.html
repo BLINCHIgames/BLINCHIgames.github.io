@@ -172,33 +172,24 @@
 </head>
 <body>
 
-<!-- CORE GAME SDK INITIALIZATION ONLY -->
+<!-- MINIMAL SDK LOAD -->
 <script type="text/javascript">
    window.SDK_OPTIONS = {
       gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
       onEvent: function (a) {
-         switch (a.name) {
-            case "SDK_GAME_PAUSE":
-               // Game should pause during ads
-               break;
-            case "SDK_GAME_START":
-               // Resume game
-               break;
-            case "SDK_READY":
-               console.log("GameMonetize SDK Ready");
-               break;
-         }
+         console.log("SDK Event:", a.name);
       }
    };
-(function (a, b, c) {
-   var d = a.getElementsByTagName(b)[0];
-   if (!a.getElementById(c)) {
-       var s = a.createElement(b);
-       s.id = c;
-       s.src = "https://api.gamemonetize.com/sdk.js";
-       d.parentNode.insertBefore(s, d);
-   }
-})(document, "script", "gamemonetize-sdk"); 
+   (function (a, b, c) {
+      var d = a.getElementsByTagName(b)[0];
+      if (!a.getElementById(c)) {
+          var s = a.createElement(b);
+          s.id = c;
+          s.async = true;
+          s.src = "https://api.gamemonetize.com/sdk.js";
+          d.parentNode.insertBefore(s, d);
+      }
+   })(document, "script", "gamemonetize-sdk"); 
 </script>
 
 <nav class="navbar navbar-expand-lg sticky-top">
@@ -231,7 +222,12 @@
             </div>
 
             <div class="iframe-wrap">
-                <iframe id="stage-iframe" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+                <!-- Sandbox added to prevent the iframe from redirecting the parent page -->
+                <iframe id="stage-iframe" src="" 
+                    allowfullscreen 
+                    allow="autoplay; encrypted-media" 
+                    sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-presentation allow-scripts allow-same-origin">
+                </iframe>
             </div>
             
             <div class="mt-4 p-3 bg-dark rounded border-start border-success">
@@ -273,7 +269,6 @@
 
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
     
-    // Improved feed loading with error handling
     async function loadFeeds() {
         for (const feed of feeds) {
             try {
@@ -303,14 +298,7 @@
         const game = catalog.find(g => g.id === id);
         if(!game) return;
         
-        // Show Ad Banner via SDK if ready
-        if (typeof sdk !== 'undefined' && sdk.showBanner) {
-            try {
-                sdk.showBanner();
-            } catch(e) {
-                console.error("Ad failed to show", e);
-            }
-        }
+        // REMOVED sdk.showBanner() to prevent forced redirects
 
         document.getElementById('main-library').style.display = 'none';
         document.getElementById('game-stage').style.display = 'block';

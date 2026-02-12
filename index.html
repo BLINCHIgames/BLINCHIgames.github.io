@@ -93,7 +93,7 @@
             letter-spacing: -2px;
         }
 
-        /* Game Cards - Pixel/Apple Aesthetic */
+        /* Game Cards */
         .game-card { 
             transition: transform 0.4s var(--transition), background-color 0.3s var(--transition); 
             cursor: pointer; 
@@ -136,23 +136,13 @@
         }
 
         .game-info h6 { 
-            font-size: 0.9rem; 
+            font-size: 0.95rem; 
             margin: 0; 
             font-weight: 700;
             color: var(--text-main);
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; 
-        }
-
-        .game-tag {
-            font-size: 0.7rem;
-            color: var(--brand);
-            text-transform: uppercase;
-            font-weight: 800;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-            display: block;
         }
 
         /* Game Stage Layout */
@@ -242,13 +232,26 @@
 
     <!-- GameMonetize SDK Initialization -->
     <script type="text/javascript">
+       // Enhanced SDK options with error suppression and ready tracking
+       window.sdkReady = false;
        window.SDK_OPTIONS = {
           gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
           onEvent: function (a) {
              switch (a.name) {
-                case "SDK_GAME_PAUSE": break;
-                case "SDK_GAME_START": break;
-                case "SDK_READY": console.log("SDK Ready"); break;
+                case "SDK_GAME_PAUSE": 
+                    // Mute game logic if needed
+                    break;
+                case "SDK_GAME_START": 
+                    // Resume game logic
+                    break;
+                case "SDK_READY": 
+                    window.sdkReady = true;
+                    console.log("GameMonetize SDK Ready"); 
+                    break;
+                case "SDK_ERROR":
+                    // Log but don't break the app
+                    console.warn("GameMonetize SDK Error Handled");
+                    break;
              }
           }
        };
@@ -257,6 +260,7 @@
           if (!a.getElementById(c)) {
               var s = a.createElement(b);
               s.id = c;
+              s.async = true; // Use async to prevent blocking
               s.src = "https://api.gamemonetize.com/sdk.js";
               d.parentNode.insertBefore(s, d);
           }
@@ -269,7 +273,7 @@
     <div class="container">
         <a class="navbar-brand" onclick="closeGame()">BLINCHI<span>GAMES</span></a>
         <div class="search-container ms-auto">
-            <input id="gameSearch" class="form-control" type="search" placeholder="Search elite titles...">
+            <input id="gameSearch" class="form-control" type="search" placeholder="Search for your favorite games...">
         </div>
     </div>
 </nav>
@@ -277,8 +281,8 @@
 <div id="main-library">
     <div class="container">
         <div class="py-5 text-center">
-            <h1 class="hero-title">Discover the<br><span style="color:var(--brand)">Next Gen.</span></h1>
-            <p id="lib-subtitle" class="text-secondary fw-semibold mt-3 text-uppercase small" style="letter-spacing: 4px;">Syncing Library...</p>
+            <h1 class="hero-title">Play the Best<br><span style="color:var(--brand)">Web Games.</span></h1>
+            <p id="lib-subtitle" class="text-secondary fw-semibold mt-3 text-uppercase small" style="letter-spacing: 4px;">Loading Games...</p>
         </div>
         <div id="grid" class="row g-4"></div>
     </div>
@@ -300,14 +304,14 @@
         <main class="viewport-container">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <button class="btn-exit" onclick="closeGame()">Back to Library</button>
-                <div class="small fw-bold text-uppercase text-secondary" id="active-title">Now Playing</div>
+                <div class="small fw-bold text-uppercase text-secondary" id="active-title">Loading...</div>
             </div>
 
             <div class="iframe-container">
                 <div class="iframe-wrap">
                     <iframe id="stage-iframe" src="" 
                         allowfullscreen 
-                        allow="autoplay; encrypted-media" 
+                        allow="autoplay; encrypted-media; fullscreen" 
                         sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-presentation allow-scripts allow-same-origin">
                     </iframe>
                 </div>
@@ -342,6 +346,7 @@
 
     function renderGames(list) {
         const grid = document.getElementById('grid');
+        if (!grid) return;
         grid.innerHTML = '';
         list.forEach((game, index) => {
             const col = document.createElement('div');
@@ -351,14 +356,13 @@
                 <div class="game-card" onclick="openGame('${game.id}')">
                     <div class="thumb-box"><img src="${game.thumb}" alt="${game.title}" loading="lazy"></div>
                     <div class="game-info">
-                        <span class="game-tag">Trending</span>
                         <h6>${game.title}</h6>
                     </div>
                 </div>
             `;
             grid.appendChild(col);
         });
-        document.getElementById('lib-subtitle').innerText = `${list.length} Experience${list.length !== 1 ? 's' : ''} available`;
+        document.getElementById('lib-subtitle').innerText = `${list.length} Games Ready to Play`;
     }
 
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
@@ -383,7 +387,7 @@
                 }
                 renderGames(catalog);
             } catch (e) {
-                console.warn("Feed check:", feed);
+                console.warn("Feed not found or unreachable:", feed);
             }
         }
     }
@@ -392,6 +396,15 @@
         const game = catalog.find(g => g.id === id);
         if(!game) return;
         
+        // Safely attempt to show banner if SDK is ready
+        try {
+            if (window.sdkReady && typeof sdk !== 'undefined' && sdk.showBanner) {
+                sdk.showBanner();
+            }
+        } catch (e) {
+            console.warn("Could not show SDK banner", e);
+        }
+
         document.getElementById('main-library').style.display = 'none';
         document.getElementById('game-stage').style.display = 'block';
         document.getElementById('stage-iframe').src = game.url;
@@ -408,7 +421,6 @@
         window.scrollTo(0,0);
     }
 
-    // Improved Search Logic
     document.getElementById('gameSearch').addEventListener('input', (e) => {
         const q = e.target.value.toLowerCase().trim();
         const filtered = catalog.filter(game => 
@@ -418,10 +430,10 @@
         renderGames(filtered);
     });
 
-    window.onload = () => {
+    window.addEventListener('load', () => {
         renderGames(catalog);
         loadFeeds();
-    };
+    });
 </script>
 
 </body>

@@ -83,19 +83,50 @@
         }
 
         /* Hero Section */
-        #main-library { padding: 60px 0; }
+        #main-library { padding: 40px 0; }
         
         .hero-title {
             font-family: var(--font-display);
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            line-height: 1;
-            margin-bottom: 1rem;
-            letter-spacing: -2px;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            margin-top: 40px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-badge {
+            background: var(--brand-soft);
+            color: var(--brand);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 12px;
+            text-transform: uppercase;
         }
 
         /* Game Cards */
         .game-card { 
-            transition: transform 0.4s var(--transition), background-color 0.3s var(--transition); 
+            transition: transform 0.3s var(--transition), background-color 0.3s var(--transition); 
             cursor: pointer; 
             background: var(--surface); 
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -104,39 +135,41 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            will-change: transform; /* Performance optimization */
         }
 
         .game-card:hover { 
-            transform: scale(1.02);
+            transform: translateY(-4px);
             background: var(--surface-hover);
             border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
         }
 
         .thumb-box { 
-            aspect-ratio: 1/1;
+            aspect-ratio: 16/9;
             background: #0a0a0a;
             overflow: hidden;
-            margin: 8px;
-            border-radius: 12px;
+            position: relative;
         }
         
         .thumb-box img { 
             width: 100%; 
             height: 100%; 
             object-fit: cover;
-            transition: transform 0.6s var(--transition);
+            transition: opacity 0.3s ease;
+            opacity: 0; /* Fade in on load */
         }
-
-        .game-card:hover .thumb-box img {
-            transform: scale(1.1);
+        
+        .thumb-box img.loaded {
+            opacity: 1;
         }
 
         .game-info { 
-            padding: 12px 16px 20px; 
+            padding: 12px 16px; 
         }
 
         .game-info h6 { 
-            font-size: 0.95rem; 
+            font-size: 0.9rem; 
             margin: 0; 
             font-weight: 700;
             color: var(--text-main);
@@ -176,7 +209,7 @@
         .iframe-container {
             background: var(--surface);
             border-radius: var(--radius-lg);
-            padding: 12px;
+            padding: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 40px 100px rgba(0,0,0,0.8);
         }
@@ -214,16 +247,6 @@
             transform: scale(1.05);
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .game-item {
-            animation: fadeIn 0.6s var(--transition) both;
-        }
-
         @media (max-width: 1200px) {
             .stage-layout { grid-template-columns: 1fr; }
             .ad-sidebar { display: none; }
@@ -232,26 +255,15 @@
 
     <!-- GameMonetize SDK Initialization -->
     <script type="text/javascript">
-       // Enhanced SDK options with error suppression and ready tracking
        window.sdkReady = false;
        window.SDK_OPTIONS = {
           gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
           onEvent: function (a) {
              switch (a.name) {
-                case "SDK_GAME_PAUSE": 
-                    // Mute game logic if needed
-                    break;
-                case "SDK_GAME_START": 
-                    // Resume game logic
-                    break;
-                case "SDK_READY": 
-                    window.sdkReady = true;
-                    console.log("GameMonetize SDK Ready"); 
-                    break;
-                case "SDK_ERROR":
-                    // Log but don't break the app
-                    console.warn("GameMonetize SDK Error Handled");
-                    break;
+                case "SDK_GAME_PAUSE": break;
+                case "SDK_GAME_START": break;
+                case "SDK_READY": window.sdkReady = true; break;
+                case "SDK_ERROR": console.warn("SDK Error"); break;
              }
           }
        };
@@ -260,7 +272,7 @@
           if (!a.getElementById(c)) {
               var s = a.createElement(b);
               s.id = c;
-              s.async = true; // Use async to prevent blocking
+              s.async = true;
               s.src = "https://api.gamemonetize.com/sdk.js";
               d.parentNode.insertBefore(s, d);
           }
@@ -273,18 +285,20 @@
     <div class="container">
         <a class="navbar-brand" onclick="closeGame()">BLINCHI<span>GAMES</span></a>
         <div class="search-container ms-auto">
-            <input id="gameSearch" class="form-control" type="search" placeholder="Search for your favorite games...">
+            <input id="gameSearch" class="form-control" type="search" placeholder="Search games...">
         </div>
     </div>
 </nav>
 
 <div id="main-library">
     <div class="container">
-        <div class="py-5 text-center">
-            <h1 class="hero-title">Play the Best<br><span style="color:var(--brand)">Web Games.</span></h1>
-            <p id="lib-subtitle" class="text-secondary fw-semibold mt-3 text-uppercase small" style="letter-spacing: 4px;">Loading Games...</p>
+        <div class="py-4 text-center">
+            <h1 class="hero-title">Play the best<br><span style="color:var(--brand)">web games</span></h1>
+            <p id="lib-subtitle" class="text-secondary fw-semibold mt-2 text-uppercase small" style="letter-spacing: 3px;">Loading Library...</p>
         </div>
-        <div id="grid" class="row g-4"></div>
+        
+        <!-- Game Sections Container -->
+        <div id="game-sections"></div>
     </div>
 </div>
 
@@ -309,10 +323,16 @@
 
             <div class="iframe-container">
                 <div class="iframe-wrap">
+                    <!-- 
+                        CRITICAL UPDATE FOR IN-GAME ADS:
+                        allow-popups-to-escape-sandbox: Enables rewarded ads to open new windows.
+                        allow-same-origin & allow-scripts: Required for game logic.
+                        NO allow-top-navigation: Prevents redirecting your site.
+                    -->
                     <iframe id="stage-iframe" src="" 
                         allowfullscreen 
                         allow="autoplay; encrypted-media; fullscreen" 
-                        sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-presentation allow-scripts allow-same-origin">
+                        sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-same-origin">
                     </iframe>
                 </div>
             </div>
@@ -337,72 +357,127 @@
 </div>
 
 <script>
-    let catalog = [
-        {"id":"35801","title":"Fish Super IO Eating","url":"https://html5.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/","thumb":"https://img.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/512x384.jpg","desc":"Explore the depths and grow to dominate the ocean."},
-        {"id":"35798","title":"Blocky Combat Swat 2026","url":"https://html5.gamemonetize.com/kuryjdyq83t9camx2htr964na2j4eev0/","thumb":"https://img.gamemonetize.com/kuryjdyq83t9camx2htr964na2j4eev0/512x384.jpg","desc":"Voxel-based tactical warfare."},
-        {"id":"35786","title":"Dinosaur Evolution IO","url":"https://html5.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/","thumb":"https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg","desc":"Grow your dragon and defeat others."},
-        {"id":"35771","title":"Parking Expert: Exam","url":"https://html5.gamemonetize.com/3efo9ee8ez14ljclx20uake4khgruzf9/","thumb":"https://img.gamemonetize.com/3efo9ee8ez14ljclx20uake4khgruzf9/512x384.jpg","desc":"Realistic car physics for an immersive driving experience."}
-    ];
+    let catalog = [];
+    const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
+    
+    // Performance optimization: Render function uses DocumentFragment
+    function renderLibrary(games) {
+        const container = document.getElementById('game-sections');
+        container.innerHTML = '';
+        
+        // Group games by category
+        const categories = {};
+        games.forEach(game => {
+            // Default to 'Arcade' if no category, or clean up the string
+            const cat = (game.category || 'Arcade').split(',')[0].trim(); 
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(game);
+        });
 
-    function renderGames(list) {
-        const grid = document.getElementById('grid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        list.forEach((game, index) => {
-            const col = document.createElement('div');
-            col.className = 'col-6 col-md-4 col-lg-3 col-xl-2 game-item';
-            col.style.animationDelay = `${index * 0.05}s`;
-            col.innerHTML = `
-                <div class="game-card" onclick="openGame('${game.id}')">
-                    <div class="thumb-box"><img src="${game.thumb}" alt="${game.title}" loading="lazy"></div>
+        // Sort categories alphabetically or by priority (e.g., Action first)
+        const sortedCats = Object.keys(categories).sort();
+
+        // Use fragment to minimize reflows
+        const fragment = document.createDocumentFragment();
+
+        sortedCats.forEach(cat => {
+            const catGames = categories[cat];
+            if (catGames.length === 0) return;
+
+            // Section Header
+            const section = document.createElement('div');
+            section.className = 'mb-5';
+            section.innerHTML = `
+                <div class="section-header">
+                    <h2 class="section-title">${cat}</h2>
+                    <span class="section-badge">${catGames.length}</span>
+                </div>
+                <div class="row g-3 g-md-4">
+                    ${catGames.map(game => createGameCardHTML(game)).join('')}
+                </div>
+            `;
+            fragment.appendChild(section);
+        });
+
+        container.appendChild(fragment);
+        document.getElementById('lib-subtitle').innerText = `${games.length} Games Available`;
+        
+        // Lazy load images after render
+        observeImages();
+    }
+
+    function createGameCardHTML(game) {
+        // Safe string escape for onclick
+        const safeId = game.id.replace(/'/g, "\\'");
+        return `
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                <div class="game-card" onclick="openGame('${safeId}')">
+                    <div class="thumb-box">
+                        <img data-src="${game.thumb}" alt="${game.title}" class="lazy-img">
+                    </div>
                     <div class="game-info">
                         <h6>${game.title}</h6>
                     </div>
                 </div>
-            `;
-            grid.appendChild(col);
-        });
-        document.getElementById('lib-subtitle').innerText = `${list.length} Games Ready to Play`;
+            </div>
+        `;
     }
 
-    const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
-    
-    async function loadFeeds() {
-        for (const feed of feeds) {
-            try {
-                const response = await fetch(feed);
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    data.forEach(g => {
-                        if(!catalog.find(existing => existing.id === g.id)) {
-                            catalog.push({
-                                id: g.id,
-                                title: g.title,
-                                url: g.url,
-                                thumb: g.thumb,
-                                desc: g.description
-                            });
-                        }
-                    });
+    // Lazy Loading Logic using IntersectionObserver
+    function observeImages() {
+        const images = document.querySelectorAll('img.lazy-img');
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.onload = () => img.classList.add('loaded');
+                    observer.unobserve(img);
                 }
-                renderGames(catalog);
-            } catch (e) {
-                console.warn("Feed not found or unreachable:", feed);
+            });
+        });
+        images.forEach(img => observer.observe(img));
+    }
+
+    async function loadFeeds() {
+        const promises = feeds.map(feed => fetch(feed).then(r => r.json()).catch(() => []));
+        const results = await Promise.all(promises);
+        
+        const allGames = [];
+        const seenIds = new Set();
+
+        // Initial hardcoded games (if you still want them)
+        const initial = [
+            {"id":"35801","title":"Fish Super IO Eating","url":"https://html5.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/","thumb":"https://img.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/512x384.jpg","category":"Arcade","desc":"Explore the depths..."},
+            // ... add other critical initial games here if needed
+        ];
+        
+        // Merge Logic
+        [...initial, ...results.flat()].forEach(g => {
+            if (g && g.id && !seenIds.has(g.id)) {
+                seenIds.add(g.id);
+                allGames.push({
+                    id: g.id,
+                    title: g.title || "Unknown Game",
+                    url: g.url,
+                    thumb: g.thumb,
+                    category: g.category || "Arcade",
+                    desc: g.description || ""
+                });
             }
-        }
+        });
+
+        catalog = allGames;
+        renderLibrary(catalog);
     }
 
     function openGame(id) {
         const game = catalog.find(g => g.id === id);
         if(!game) return;
         
-        // Safely attempt to show banner if SDK is ready
-        try {
-            if (window.sdkReady && typeof sdk !== 'undefined' && sdk.showBanner) {
-                sdk.showBanner();
-            }
-        } catch (e) {
-            console.warn("Could not show SDK banner", e);
+        // Try SDK Banner
+        if (window.sdkReady && typeof sdk !== 'undefined' && sdk.showBanner) {
+            try { sdk.showBanner(); } catch(e) {}
         }
 
         document.getElementById('main-library').style.display = 'none';
@@ -421,19 +496,24 @@
         window.scrollTo(0,0);
     }
 
+    // Search Logic with Debounce
+    let searchTimeout;
     document.getElementById('gameSearch').addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase().trim();
-        const filtered = catalog.filter(game => 
-            game.title.toLowerCase().includes(q) || 
-            (game.desc && game.desc.toLowerCase().includes(q))
-        );
-        renderGames(filtered);
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const q = e.target.value.toLowerCase().trim();
+            if (!q) {
+                renderLibrary(catalog);
+                return;
+            }
+            const filtered = catalog.filter(game => 
+                game.title.toLowerCase().includes(q)
+            );
+            renderLibrary(filtered);
+        }, 300); // 300ms delay for performance
     });
 
-    window.addEventListener('load', () => {
-        renderGames(catalog);
-        loadFeeds();
-    });
+    window.addEventListener('load', loadFeeds);
 </script>
 
 </body>

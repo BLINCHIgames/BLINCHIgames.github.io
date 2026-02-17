@@ -36,6 +36,8 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             scroll-behavior: smooth;
+            /* Fix for sticky text cursor */
+            cursor: default;
         }
 
         /* --- LOADING OVERLAY --- */
@@ -163,15 +165,13 @@
             gap: 10px;
             overflow-x: auto;
             padding: 0 20px;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* IE 10+ */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
         }
         
-        .category-nav::-webkit-scrollbar { 
-            display: none; /* Chrome/Safari */
-        }
+        .category-nav::-webkit-scrollbar { display: none; }
 
         .cat-btn {
             background: rgba(255, 255, 255, 0.05);
@@ -194,13 +194,6 @@
             transform: translateY(-2px);
         }
 
-        .cat-btn.active {
-            background: var(--brand);
-            color: #000;
-            border-color: var(--brand);
-            font-weight: 800;
-        }
-
         /* Hero Section */
         #main-library { padding: 40px 0; }
         
@@ -220,7 +213,7 @@
             margin-top: 40px;
             padding-bottom: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            scroll-margin-top: 140px; /* Offset for sticky headers */
+            scroll-margin-top: 140px; 
         }
 
         .section-title {
@@ -332,7 +325,7 @@
 
         .iframe-wrap {
             position: relative;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%; 
             border-radius: 12px;
             overflow: hidden;
             background: #000;
@@ -411,7 +404,7 @@
 
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
-        <a class="navbar-brand" onclick="closeGame()">BLINCHI<span>GAMES</span></a>
+        <a class="navbar-brand" onclick="goHome()">BLINCHI<span>GAMES</span></a>
         <div class="search-container ms-auto">
             <input id="gameSearch" class="form-control" type="search" placeholder="Search games...">
         </div>
@@ -419,12 +412,9 @@
 </nav>
 
 <div id="main-library">
-    <!-- Category Navigation Bar -->
     <div class="category-nav-wrapper">
         <div class="container">
-            <div id="category-nav" class="category-nav">
-                <!-- Buttons injected via JS -->
-            </div>
+            <div id="category-nav" class="category-nav"></div>
         </div>
     </div>
 
@@ -433,15 +423,12 @@
             <h1 class="hero-title">Play the best<br><span style="color:var(--brand)">web games</span></h1>
             <p id="lib-subtitle" class="text-secondary fw-semibold mt-2 text-uppercase small" style="letter-spacing: 3px;">Loading Library...</p>
         </div>
-        
-        <!-- Game Sections Container -->
         <div id="game-sections"></div>
     </div>
 </div>
 
 <div id="game-stage">
     <div class="stage-layout">
-        <!-- LEFT SIDEBAR AD -->
         <aside class="ad-sidebar">
             <div class="adsense-unit">
                 <ins class="adsbygoogle"
@@ -474,7 +461,6 @@
             </div>
         </main>
 
-        <!-- RIGHT SIDEBAR AD -->
         <aside class="ad-sidebar">
             <div class="adsense-unit">
                 <ins class="adsbygoogle"
@@ -491,13 +477,27 @@
     let catalog = [];
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
     
+    // UI Helpers
+    function goHome() {
+        clearSearch();
+        closeGame();
+    }
+
+    function clearSearch() {
+        const searchInput = document.getElementById('gameSearch');
+        searchInput.value = '';
+        searchInput.blur(); // Remove focus to fix cursor beam issue
+        renderLibrary(catalog);
+    }
+
     function renderLibrary(games, isSearch = false) {
         const container = document.getElementById('game-sections');
+        const navWrapper = document.querySelector('.category-nav-wrapper');
         const navContainer = document.getElementById('category-nav');
         container.innerHTML = '';
         
         if (isSearch) {
-            navContainer.parentElement.parentElement.style.display = 'none';
+            navWrapper.style.display = 'none';
             const limit = 60;
             const displayGames = games.slice(0, limit);
             const section = document.createElement('div');
@@ -511,18 +511,13 @@
                     ${displayGames.map(game => createGameCardHTML(game)).join('')}
                 </div>
             `;
-            if (games.length > limit) {
-                const more = document.createElement('div');
-                more.className = 'text-center mt-3 text-secondary small';
-                more.innerText = `Showing top ${limit} results. Type more to refine.`;
-                section.appendChild(more);
-            }
             container.appendChild(section);
             observeImages();
             return;
         }
 
-        navContainer.parentElement.parentElement.style.display = 'block';
+        // Full Library mode
+        navWrapper.style.display = 'block';
         navContainer.innerHTML = '';
         
         const categories = {};
@@ -537,16 +532,12 @@
 
         sortedCats.forEach(cat => {
             const catGames = categories[cat];
-            if (catGames.length === 0) return;
-
             const btn = document.createElement('button');
             btn.className = 'cat-btn';
             btn.innerText = cat;
             btn.onclick = () => {
-                document.getElementById(`cat-${cat}`).scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+                const target = document.getElementById(`cat-${cat}`);
+                if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             };
             navContainer.appendChild(btn);
 
@@ -567,12 +558,11 @@
 
         container.appendChild(fragment);
         document.getElementById('lib-subtitle').innerText = `${games.length} Games Available`;
-        
         observeImages();
     }
 
     function createGameCardHTML(game) {
-        const safeId = game.id.replace(/'/g, "\\'");
+        const safeId = game.id.toString().replace(/'/g, "\\'");
         return `
             <div class="col-6 col-md-4 col-lg-3 col-xl-2">
                 <div class="game-card" onclick="openGame('${safeId}')">
@@ -602,7 +592,6 @@
         images.forEach(img => observer.observe(img));
     }
 
-    // --- ENHANCED LOADING LOGIC ---
     async function loadFeeds() {
         const overlay = document.getElementById('loading-overlay');
         const status = document.getElementById('loader-status');
@@ -612,25 +601,13 @@
         let loadedCount = 0;
         const totalFeeds = feeds.length;
         const startTime = Date.now();
-
         const allGames = [];
         const seenIds = new Set();
 
-        const initial = [
-            {"id":"35801","title":"Fish Super IO Eating","url":"https://html5.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/","thumb":"https://img.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/512x384.jpg","category":"Arcade","desc":"Explore the depths..."},
-        ];
-        
-        // Add Initial Games first
-        allGames.push(...initial);
-        seenIds.add("35801");
-
         for (let i = 0; i < feeds.length; i++) {
-            const feed = feeds[i];
             try {
-                // Fetch each feed
-                const response = await fetch(feed);
+                const response = await fetch(feeds[i]);
                 const data = await response.json();
-                
                 if (Array.isArray(data)) {
                     data.forEach(g => {
                         if (g && g.id && !seenIds.has(g.id)) {
@@ -646,45 +623,31 @@
                         }
                     });
                 }
-            } catch (e) {
-                console.warn("Skipping feed:", feed);
-            }
+            } catch (e) { console.warn("Feed failed:", feeds[i]); }
 
-            // Update Loading UI
             loadedCount++;
             const percent = (loadedCount / totalFeeds) * 100;
             bar.style.width = `${percent}%`;
+            status.innerText = `LOCKED & LOADED: ${allGames.length} GAMES`;
             
-            status.innerText = `FETCHING LIBRARY... (${allGames.length} GAMES FOUND)`;
-            
-            // Calculate estimate
             const elapsed = Date.now() - startTime;
-            const avgTimePerFeed = elapsed / loadedCount;
-            const remainingFeeds = totalFeeds - loadedCount;
-            const remainingTime = Math.ceil((avgTimePerFeed * remainingFeeds) / 1000);
-            
-            estimate.innerText = remainingFeeds > 0 
-                ? `Estimated Wait: ${remainingTime}s` 
-                : "Finalizing...";
+            const remaining = Math.ceil(((elapsed / loadedCount) * (totalFeeds - loadedCount)) / 1000);
+            estimate.innerText = (totalFeeds - loadedCount) > 0 ? `Wait: ${remaining}s` : "Entering Portal...";
         }
 
-        // Finish
         catalog = allGames;
         renderLibrary(catalog);
-        
         setTimeout(() => {
             overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-            }, 500);
-        }, 500);
+            setTimeout(() => overlay.style.display = 'none', 500);
+        }, 600);
     }
 
     function openGame(id) {
-        const game = catalog.find(g => g.id === id);
+        const game = catalog.find(g => g.id.toString() === id.toString());
         if(!game) return;
         
-        if (window.sdkReady && typeof sdk !== 'undefined' && sdk.showBanner) {
+        if (window.sdkReady && typeof sdk !== 'undefined') {
             try { sdk.showBanner(); } catch(e) {}
         }
 
@@ -706,22 +669,25 @@
 
     let searchTimeout;
     document.getElementById('gameSearch').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        
+        // Immediate check for empty string
+        if (!q) {
+            clearTimeout(searchTimeout);
+            renderLibrary(catalog);
+            return;
+        }
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            const q = e.target.value.toLowerCase().trim();
-            if (!q) {
-                renderLibrary(catalog);
-                return;
-            }
             const filtered = catalog.filter(game => 
                 game.title.toLowerCase().includes(q)
             );
             renderLibrary(filtered, true);
-        }, 300);
+        }, 200);
     });
 
     window.addEventListener('load', loadFeeds);
 </script>
-
 </body>
 </html>

@@ -35,6 +35,70 @@
             padding: 0;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            scroll-behavior: smooth;
+        }
+
+        /* --- LOADING OVERLAY --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loader-content {
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .loader-logo {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+        .loader-logo span { color: var(--brand); }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--brand);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--brand);
+        }
+
+        .loader-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .loader-details {
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 8px;
         }
 
         /* Premium Navbar */
@@ -82,6 +146,61 @@
             outline: none;
         }
 
+        /* Category Navigation */
+        .category-nav-wrapper {
+            position: sticky;
+            top: 76px; /* Below navbar */
+            z-index: 900;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .category-nav {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 0 20px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE 10+ */
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .category-nav::-webkit-scrollbar { 
+            display: none; /* Chrome/Safari */
+        }
+
+        .cat-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s var(--transition);
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cat-btn:hover {
+            background: var(--surface-hover);
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .cat-btn.active {
+            background: var(--brand);
+            color: #000;
+            border-color: var(--brand);
+            font-weight: 800;
+        }
+
         /* Hero Section */
         #main-library { padding: 40px 0; }
         
@@ -101,6 +220,7 @@
             margin-top: 40px;
             padding-bottom: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            scroll-margin-top: 140px; /* Offset for sticky headers */
         }
 
         .section-title {
@@ -135,7 +255,7 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            will-change: transform; /* Performance optimization */
+            will-change: transform;
         }
 
         .game-card:hover { 
@@ -157,16 +277,12 @@
             height: 100%; 
             object-fit: cover;
             transition: opacity 0.3s ease;
-            opacity: 0; /* Fade in on load */
+            opacity: 0;
         }
         
-        .thumb-box img.loaded {
-            opacity: 1;
-        }
+        .thumb-box img.loaded { opacity: 1; }
 
-        .game-info { 
-            padding: 12px 16px; 
-        }
+        .game-info { padding: 12px 16px; }
 
         .game-info h6 { 
             font-size: 0.9rem; 
@@ -281,6 +397,18 @@
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div id="loading-overlay">
+    <div class="loader-content">
+        <div class="loader-logo">BLINCHI<span>GAMES</span></div>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="loader-status" class="loader-text">INITIALIZING...</div>
+        <div id="loader-estimate" class="loader-details">Estimated wait: calculating...</div>
+    </div>
+</div>
+
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
         <a class="navbar-brand" onclick="closeGame()">BLINCHI<span>GAMES</span></a>
@@ -291,6 +419,15 @@
 </nav>
 
 <div id="main-library">
+    <!-- Category Navigation Bar -->
+    <div class="category-nav-wrapper">
+        <div class="container">
+            <div id="category-nav" class="category-nav">
+                <!-- Buttons injected via JS -->
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="py-4 text-center">
             <h1 class="hero-title">Play the best<br><span style="color:var(--brand)">web games</span></h1>
@@ -323,12 +460,6 @@
 
             <div class="iframe-container">
                 <div class="iframe-wrap">
-                    <!-- 
-                        CRITICAL UPDATE FOR IN-GAME ADS:
-                        allow-popups-to-escape-sandbox: Enables rewarded ads to open new windows.
-                        allow-same-origin & allow-scripts: Required for game logic.
-                        NO allow-top-navigation: Prevents redirecting your site.
-                    -->
                     <iframe id="stage-iframe" src="" 
                         allowfullscreen 
                         allow="autoplay; encrypted-media; fullscreen" 
@@ -360,33 +491,68 @@
     let catalog = [];
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
     
-    // Performance optimization: Render function uses DocumentFragment
-    function renderLibrary(games) {
+    function renderLibrary(games, isSearch = false) {
         const container = document.getElementById('game-sections');
+        const navContainer = document.getElementById('category-nav');
         container.innerHTML = '';
         
-        // Group games by category
+        if (isSearch) {
+            navContainer.parentElement.parentElement.style.display = 'none';
+            const limit = 60;
+            const displayGames = games.slice(0, limit);
+            const section = document.createElement('div');
+            section.className = 'mb-5';
+            section.innerHTML = `
+                <div class="section-header">
+                    <h2 class="section-title">Search Results</h2>
+                    <span class="section-badge">${games.length} Found</span>
+                </div>
+                <div class="row g-3 g-md-4">
+                    ${displayGames.map(game => createGameCardHTML(game)).join('')}
+                </div>
+            `;
+            if (games.length > limit) {
+                const more = document.createElement('div');
+                more.className = 'text-center mt-3 text-secondary small';
+                more.innerText = `Showing top ${limit} results. Type more to refine.`;
+                section.appendChild(more);
+            }
+            container.appendChild(section);
+            observeImages();
+            return;
+        }
+
+        navContainer.parentElement.parentElement.style.display = 'block';
+        navContainer.innerHTML = '';
+        
         const categories = {};
         games.forEach(game => {
-            // Default to 'Arcade' if no category, or clean up the string
             const cat = (game.category || 'Arcade').split(',')[0].trim(); 
             if (!categories[cat]) categories[cat] = [];
             categories[cat].push(game);
         });
 
-        // Sort categories alphabetically or by priority (e.g., Action first)
         const sortedCats = Object.keys(categories).sort();
-
-        // Use fragment to minimize reflows
         const fragment = document.createDocumentFragment();
 
         sortedCats.forEach(cat => {
             const catGames = categories[cat];
             if (catGames.length === 0) return;
 
-            // Section Header
+            const btn = document.createElement('button');
+            btn.className = 'cat-btn';
+            btn.innerText = cat;
+            btn.onclick = () => {
+                document.getElementById(`cat-${cat}`).scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            };
+            navContainer.appendChild(btn);
+
             const section = document.createElement('div');
             section.className = 'mb-5';
+            section.id = `cat-${cat}`;
             section.innerHTML = `
                 <div class="section-header">
                     <h2 class="section-title">${cat}</h2>
@@ -402,12 +568,10 @@
         container.appendChild(fragment);
         document.getElementById('lib-subtitle').innerText = `${games.length} Games Available`;
         
-        // Lazy load images after render
         observeImages();
     }
 
     function createGameCardHTML(game) {
-        // Safe string escape for onclick
         const safeId = game.id.replace(/'/g, "\\'");
         return `
             <div class="col-6 col-md-4 col-lg-3 col-xl-2">
@@ -423,7 +587,6 @@
         `;
     }
 
-    // Lazy Loading Logic using IntersectionObserver
     function observeImages() {
         const images = document.querySelectorAll('img.lazy-img');
         const observer = new IntersectionObserver((entries, observer) => {
@@ -439,43 +602,88 @@
         images.forEach(img => observer.observe(img));
     }
 
+    // --- ENHANCED LOADING LOGIC ---
     async function loadFeeds() {
-        const promises = feeds.map(feed => fetch(feed).then(r => r.json()).catch(() => []));
-        const results = await Promise.all(promises);
+        const overlay = document.getElementById('loading-overlay');
+        const status = document.getElementById('loader-status');
+        const estimate = document.getElementById('loader-estimate');
+        const bar = document.getElementById('progress-bar');
         
+        let loadedCount = 0;
+        const totalFeeds = feeds.length;
+        const startTime = Date.now();
+
         const allGames = [];
         const seenIds = new Set();
 
-        // Initial hardcoded games (if you still want them)
         const initial = [
             {"id":"35801","title":"Fish Super IO Eating","url":"https://html5.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/","thumb":"https://img.gamemonetize.com/boeaw04eduubp8cjsl4umvc3yw4omaro/512x384.jpg","category":"Arcade","desc":"Explore the depths..."},
-            // ... add other critical initial games here if needed
         ];
         
-        // Merge Logic
-        [...initial, ...results.flat()].forEach(g => {
-            if (g && g.id && !seenIds.has(g.id)) {
-                seenIds.add(g.id);
-                allGames.push({
-                    id: g.id,
-                    title: g.title || "Unknown Game",
-                    url: g.url,
-                    thumb: g.thumb,
-                    category: g.category || "Arcade",
-                    desc: g.description || ""
-                });
-            }
-        });
+        // Add Initial Games first
+        allGames.push(...initial);
+        seenIds.add("35801");
 
+        for (let i = 0; i < feeds.length; i++) {
+            const feed = feeds[i];
+            try {
+                // Fetch each feed
+                const response = await fetch(feed);
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    data.forEach(g => {
+                        if (g && g.id && !seenIds.has(g.id)) {
+                            seenIds.add(g.id);
+                            allGames.push({
+                                id: g.id,
+                                title: g.title || "Unknown Game",
+                                url: g.url,
+                                thumb: g.thumb,
+                                category: g.category || "Arcade",
+                                desc: g.description || ""
+                            });
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn("Skipping feed:", feed);
+            }
+
+            // Update Loading UI
+            loadedCount++;
+            const percent = (loadedCount / totalFeeds) * 100;
+            bar.style.width = `${percent}%`;
+            
+            status.innerText = `FETCHING LIBRARY... (${allGames.length} GAMES FOUND)`;
+            
+            // Calculate estimate
+            const elapsed = Date.now() - startTime;
+            const avgTimePerFeed = elapsed / loadedCount;
+            const remainingFeeds = totalFeeds - loadedCount;
+            const remainingTime = Math.ceil((avgTimePerFeed * remainingFeeds) / 1000);
+            
+            estimate.innerText = remainingFeeds > 0 
+                ? `Estimated Wait: ${remainingTime}s` 
+                : "Finalizing...";
+        }
+
+        // Finish
         catalog = allGames;
         renderLibrary(catalog);
+        
+        setTimeout(() => {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
+        }, 500);
     }
 
     function openGame(id) {
         const game = catalog.find(g => g.id === id);
         if(!game) return;
         
-        // Try SDK Banner
         if (window.sdkReady && typeof sdk !== 'undefined' && sdk.showBanner) {
             try { sdk.showBanner(); } catch(e) {}
         }
@@ -496,7 +704,6 @@
         window.scrollTo(0,0);
     }
 
-    // Search Logic with Debounce
     let searchTimeout;
     document.getElementById('gameSearch').addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
@@ -509,8 +716,8 @@
             const filtered = catalog.filter(game => 
                 game.title.toLowerCase().includes(q)
             );
-            renderLibrary(filtered);
-        }, 300); // 300ms delay for performance
+            renderLibrary(filtered, true);
+        }, 300);
     });
 
     window.addEventListener('load', loadFeeds);

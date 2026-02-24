@@ -1,572 +1,301 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>BLINCHIGAMES | Elite Game Library</title>
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  Gamepad2, 
+  Flame, 
+  Search, 
+  Maximize2, 
+  ChevronLeft, 
+  LayoutGrid, 
+  Rocket, 
+  Trophy,
+  Share2,
+  Info,
+  Menu,
+  X,
+  Clock,
+  Star,
+  Zap,
+  Users,
+  Monitor,
+  DownloadCloud
+} from 'lucide-react';
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+const App = () => {
+  const [catalog, setCatalog] = useState([]);
+  const [filteredCatalog, setFilteredCatalog] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('home'); 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [recentGames, setRecentGames] = useState([]);
 
-    <!-- Google AdSense Main Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157317095946191" crossorigin="anonymous"></script>
+  const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php'];
+  
+  const specialGames = [
+    { id: "wbwwb", title: "We Become What We Behold", url: "https://ncase.itch.io/wbwwb", thumb: "https://img.itch.zone/aW1nLzU0NjEwNy5wbmc=/315x250%23c/yH%2F6pI.png", category: "Indie", isTop: true, isTrending: true, date: 1739000000000 },
+    { id: "polytrack", title: "PolyTrack", url: "https://kodub.itch.io/polytrack", thumb: "https://img.itch.zone/aW1nLzEwNjkzNTU4LnBuZw==/315x250%23c/4v09eA.png", category: "Racing", isTop: true, isTrending: true, date: 1738000000000 },
+    { id: "poom", title: "POOM", url: "https://freds72.itch.io/poom", thumb: "https://img.itch.zone/aW1nLzM5MjY3OTkucG5n/315x250%23c/0RjS5Q.png", category: "Shooter", isHot: true, isTrending: true, date: 1737000000000 },
+    { id: "gun-knight", title: "Gun Knight", url: "https://stepford.itch.io/gun-knight", thumb: "https://img.itch.zone/aW1nLzI3ODc5MzMucG5n/315x250%23c/1X%2BR8S.png", category: "Action", isUpdated: true, isTrending: false, date: 1740000000000 },
+    { id: "captchaware", title: "CaptchaWare", url: "https://paperhatprojects.itch.io/captchaware", thumb: "https://img.itch.zone/aW1nLzE3Njg1NDUyLnBuZw==/315x250%23c/9f%2BFuB.png", category: "Puzzle", isHot: true, isTrending: true, date: 1736000000000 },
+    { id: "speedstars", title: "Speed Stars 2", url: "https://speedstars2.io/", thumb: "https://img.gamemonetize.com/9hibl9blop3ss2jxycuxpzoflnl2n16w/512x384.jpg", category: "Sports", isTop: true, isTrending: true, date: 1735000000000 }
+  ];
 
-    <style>
-        :root {
-            --brand: #32ff0e;
-            --brand-soft: rgba(50, 255, 14, 0.1);
-            --bg-dark: #000000;
-            --surface: #121212;
-            --surface-hover: #1c1c1c;
-            --text-main: #ffffff;
-            --text-secondary: #a1a1a1;
-            --font-main: 'Plus Jakarta Sans', sans-serif;
-            --font-display: 'Space Grotesk', sans-serif;
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --transition: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body { 
-            background: var(--bg-dark); 
-            color: var(--text-main);
-            font-family: var(--font-main);
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            scroll-behavior: smooth;
-            cursor: default;
-        }
-
-        /* --- LOADING OVERLAY --- */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .loader-content {
-            text-align: center;
-            width: 90%;
-            max-width: 500px;
-        }
-
-        .loader-logo {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-            animation: pulse 2s infinite ease-in-out;
-        }
-        .loader-logo span { color: var(--brand); }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(0.98); }
-        }
-
-        /* Mini Game Styles */
-        #mini-game-container {
-            width: 300px;
-            height: 200px;
-            background: #111;
-            border: 2px solid var(--brand-soft);
-            border-radius: var(--radius-md);
-            margin: 20px auto;
-            position: relative;
-            overflow: hidden;
-            cursor: crosshair;
-        }
-        
-        #game-canvas { display: block; }
-
-        .loader-text {
-            color: var(--brand);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: 800;
-            margin-top: 15px;
-        }
-
-        /* Premium Navbar */
-        .navbar {
-            background-color: rgba(0, 0, 0, 0.8) !important;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 1rem 0;
-            z-index: 1000;
-        }
-
-        .navbar-brand { 
-            font-family: var(--font-display); 
-            color: var(--text-main) !important; 
-            font-weight: 800; 
-            font-size: 1.5rem;
-            letter-spacing: -0.5px;
-            cursor: pointer;
-        }
-        .navbar-brand span { color: var(--brand); }
-
-        .search-container {
-            position: relative;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        #gameSearch {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-radius: 100px;
-            padding: 0.6rem 1.5rem;
-            transition: all 0.3s var(--transition);
-        }
-
-        #gameSearch:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--brand);
-            box-shadow: 0 0 0 4px var(--brand-soft);
-            outline: none;
-        }
-
-        /* Category Navigation */
-        .category-nav-wrapper {
-            position: sticky;
-            top: 76px;
-            z-index: 900;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding: 10px 0;
-        }
-
-        .category-nav {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 0 20px;
-            scrollbar-width: none;
-            white-space: nowrap;
-        }
-        .category-nav::-webkit-scrollbar { display: none; }
-
-        .cat-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 100px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s var(--transition);
-        }
-        .cat-btn:hover { background: var(--surface-hover); border-color: #fff; }
-
-        /* Library Layout */
-        #main-library { padding: 40px 0; }
-        
-        .hero-title {
-            font-family: var(--font-display);
-            font-size: clamp(2rem, 6vw, 3.5rem);
-            line-height: 1.1;
-            margin-bottom: 0.5rem;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 24px;
-            margin-top: 40px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            scroll-margin-top: 140px;
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            text-transform: uppercase;
-        }
-
-        .section-badge {
-            background: var(--brand-soft);
-            color: var(--brand);
-            padding: 4px 12px;
-            border-radius: 100px;
-            font-size: 0.75rem;
-            margin-left: 12px;
-        }
-
-        /* Game Cards */
-        .game-card { 
-            transition: transform 0.3s var(--transition), background-color 0.3s var(--transition); 
-            cursor: pointer; 
-            background: var(--surface); 
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            height: 100%;
-        }
-        .game-card:hover { 
-            transform: translateY(-4px);
-            background: var(--surface-hover);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .thumb-box { 
-            aspect-ratio: 16/9;
-            background: #0a0a0a;
-            overflow: hidden;
-        }
-        .thumb-box img { 
-            width: 100%; height: 100%; object-fit: cover; opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        .thumb-box img.loaded { opacity: 1; }
-
-        .game-info { padding: 12px 16px; }
-        .game-info h6 { font-size: 0.9rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Stage */
-        #game-stage { display: none; background: #000; min-height: 100vh; }
-        .stage-layout {
-            display: grid; grid-template-columns: 180px 1fr 180px; gap: 32px;
-            max-width: 1600px; margin: 0 auto; padding: 32px 20px;
-        }
-
-        .iframe-container {
-            background: var(--surface); border-radius: var(--radius-lg); padding: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .iframe-wrap { position: relative; padding-top: 56.25%; border-radius: 12px; overflow: hidden; }
-        #stage-iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        .btn-exit { 
-            background: rgba(255,255,255,0.08); color: #fff; border: none;
-            padding: 10px 24px; border-radius: 100px; font-weight: 700;
-        }
-        .btn-exit:hover { background: #fff; color: #000; }
-
-        @media (max-width: 1200px) {
-            .stage-layout { grid-template-columns: 1fr; }
-            .ad-sidebar { display: none; }
-        }
-    </style>
-
-    <script type="text/javascript">
-       window.sdkReady = false;
-       window.SDK_OPTIONS = {
-          gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
-          onEvent: function (a) {
-             if(a.name === "SDK_READY") window.sdkReady = true;
-          }
-       };
-       (function (a, b, c) {
-          var d = a.getElementsByTagName(b)[0];
-          if (!a.getElementById(c)) {
-              var s = a.createElement(b); s.id = c; s.async = true;
-              s.src = "https://api.gamemonetize.com/sdk.js";
-              d.parentNode.insertBefore(s, d);
-          }
-       })(document, "script", "gamemonetize-sdk");
-    </script>
-</head>
-<body>
-
-<div id="loading-overlay">
-    <div class="loader-content">
-        <div class="loader-logo">BLINCHI<span>GAMES</span></div>
-        <div id="mini-game-container">
-            <canvas id="game-canvas" width="300" height="200"></canvas>
-        </div>
-        <div id="loader-status" class="loader-text">Warming Up Engines...</div>
-        <p class="text-secondary small mt-2">Hit the square to keep it bouncing!</p>
-    </div>
-</div>
-
-<nav class="navbar navbar-expand-lg sticky-top">
-    <div class="container">
-        <a class="navbar-brand" onclick="goHome()">BLINCHI<span>GAMES</span></a>
-        <div class="search-container ms-auto">
-            <input id="gameSearch" class="form-control" type="search" placeholder="Search games...">
-        </div>
-    </div>
-</nav>
-
-<div id="main-library">
-    <div class="category-nav-wrapper">
-        <div class="container">
-            <div id="category-nav" class="category-nav"></div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="py-4 text-center">
-            <h1 class="hero-title">Elite<br><span style="color:var(--brand)">Web Gaming</span></h1>
-            <p id="lib-subtitle" class="text-secondary fw-semibold mt-2 text-uppercase small" style="letter-spacing: 3px;">Syncing Library...</p>
-        </div>
-        <div id="game-sections"></div>
-    </div>
-</div>
-
-<div id="game-stage">
-    <div class="stage-layout">
-        <aside class="ad-sidebar">
-            <div class="adsense-unit">
-                <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-5157317095946191" data-ad-slot="4832577246"></ins>
-                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-            </div>
-        </aside>
-
-        <main class="viewport-container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <button class="btn-exit" onclick="closeGame()">Back to Library</button>
-                <div class="small fw-bold text-uppercase text-secondary" id="active-title">Loading Game...</div>
-            </div>
-            <div class="iframe-container">
-                <div class="iframe-wrap">
-                    <iframe id="stage-iframe" src="" allowfullscreen allow="autoplay; encrypted-media; fullscreen"></iframe>
-                </div>
-            </div>
-            <div class="mt-5 ps-4 border-start border-4 border-success">
-                <h2 id="stage-title" class="fw-bold mb-2"></h2>
-                <p id="stage-desc" class="text-secondary mb-0"></p>
-            </div>
-        </main>
-
-        <aside class="ad-sidebar">
-            <div class="adsense-unit">
-                <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-5157317095946191" data-ad-slot="8074246080"></ins>
-                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-            </div>
-        </aside>
-    </div>
-</div>
-
-<script>
-    let catalog = [];
-    const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
-    
-    // --- MINI GAME LOGIC ---
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
-    let gameBox = { x: 135, y: 85, size: 30, dx: 3, dy: 3, color: '#32ff0e' };
-    let score = 0;
-
-    function drawMiniGame() {
-        ctx.fillStyle = '#111';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Target Box
-        ctx.fillStyle = gameBox.color;
-        ctx.fillRect(gameBox.x, gameBox.y, gameBox.size, gameBox.size);
-        
-        // Score
-        ctx.fillStyle = '#555';
-        ctx.font = '12px Space Grotesk';
-        ctx.fillText(`BOUNCES: ${score}`, 10, 20);
-
-        gameBox.x += gameBox.dx;
-        gameBox.y += gameBox.dy;
-
-        if (gameBox.x <= 0 || gameBox.x + gameBox.size >= canvas.width) gameBox.dx *= -1;
-        if (gameBox.y <= 0 || gameBox.y + gameBox.size >= canvas.height) gameBox.dy *= -1;
-
-        requestAnimationFrame(drawMiniGame);
-    }
-
-    canvas.addEventListener('mousedown', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        if (mouseX >= gameBox.x && mouseX <= gameBox.x + gameBox.size &&
-            mouseY >= gameBox.y && mouseY <= gameBox.y + gameBox.size) {
-            score++;
-            gameBox.dx *= 1.1; // Speed up
-            gameBox.dy *= 1.1;
-            gameBox.color = '#fff';
-            setTimeout(() => gameBox.color = '#32ff0e', 100);
-        }
-    });
-
-    drawMiniGame();
-
-    // --- PORTAL LOGIC ---
-
-    function goHome() {
-        clearSearch();
-        closeGame();
-    }
-
-    function clearSearch() {
-        const input = document.getElementById('gameSearch');
-        input.value = '';
-        input.blur();
-        renderLibrary(catalog);
-    }
-
-    function renderLibrary(games, isSearch = false) {
-        const container = document.getElementById('game-sections');
-        const navWrapper = document.querySelector('.category-nav-wrapper');
-        const navContainer = document.getElementById('category-nav');
-        container.innerHTML = '';
-        
-        if (isSearch) {
-            navWrapper.style.display = 'none';
-            const displayGames = games.slice(0, 60);
-            container.innerHTML = `
-                <div class="section-header">
-                    <h2 class="section-title">Found</h2>
-                    <span class="section-badge">${games.length} Games</span>
-                </div>
-                <div class="row g-3 g-md-4">${displayGames.map(g => createGameCardHTML(g)).join('')}</div>
-            `;
-            observeImages();
-            return;
-        }
-
-        navWrapper.style.display = 'block';
-        navContainer.innerHTML = '';
-        const cats = {};
-        games.forEach(g => {
-            const c = (g.category || 'Arcade').split(',')[0].trim();
-            if(!cats[c]) cats[c] = [];
-            cats[c].push(g);
-        });
-
-        Object.keys(cats).sort().forEach(cat => {
-            const btn = document.createElement('button');
-            btn.className = 'cat-btn';
-            btn.innerText = cat;
-            btn.onclick = () => document.getElementById(`cat-${cat}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
-            navContainer.appendChild(btn);
-
-            const section = document.createElement('div');
-            section.id = `cat-${cat}`;
-            section.className = 'mb-5';
-            section.innerHTML = `
-                <div class="section-header">
-                    <h2 class="section-title">${cat}</h2>
-                    <span class="section-badge">${cats[cat].length}</span>
-                </div>
-                <div class="row g-3 g-md-4">${cats[cat].map(g => createGameCardHTML(g)).join('')}</div>
-            `;
-            container.appendChild(section);
-        });
-        document.getElementById('lib-subtitle').innerText = `${games.length} ELITE GAMES ONLINE`;
-        observeImages();
-    }
-
-    function createGameCardHTML(game) {
-        return `
-            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-                <div class="game-card" onclick="openGame('${game.id}')">
-                    <div class="thumb-box"><img data-src="${game.thumb}" alt="${game.title}" class="lazy-img"></div>
-                    <div class="game-info"><h6>${game.title}</h6></div>
-                </div>
-            </div>`;
-    }
-
-    function observeImages() {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    const img = e.target;
-                    img.src = img.dataset.src;
-                    img.onload = () => img.classList.add('loaded');
-                    observer.unobserve(img);
-                }
-            });
-        });
-        document.querySelectorAll('img.lazy-img').forEach(i => observer.observe(i));
-    }
-
-    // --- REDUCED LOADING SPEED (Parallel Processing) ---
-    async function loadFeeds() {
-        const status = document.getElementById('loader-status');
-        const seenIds = new Set();
-        
-        // Fetch ALL feeds in parallel for maximum speed
-        const fetchPromises = feeds.map(url => 
-            fetch(url)
-                .then(r => r.json())
-                .catch(e => { console.warn(`Feed ${url} skipped`); return []; })
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const results = await Promise.all(
+          feeds.map(url => fetch(url).then(res => res.json()).catch(() => []))
         );
+        const combined = [...specialGames, ...results.flat()];
+        const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+        setCatalog(unique);
+        setFilteredCatalog(unique);
+        setLoading(false);
+      } catch (e) {
+        setCatalog(specialGames);
+        setFilteredCatalog(specialGames);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
-        const results = await Promise.all(fetchPromises);
-        
-        results.forEach(data => {
-            if (Array.isArray(data)) {
-                data.forEach(g => {
-                    if (g && g.id && !seenIds.has(g.id)) {
-                        seenIds.add(g.id);
-                        catalog.push({
-                            id: g.id,
-                            title: g.title,
-                            url: g.url,
-                            thumb: g.thumb,
-                            category: g.category,
-                            desc: g.description
-                        });
-                    }
-                });
-            }
-        });
+  // Functional Filters Logic
+  useEffect(() => {
+    let result = [...catalog];
 
-        status.innerText = "OPENING PORTAL...";
-        renderLibrary(catalog);
-        
-        setTimeout(() => {
-            const overlay = document.getElementById('loading-overlay');
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.style.display = 'none', 800);
-        }, 500);
+    if (searchQuery) {
+      result = result.filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    } else if (activeCategory) {
+      result = result.filter(g => g.category?.split(',')[0].trim() === activeCategory);
+    } else {
+      switch (activeFilter) {
+        case 'new':
+          // Sort by a timestamp (mock or actual)
+          result = [...result].sort((a, b) => (b.date || 0) - (a.date || 0));
+          break;
+        case 'trending':
+          // Only show items marked as trending or high performance
+          result = result.filter(g => g.isTrending || g.isHot || g.isTop);
+          break;
+        case 'recent':
+          // Shows the history of games you've clicked
+          result = recentGames;
+          break;
+        default:
+          // Standard catalog order
+          result = catalog;
+      }
     }
+    setFilteredCatalog(result);
+  }, [searchQuery, activeCategory, activeFilter, catalog, recentGames]);
 
-    function openGame(id) {
-        const g = catalog.find(x => x.id.toString() === id.toString());
-        if(!g) return;
-        document.getElementById('main-library').style.display = 'none';
-        document.getElementById('game-stage').style.display = 'block';
-        document.getElementById('stage-iframe').src = g.url;
-        document.getElementById('stage-title').innerText = g.title;
-        document.getElementById('stage-desc').innerText = g.desc;
-        document.getElementById('active-title').innerText = `LIVE: ${g.title}`;
-        window.scrollTo(0,0);
-        if (window.sdkReady && typeof sdk !== 'undefined') sdk.showBanner();
-    }
+  const categories = useMemo(() => {
+    const cats = catalog.map(g => g.category?.split(',')[0].trim()).filter(Boolean);
+    return [...new Set(cats)].sort();
+  }, [catalog]);
 
-    function closeGame() {
-        document.getElementById('stage-iframe').src = '';
-        document.getElementById('game-stage').style.display = 'none';
-        document.getElementById('main-library').style.display = 'block';
-        window.scrollTo(0,0);
-    }
-
-    document.getElementById('gameSearch').addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase().trim();
-        if (!q) { renderLibrary(catalog); return; }
-        const filtered = catalog.filter(g => g.title.toLowerCase().includes(q));
-        renderLibrary(filtered, true);
+  const handleGameSelect = (game) => {
+    setSelectedGame(game);
+    // Persist history for "Recent" filter
+    setRecentGames(prev => {
+      const filtered = prev.filter(g => g.id !== game.id);
+      return [game, ...filtered].slice(0, 30);
     });
+  };
 
-    window.addEventListener('load', loadFeeds);
-</script>
-</body>
-</html>
+  // The Smiling Square Duck Mascot (Non-Interactive)
+  const SquareDuck = ({ size = "w-10 h-10" }) => (
+    <div className={`${size} bg-[#32ff0e] rounded-xl flex flex-col items-center justify-center relative shadow-[0_0_15px_rgba(50,255,14,0.3)]`}>
+      {/* Eyes */}
+      <div className="flex gap-2 mb-1">
+        <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
+        <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
+      </div>
+      {/* Yellow Beak */}
+      <div className="w-4 h-2 bg-yellow-400 rounded-sm border-b border-yellow-600"></div>
+      {/* Subtle Smile line under beak */}
+      <div className="w-2.5 h-0.5 bg-black/20 rounded-full mt-0.5"></div>
+    </div>
+  );
+
+  const GameCard = ({ game, size = "normal" }) => (
+    <div 
+      onClick={() => handleGameSelect(game)}
+      className={`group relative overflow-hidden rounded-xl cursor-pointer bg-[#111] transition-all duration-300 hover:scale-[1.03] active:scale-95 border border-white/5 hover:border-[#32ff0e]/50 ${size === 'large' ? 'col-span-2 row-span-2' : ''}`}
+    >
+      <img src={game.thumb} alt={game.title} className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110" loading="lazy" />
+      
+      <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+        {game.isTop && <div className="bg-[#ffcc00] text-black text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-1 uppercase italic shadow-lg"><Star size={8} fill="black" /> Top</div>}
+        {game.isHot && <div className="bg-[#ff4d00] text-white text-[9px] font-black px-1.5 py-0.5 rounded flex items-center gap-1 uppercase italic shadow-lg"><Flame size={8} fill="white" /> Hot</div>}
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70 group-hover:opacity-90 transition-opacity"></div>
+      <div className="absolute bottom-0 left-0 right-0 p-3">
+        <p className={`font-black leading-tight text-white uppercase tracking-tight truncate ${size === 'large' ? 'text-lg' : 'text-[11px]'}`}>
+          {game.title}
+        </p>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-slate-100 font-sans selection:bg-[#32ff0e] selection:text-black flex">
+      
+      {/* SIDEBAR */}
+      <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} hidden md:flex flex-col bg-[#0b0b0b] border-r border-white/5 transition-all duration-300 sticky top-0 h-screen shrink-0 z-[200]`}>
+        <div className="p-5 flex items-center gap-3 mb-4">
+          <SquareDuck size="w-9 h-9" />
+          {isSidebarOpen && <span className="font-black text-sm uppercase italic tracking-tighter">Blinchi<span className="text-[#32ff0e]">Games</span></span>}
+        </div>
+
+        <nav className="flex-1 px-3 space-y-1 overflow-y-auto no-scrollbar">
+          <button 
+            onClick={() => {setSelectedGame(null); setActiveCategory(null); setActiveFilter('home')}} 
+            className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-bold transition-all ${activeFilter === 'home' && !activeCategory ? 'bg-[#32ff0e] text-black' : 'text-slate-500 hover:bg-white/5'}`}
+          >
+            <LayoutGrid size={20} /> {isSidebarOpen && "Home"}
+          </button>
+          <button 
+            onClick={() => {setSelectedGame(null); setActiveCategory(null); setActiveFilter('new')}}
+            className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-bold transition-all ${activeFilter === 'new' ? 'bg-white/5 text-[#32ff0e]' : 'text-slate-500 hover:bg-white/5'}`}
+          >
+            <Flame size={20} /> {isSidebarOpen && "New"}
+          </button>
+          <button 
+            onClick={() => {setSelectedGame(null); setActiveCategory(null); setActiveFilter('recent')}}
+            className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-bold transition-all ${activeFilter === 'recent' ? 'bg-white/5 text-[#32ff0e]' : 'text-slate-500 hover:bg-white/5'}`}
+          >
+            <Clock size={20} /> {isSidebarOpen && "Recent"}
+          </button>
+          <button 
+            onClick={() => {setSelectedGame(null); setActiveCategory(null); setActiveFilter('trending')}}
+            className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-bold transition-all ${activeFilter === 'trending' ? 'bg-white/5 text-[#32ff0e]' : 'text-slate-500 hover:bg-white/5'}`}
+          >
+            <Zap size={20} /> {isSidebarOpen && "Trending"}
+          </button>
+          
+          <div className="pt-8 pb-3 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">
+            {isSidebarOpen ? "Categories" : "•••"}
+          </div>
+          
+          {categories.map(cat => (
+            <button 
+              key={cat}
+              onClick={() => {setActiveCategory(cat); setSelectedGame(null)}}
+              className={`w-full flex items-center gap-4 px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${activeCategory === cat ? 'text-[#32ff0e] bg-white/5' : 'text-slate-500 hover:text-white'}`}
+            >
+              <div className={`w-1.5 h-1.5 rounded-full ${activeCategory === cat ? 'bg-[#32ff0e]' : 'bg-slate-800'}`}></div>
+              {isSidebarOpen && cat}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      <main className="flex-1 min-w-0">
+        <header className="h-16 flex items-center px-6 gap-6 sticky top-0 z-[100] bg-[#050505]/90 backdrop-blur-xl border-b border-white/5">
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-white/5 rounded-lg text-slate-400">
+            <Menu size={20} />
+          </button>
+          <div className="flex-1 max-w-xl relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#32ff0e] transition-colors" size={16} />
+            <input 
+              type="text" 
+              placeholder="Search games..." 
+              className="w-full bg-[#111] border border-white/5 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#32ff0e]/40 transition-all"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </header>
+
+        <div className="p-4 md:p-8 max-w-[1600px] mx-auto">
+          {selectedGame ? (
+            <div className="animate-in fade-in zoom-in duration-300">
+              <button 
+                onClick={() => setSelectedGame(null)}
+                className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 text-[10px] font-black uppercase tracking-widest bg-white/5 px-5 py-2.5 rounded-full border border-white/5"
+              >
+                <ChevronLeft size={16} /> Back to Library
+              </button>
+
+              <div className="relative bg-[#000] rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+                <div className="aspect-video w-full bg-[#0a0a0a]">
+                  <iframe src={selectedGame.url} className="w-full h-full border-none" allowFullScreen />
+                </div>
+                <div className="p-6 flex flex-wrap gap-6 items-center justify-between bg-white/[0.02]">
+                  <div className="flex items-center gap-5">
+                    <img src={selectedGame.thumb} className="w-14 h-14 rounded-2xl object-cover border border-white/10 shadow-lg" alt="" />
+                    <div>
+                      <h2 className="font-black text-2xl tracking-tighter uppercase italic">{selectedGame.title}</h2>
+                      <span className="text-[10px] text-[#32ff0e] font-black uppercase tracking-[0.2em]">{selectedGame.category}</span>
+                    </div>
+                  </div>
+                  <button className="flex items-center gap-3 bg-[#32ff0e] hover:bg-[#2ce60d] text-black font-black px-10 py-4 rounded-2xl text-sm transition-all shadow-2xl shadow-[#32ff0e]/30">
+                    <Rocket size={18} /> PLAY FULLSCREEN
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              {!activeCategory && !searchQuery && activeFilter === 'home' && (
+                <div className="relative rounded-[2.5rem] overflow-hidden bg-[#0b0b0b] border border-white/5 p-10 flex flex-col lg:flex-row items-center justify-between gap-10">
+                  <div className="z-10">
+                    <h1 className="text-5xl font-black mb-3 tracking-tighter uppercase italic">
+                      Blinchi<span className="text-[#32ff0e]">Games</span>
+                    </h1>
+                    <p className="text-slate-400 font-bold text-lg mb-8 max-w-lg">
+                      High-performance browser gaming. <br/> Zero downloads, zero lag.
+                    </p>
+                    <div className="flex gap-4">
+                      <div className="flex items-center gap-3 text-slate-300 text-sm font-bold bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                        <DownloadCloud size={18} className="text-[#32ff0e]"/> {catalog.length}+ Games
+                      </div>
+                      <div className="flex items-center gap-3 text-slate-300 text-sm font-bold bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                        <Zap size={18} className="text-[#32ff0e]"/> Speed Optimized
+                      </div>
+                    </div>
+                  </div>
+                  <SquareDuck size="w-32 h-32" />
+                </div>
+              )}
+
+              <section>
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-3">
+                    <div className="w-8 h-1 bg-[#32ff0e] rounded-full"></div>
+                    {activeFilter === 'recent' && recentGames.length === 0 ? "No Recently Played Games" : (activeCategory || activeFilter)}
+                  </h2>
+                  <div className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">{filteredCatalog.length} Matches</div>
+                </div>
+
+                {activeFilter === 'recent' && recentGames.length === 0 ? (
+                  <div className="py-20 flex flex-col items-center justify-center bg-white/[0.02] border border-dashed border-white/5 rounded-3xl">
+                    <Clock size={40} className="text-slate-800 mb-4" />
+                    <p className="text-slate-500 font-bold">Games you play will appear here.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+                    {activeFilter === 'home' && !activeCategory && !searchQuery && filteredCatalog.length > 0 && (
+                      <GameCard game={filteredCatalog[0]} size="large" />
+                    )}
+                    {filteredCatalog.slice(activeFilter === 'home' && !activeCategory && !searchQuery ? 1 : 0, 80).map((game) => (
+                      <GameCard key={game.id} game={game} />
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+          )}
+        </div>
+      </main>
+      <style dangerouslySetInnerHTML={{ __html: `.no-scrollbar::-webkit-scrollbar { display: none; }` }} />
+    </div>
+  );
+};
+
+export default App;

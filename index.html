@@ -110,6 +110,15 @@
             transition: opacity 0.6s ease;
         }
 
+        /* Bouncy Animation for logo */
+        .bouncy-logo {
+            animation: bounce 0.8s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-15px); }
+        }
+
         /* --- AD SLOTS --- */
         .ad-container-top { padding: 20px; background: rgba(255,255,255,0.02); text-align: center; }
         .ad-sidebar-fixed { width: 160px; flex-shrink: 0; padding: 20px 0; }
@@ -157,8 +166,9 @@
 
 <div id="loading-overlay">
     <div class="text-center">
-        <h2 class="logo mb-4" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h2>
+        <h2 class="logo mb-4 bouncy-logo" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h2>
         <div class="spinner-border text-success" role="status"></div>
+        <p class="text-secondary mt-3 small opacity-50">Optimizing Engine...</p>
     </div>
 </div>
 
@@ -183,10 +193,10 @@
                 <!-- Categories will be injected here -->
             </div>
             
-            <div class="menu-label">Community</div>
-            <button class="nav-item">
-                <i class="bi bi-discord"></i> Discord Server
-            </button>
+            <div class="menu-label">Follow Us</div>
+            <a href="https://www.tiktok.com/@blinchigames3?lang=en" target="_blank" class="nav-item text-decoration-none">
+                <i class="bi bi-tiktok"></i> TikTok
+            </a>
         </div>
 
         <div class="p-4 mt-auto">
@@ -256,6 +266,9 @@
     ];
 
     let fullCatalog = [];
+    let backgroundPointer = 0;
+    const CHUNK_SIZE = 100;
+    const BACKGROUND_LOAD_INTERVAL = 20000; // 20 seconds
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
 
     async function init() {
@@ -265,7 +278,7 @@
             eliteContainer.innerHTML += createCardHTML(g, true);
         });
 
-        // Load Catalog
+        // Load Catalog Metadata
         const fetchPromises = feeds.map(url => fetch(url).then(r => r.json()).catch(() => []));
         const results = await Promise.all(fetchPromises);
         
@@ -277,14 +290,56 @@
             }
         });
 
+        // 1. Load HALF of the games immediately during the bouncy screen
+        const halfCount = Math.floor(fullCatalog.length / 2);
+        renderInitialBatch(halfCount);
+        
+        // 2. Setup background loader for the rest
+        backgroundPointer = halfCount;
+        startBackgroundLoader();
+
         renderMenu();
-        renderHomeLibrary();
         
         // Hide Loader
         setTimeout(() => {
             document.getElementById('loading-overlay').style.opacity = '0';
             setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 600);
-        }, 1000);
+        }, 1500); // Slightly longer for the "bouncy" effect
+    }
+
+    function renderInitialBatch(count) {
+        const container = document.getElementById('library-preview');
+        const batch = fullCatalog.slice(0, count);
+        
+        // Use requestAnimationFrame to avoid freezing the main thread during heavy DOM insertion
+        let i = 0;
+        function step() {
+            const nextBatch = batch.slice(i, i + 50);
+            if (nextBatch.length > 0) {
+                let html = '';
+                nextBatch.forEach(g => html += createCardHTML(g));
+                container.insertAdjacentHTML('beforeend', html);
+                i += 50;
+                requestAnimationFrame(step);
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    function startBackgroundLoader() {
+        setInterval(() => {
+            if (backgroundPointer < fullCatalog.length) {
+                const container = document.getElementById('library-preview');
+                const chunk = fullCatalog.slice(backgroundPointer, backgroundPointer + CHUNK_SIZE);
+                
+                let html = '';
+                chunk.forEach(g => html += createCardHTML(g));
+                container.insertAdjacentHTML('beforeend', html);
+                
+                backgroundPointer += CHUNK_SIZE;
+                console.log(`Background Loader: Loaded up to ${backgroundPointer} games.`);
+            }
+        }, BACKGROUND_LOAD_INTERVAL);
     }
 
     function renderMenu() {
@@ -297,14 +352,6 @@
             btn.innerHTML = `<i class="bi bi-folder2"></i> ${cat}`;
             btn.onclick = () => showCategory(cat);
             menu.appendChild(btn);
-        });
-    }
-
-    function renderHomeLibrary() {
-        const container = document.getElementById('library-preview');
-        // Show a mix of games on home
-        fullCatalog.slice(0, 48).forEach(g => {
-            container.innerHTML += createCardHTML(g);
         });
     }
 

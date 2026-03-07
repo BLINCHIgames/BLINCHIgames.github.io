@@ -37,10 +37,8 @@
             overflow-x: hidden;
         }
 
-        /* --- LAYOUT STRUCTURE --- */
         .app-container { display: flex; min-height: 100vh; }
 
-        /* Sidebar Menu */
         .sidebar {
             width: 280px;
             background: var(--sidebar);
@@ -51,7 +49,6 @@
             display: flex;
             flex-direction: column;
             z-index: 1000;
-            transition: transform 0.3s ease;
         }
 
         .sidebar-header { padding: 30px 25px; }
@@ -96,12 +93,9 @@
         }
         .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .nav-item.active { color: var(--brand); background: var(--brand-soft); }
-        .nav-item i { font-size: 1.1rem; }
 
-        /* Main Content */
         .main-content { flex: 1; min-width: 0; position: relative; }
 
-        /* --- LOADING OVERLAY --- */
         #loading-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -110,20 +104,15 @@
             transition: opacity 0.6s ease;
         }
 
-        /* Bouncy Animation for logo */
-        .bouncy-logo {
-            animation: bounce 0.8s infinite alternate;
-        }
+        .bouncy-logo { animation: bounce 0.8s infinite alternate; }
         @keyframes bounce {
             from { transform: translateY(0); }
             to { transform: translateY(-15px); }
         }
 
-        /* --- AD SLOTS --- */
-        .ad-container-top { padding: 20px; background: rgba(255,255,255,0.02); text-align: center; }
+        .ad-container-top { padding: 20px; text-align: center; }
         .ad-sidebar-fixed { width: 160px; flex-shrink: 0; padding: 20px 0; }
 
-        /* --- GAME CARDS --- */
         .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; }
         .elite-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 
@@ -138,8 +127,7 @@
         }
         .game-card:hover { transform: translateY(-5px); border-color: var(--brand); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .game-thumb { aspect-ratio: 16/10; overflow: hidden; position: relative; }
-        .game-thumb img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .game-card:hover .game-thumb img { transform: scale(1.1); }
+        .game-thumb img { width: 100%; height: 100%; object-fit: cover; }
         
         .game-info { padding: 12px; }
         .game-info h6 { margin: 0; font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -149,17 +137,13 @@
             font-size: 0.6rem; font-weight: 900; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;
         }
 
-        /* --- STAGE --- */
         #game-stage { display: none; position: fixed; inset: 0; background: #000; z-index: 1500; }
         .stage-header { height: 60px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #222; }
         .stage-body { display: flex; height: calc(100vh - 60px); }
         .iframe-container { flex: 1; position: relative; background: #000; }
         #stage-iframe { width: 100%; height: 100%; border: none; }
 
-        @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); position: fixed; }
-            .sidebar.open { transform: translateX(0); }
-        }
+        #scroll-sentinel { height: 50px; width: 100%; }
     </style>
 </head>
 <body>
@@ -168,12 +152,11 @@
     <div class="text-center">
         <h2 class="logo mb-4 bouncy-logo" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h2>
         <div class="spinner-border text-success" role="status"></div>
-        <p class="text-secondary mt-3 small opacity-50">Optimizing Engine...</p>
+        <p class="text-secondary mt-3 small opacity-50">Optimizing Performance Engine...</p>
     </div>
 </div>
 
 <div class="app-container">
-    <!-- SIDEBAR MENU -->
     <aside id="main-sidebar" class="sidebar">
         <div class="sidebar-header">
             <a href="#" class="logo" onclick="showSection('home')">BLINCHI<span>GAMES</span></a>
@@ -181,17 +164,12 @@
         
         <div class="menu-scroll">
             <div class="menu-label">Featured</div>
-            <button class="nav-item active" onclick="showSection('home')">
+            <button class="nav-item active" id="btn-nav-home" onclick="showSection('home')">
                 <i class="bi bi-house-door"></i> Home
-            </button>
-            <button class="nav-item" onclick="showSection('elite')">
-                <i class="bi bi-star-fill text-warning"></i> Elite Picks
             </button>
 
             <div class="menu-label">Library Menu</div>
-            <div id="category-nav-list">
-                <!-- Categories will be injected here -->
-            </div>
+            <div id="category-nav-list"></div>
             
             <div class="menu-label">Follow Us</div>
             <a href="https://www.tiktok.com/@blinchigames3?lang=en" target="_blank" class="nav-item text-decoration-none">
@@ -200,16 +178,12 @@
         </div>
 
         <div class="p-4 mt-auto">
-            <div class="adsense-unit">
-                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5157317095946191" data-ad-slot="4832577246" data-ad-format="auto" data-full-width-responsive="true"></ins>
-                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-            </div>
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5157317095946191" data-ad-slot="4832577246" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="main-content">
-        <!-- Top Ad Banner -->
         <div class="ad-container-top">
             <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-5157317095946191" data-ad-slot="4832577246"></ins>
             <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
@@ -217,24 +191,21 @@
 
         <div id="view-home" class="view-section container-fluid py-4">
             <h2 class="section-title mb-4 font-display fw-bold text-uppercase italic"><i class="bi bi-lightning-charge-fill text-success"></i> Elite Collection</h2>
-            <div id="elite-games-container" class="game-grid elite-grid mb-5">
-                <!-- Constant games here -->
-            </div>
+            <div id="elite-games-container" class="game-grid elite-grid mb-5"></div>
 
             <h2 class="section-title mb-4 font-display fw-bold text-uppercase italic">Browse Library</h2>
-            <div id="library-preview" class="game-grid">
-                <!-- Catalog games here -->
-            </div>
+            <div id="library-preview" class="game-grid"></div>
         </div>
 
         <div id="view-category" class="view-section container-fluid py-4" style="display:none">
             <h2 id="category-title" class="section-title mb-4 font-display fw-bold text-uppercase italic"></h2>
             <div id="category-games-container" class="game-grid"></div>
         </div>
+
+        <div id="scroll-sentinel"></div>
     </main>
 </div>
 
-<!-- GAME STAGE -->
 <div id="game-stage">
     <div class="stage-header">
         <button class="btn btn-dark btn-sm rounded-pill px-4 fw-bold me-3" onclick="closeGame()"><i class="bi bi-arrow-left"></i> Exit</button>
@@ -246,7 +217,7 @@
              <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
         </aside>
         <div class="iframe-container">
-            <iframe id="stage-iframe" src=""></iframe>
+            <iframe id="stage-iframe" src="" allow="autoplay; fullscreen; keyboard" allowfullscreen></iframe>
         </div>
         <aside class="ad-sidebar-fixed d-none d-xl-block">
             <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-5157317095946191" data-ad-slot="8074246080"></ins>
@@ -256,130 +227,81 @@
 </div>
 
 <script>
+    // FIXED URLs: Using specific itch.io embed paths ensures they load inside the iframe
     const eliteGames = [
-        { id: 'wbwwb', title: 'We Become What We Behold', url: 'https://ncase.itch.io/wbwwb', thumb: 'https://img.itch.zone/aW1nLzU0NjEwNy5wbmc=/315x250%23c/yH%2F6pI.png' },
-        { id: 'polytrack', title: 'PolyTrack', url: 'https://kodub.itch.io/polytrack', thumb: 'https://img.itch.zone/aW1nLzEwNjkzNTU4LnBuZw==/315x250%23c/4v09eA.png' },
-        { id: 'poom', title: 'POOM', url: 'https://freds72.itch.io/poom', thumb: 'https://img.itch.zone/aW1nLzM5MjY3OTkucG5n/315x250%23c/0RjS5Q.png' },
-        { id: 'gunknight', title: 'Gun Knight', url: 'https://stepford.itch.io/gun-knight', thumb: 'https://img.itch.zone/aW1nLzI3ODc5MzMucG5n/315x250%23c/1X%2BR8S.png' },
-        { id: 'captchaware', title: 'CaptchaWare', url: 'https://paperhatprojects.itch.io/captchaware', thumb: 'https://img.itch.zone/aW1nLzE3Njg1NDUyLnBuZw==/315x250%23c/9f%2BFuB.png' },
+        { id: 'polytrack', title: 'PolyTrack', url: 'https://itch.io/embed-upload/10693558?color=000000', thumb: 'https://img.itch.zone/aW1nLzEwNjkzNTU4LnBuZw==/315x250%23c/4v09eA.png' },
+        { id: 'deathloop', title: 'Death Loop (Danganronpa)', url: 'https://itch.io/embed-upload/11266205?color=000000', thumb: 'https://img.itch.zone/aW1nLzE3Njg1NDUyLnBuZw==/315x250%23c/9f%2BFuB.png' },
+        { id: 'dungeon', title: 'Die in the Dungeon', url: 'https://itch.io/embed-upload/3796541?color=000000', thumb: 'https://img.itch.zone/aW1nLzUzODU0MzIucG5n/315x250%23c/X%2F%2F%2FRq.png' },
+        { id: 'littlechef', title: 'Little Chef', url: 'https://itch.io/embed-upload/8133544?color=000000', thumb: 'https://img.itch.zone/aW1nLzEyMzk0MTk3LnBuZw==/315x250%23c/W0mO4H.png' },
+        { id: 'wbwwb', title: 'We Become What We Behold', url: 'https://itch.io/embed-upload/546107?color=000000', thumb: 'https://img.itch.zone/aW1nLzU0NjEwNy5wbmc=/315x250%23c/yH%2F6pI.png' },
         { id: 'speedstars', title: 'Speed Stars 2', url: 'https://speedstars2.io/', thumb: 'https://img.gamemonetize.com/9hibl9blop3ss2jxycuxpzoflnl2n16w/512x384.jpg' }
     ];
 
     let fullCatalog = [];
-    let backgroundPointer = 0;
-    const CHUNK_SIZE = 100;
-    const BACKGROUND_LOAD_INTERVAL = 20000; // 20 seconds
+    let currentCategoryGames = [];
+    let activeView = 'home';
+    let loadedCount = 0;
+    
+    const CHUNK_SIZE_INITIAL = 100;
+    const CHUNK_SIZE_SCROLL = 30;
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
 
     async function init() {
-        // Render Elite Games first
         const eliteContainer = document.getElementById('elite-games-container');
-        eliteGames.forEach(g => {
-            eliteContainer.innerHTML += createCardHTML(g, true);
-        });
+        eliteGames.forEach(g => eliteContainer.innerHTML += createCardHTML(g, true));
 
-        // Load Catalog Metadata
         const fetchPromises = feeds.map(url => fetch(url).then(r => r.json()).catch(() => []));
         const results = await Promise.all(fetchPromises);
         
         results.forEach(data => {
             if (Array.isArray(data)) {
-                data.forEach(g => {
-                    if (g && g.id) fullCatalog.push(g);
-                });
+                data.forEach(g => { if (g && g.id) fullCatalog.push(g); });
             }
         });
 
-        // 1. Load HALF of the games immediately during the bouncy screen
-        const halfCount = Math.floor(fullCatalog.length / 2);
-        renderInitialBatch(halfCount);
-        
-        // 2. Setup background loader for the rest
-        backgroundPointer = halfCount;
-        startBackgroundLoader();
+        currentCategoryGames = [...fullCatalog];
+        loadMoreGames(Math.floor(fullCatalog.length / 2), 'library-preview');
 
         renderMenu();
+        initInfiniteScroll();
         
-        // Hide Loader
         setTimeout(() => {
             document.getElementById('loading-overlay').style.opacity = '0';
             setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 600);
-        }, 1500); // Slightly longer for the "bouncy" effect
-    }
-
-    function renderInitialBatch(count) {
-        const container = document.getElementById('library-preview');
-        const batch = fullCatalog.slice(0, count);
-        
-        // Use requestAnimationFrame to avoid freezing the main thread during heavy DOM insertion
-        let i = 0;
-        function step() {
-            const nextBatch = batch.slice(i, i + 50);
-            if (nextBatch.length > 0) {
-                let html = '';
-                nextBatch.forEach(g => html += createCardHTML(g));
-                container.insertAdjacentHTML('beforeend', html);
-                i += 50;
-                requestAnimationFrame(step);
-            }
-        }
-        requestAnimationFrame(step);
-    }
-
-    function startBackgroundLoader() {
-        setInterval(() => {
-            if (backgroundPointer < fullCatalog.length) {
-                const container = document.getElementById('library-preview');
-                const chunk = fullCatalog.slice(backgroundPointer, backgroundPointer + CHUNK_SIZE);
-                
-                let html = '';
-                chunk.forEach(g => html += createCardHTML(g));
-                container.insertAdjacentHTML('beforeend', html);
-                
-                backgroundPointer += CHUNK_SIZE;
-                console.log(`Background Loader: Loaded up to ${backgroundPointer} games.`);
-            }
-        }, BACKGROUND_LOAD_INTERVAL);
+        }, 1500);
     }
 
     function renderMenu() {
         const menu = document.getElementById('category-nav-list');
         const cats = [...new Set(fullCatalog.map(g => (g.category || 'Arcade').split(',')[0].trim()))].sort();
-        
         cats.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = 'nav-item';
             btn.innerHTML = `<i class="bi bi-folder2"></i> ${cat}`;
-            btn.onclick = () => showCategory(cat);
+            btn.onclick = () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                btn.classList.add('active');
+                showCategory(cat);
+            };
             menu.appendChild(btn);
         });
     }
 
-    function createCardHTML(game, isElite = false) {
-        return `
-            <div class="game-card" onclick="openGame('${game.url}', '${game.title}')">
-                <div class="game-thumb">
-                    ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
-                    <img src="${game.thumb}" alt="${game.title}" loading="lazy">
-                </div>
-                <div class="game-info">
-                    <h6>${game.title}</h6>
-                </div>
-            </div>
-        `;
-    }
-
     function showSection(section) {
+        activeView = section;
         document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         
         if(section === 'home') {
             document.getElementById('view-home').style.display = 'block';
-            document.querySelector('[onclick="showSection(\'home\')"]').classList.add('active');
+            document.getElementById('btn-nav-home').classList.add('active');
+            currentCategoryGames = [...fullCatalog];
+            loadedCount = document.getElementById('library-preview').children.length;
         }
     }
 
     function showCategory(cat) {
+        activeView = 'category';
         document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
         const view = document.getElementById('view-category');
         const container = document.getElementById('category-games-container');
@@ -389,9 +311,45 @@
         title.innerHTML = `<i class="bi bi-folder2-open text-success"></i> ${cat}`;
         container.innerHTML = '';
         
-        const filtered = fullCatalog.filter(g => (g.category || 'Arcade').includes(cat));
-        filtered.forEach(g => container.innerHTML += createCardHTML(g));
+        currentCategoryGames = fullCatalog.filter(g => (g.category || 'Arcade').includes(cat));
+        loadedCount = 0;
+        loadMoreGames(CHUNK_SIZE_INITIAL, 'category-games-container');
         window.scrollTo(0,0);
+    }
+
+    function loadMoreGames(limit, containerId) {
+        const container = document.getElementById(containerId);
+        const nextBatch = currentCategoryGames.slice(loadedCount, loadedCount + limit);
+        if (nextBatch.length === 0) return;
+        let html = '';
+        nextBatch.forEach(g => html += createCardHTML(g));
+        container.insertAdjacentHTML('beforeend', html);
+        loadedCount += nextBatch.length;
+    }
+
+    function initInfiniteScroll() {
+        const sentinel = document.getElementById('scroll-sentinel');
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                const targetId = activeView === 'home' ? 'library-preview' : 'category-games-container';
+                loadMoreGames(CHUNK_SIZE_SCROLL, targetId);
+            }
+        }, { rootMargin: '200px' });
+        observer.observe(sentinel);
+    }
+
+    function createCardHTML(game, isElite = false) {
+        return `
+            <div class="game-card" onclick="openGame('${game.url}', '${game.title}')">
+                <div class="game-thumb">
+                    ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
+                    <img src="${game.thumb}" alt="${game.title}" loading="lazy" onerror="this.src='https://placehold.co/300x200/111/32ff0e?text=Blinchi+Games'">
+                </div>
+                <div class="game-info">
+                    <h6>${game.title}</h6>
+                </div>
+            </div>
+        `;
     }
 
     function openGame(url, title) {

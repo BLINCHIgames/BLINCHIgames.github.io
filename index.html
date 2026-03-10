@@ -39,7 +39,6 @@
 
         .app-container { display: flex; min-height: 100vh; }
 
-        /* Sidebar: Sticky/Floating */
         .sidebar {
             width: 280px;
             background: var(--sidebar);
@@ -63,10 +62,7 @@
         }
         .logo span { color: var(--brand); }
 
-        /* Search Engine Styles */
-        .search-box {
-            padding: 0 15px 15px;
-        }
+        .search-box { padding: 0 15px 15px; }
         .search-input-wrapper {
             position: relative;
             background: rgba(255,255,255,0.05);
@@ -135,13 +131,7 @@
         }
 
         .bouncy-logo { animation: bounce 0.8s infinite alternate; }
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-15px); }
-        }
-
-        .ad-container-top { padding: 20px; text-align: center; }
-        .ad-sidebar-fixed { width: 160px; flex-shrink: 0; padding: 20px 0; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
 
         .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; }
         .elite-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
@@ -167,13 +157,14 @@
             font-size: 0.6rem; font-weight: 900; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;
         }
 
+        #scroll-sentinel { height: 120px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .sync-status { font-size: 0.7rem; color: var(--brand); margin-top: 8px; font-weight: bold; opacity: 0.8; }
+
         #game-stage { display: none; position: fixed; inset: 0; background: #000; z-index: 1500; }
         .stage-header { height: 60px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #222; }
         .stage-body { display: flex; height: calc(100vh - 60px); }
         .iframe-container { flex: 1; position: relative; background: #000; }
         #stage-iframe { width: 100%; height: 100%; border: none; }
-
-        #scroll-sentinel { height: 50px; width: 100%; }
     </style>
 </head>
 <body>
@@ -182,7 +173,7 @@
     <div class="text-center">
         <h2 class="logo mb-4 bouncy-logo" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h2>
         <div class="spinner-border text-success" role="status"></div>
-        <p class="text-secondary mt-3 small opacity-50">Checking for duplicate entries...</p>
+        <p class="text-secondary mt-3 small opacity-50">Initializing 100-Game Batch...</p>
     </div>
 </div>
 
@@ -205,7 +196,7 @@
                 <i class="bi bi-house-door"></i> Home
             </button>
 
-            <div class="menu-label">Library Menu</div>
+            <div class="menu-label">Categories</div>
             <div id="category-nav-list"></div>
             
             <div class="menu-label">Follow Us</div>
@@ -213,19 +204,9 @@
                 <i class="bi bi-tiktok"></i> TikTok
             </a>
         </div>
-
-        <div class="p-4 mt-auto">
-            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5157317095946191" data-ad-slot="4832577246" data-ad-format="auto" data-full-width-responsive="true"></ins>
-            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
     </aside>
 
     <main class="main-content">
-        <div class="ad-container-top">
-            <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-5157317095946191" data-ad-slot="4832577246"></ins>
-            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
-
         <div id="view-home" class="view-section container-fluid py-4">
             <h2 class="section-title mb-4 font-display fw-bold text-uppercase italic"><i class="bi bi-lightning-charge-fill text-success"></i> Elite Collection</h2>
             <div id="elite-games-container" class="game-grid elite-grid mb-5"></div>
@@ -239,27 +220,22 @@
             <div id="category-games-container" class="game-grid"></div>
         </div>
 
-        <div id="scroll-sentinel"></div>
+        <div id="scroll-sentinel">
+            <div class="spinner-border text-success spinner-border-sm" role="status"></div>
+            <div class="sync-status" id="bg-sync-info">Background Sync Active</div>
+        </div>
     </main>
 </div>
 
 <div id="game-stage">
     <div class="stage-header">
         <button class="btn btn-dark btn-sm rounded-pill px-4 fw-bold me-3" onclick="closeGame()"><i class="bi bi-arrow-left"></i> Exit</button>
-        <span id="active-game-title" class="fw-bold text-uppercase small tracking-widest text-secondary"></span>
+        <span id="active-game-title" class="fw-bold text-uppercase small text-secondary"></span>
     </div>
     <div class="stage-body">
-        <aside class="ad-sidebar-fixed d-none d-xl-block">
-             <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-5157317095946191" data-ad-slot="4832577246"></ins>
-             <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </aside>
         <div class="iframe-container">
             <iframe id="stage-iframe" src="" allow="autoplay; fullscreen; keyboard" allowfullscreen></iframe>
         </div>
-        <aside class="ad-sidebar-fixed d-none d-xl-block">
-            <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-5157317095946191" data-ad-slot="8074246080"></ins>
-            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </aside>
     </div>
 </div>
 
@@ -272,61 +248,88 @@
         { id: 'speedstars', title: 'Speed Stars 2', url: 'https://speedstars2.io/', thumb: 'https://img.gamemonetize.com/9hibl9blop3ss2jxycuxpzoflnl2n16w/512x384.jpg' }
     ];
 
-    let fullCatalog = [];
-    let currentCategoryGames = [];
-    let activeView = 'home';
-    let loadedCount = 0;
+    let rawFeedData = []; // Untouched raw list from feeds
+    let fullCatalog = []; // Filtered, non-duplicate list available for display
+    let currentFilteredView = []; // What the user is currently seeing (e.g. search or category)
     
-    const GLOBAL_MAX_GAMES = 100;
-    const CHUNK_SIZE_INITIAL = 40;
-    const CHUNK_SIZE_SCROLL = 20;
+    let activeView = 'home';
+    let loadedCount = 0; // Currently rendered count
+    
+    const INITIAL_LOAD_LIMIT = 100;
+    const SCROLL_BATCH_SIZE = 20;
+    const BACKGROUND_LOAD_SIZE = 100;
+    const BACKGROUND_TICK_MS = 20000; // 20 seconds
+    
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
+    const seenIds = new Set(eliteGames.map(g => g.id));
 
     async function init() {
         const eliteContainer = document.getElementById('elite-games-container');
         eliteGames.forEach(g => eliteContainer.innerHTML += createCardHTML(g, true));
 
+        // Initial Data Fetch
         const fetchPromises = feeds.map(url => fetch(url).then(r => r.json()).catch(() => []));
         const results = await Promise.all(fetchPromises);
         
-        // Anti-Duplicate Set
-        const seenIds = new Set(eliteGames.map(g => g.id));
-        
-        results.forEach(data => {
-            if (Array.isArray(data)) {
-                data.forEach(g => { 
-                    if (g && g.id && !seenIds.has(g.id)) { 
-                        fullCatalog.push(g); 
-                        seenIds.add(g.id);
-                    } 
-                });
-            }
-        });
+        results.forEach(data => { if (Array.isArray(data)) rawFeedData.push(...data); });
 
-        currentCategoryGames = [...fullCatalog];
-        loadMoreGames(CHUNK_SIZE_INITIAL, 'library-preview');
+        // Initial process: Get first set for display
+        processBatch(300); // Process a good chunk initially to ensure we have enough for the first 100 display
+        
+        currentFilteredView = [...fullCatalog];
+        loadMoreGames('library-preview', INITIAL_LOAD_LIMIT);
 
         renderMenu();
         initInfiniteScroll();
+        startBackgroundSync();
         
         setTimeout(() => {
             document.getElementById('loading-overlay').style.opacity = '0';
             setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 600);
-        }, 1500);
+        }, 1200);
+    }
+
+    // Transfers items from rawFeedData to fullCatalog ensuring no duplicates
+    function processBatch(count) {
+        let processed = 0;
+        let startIndex = fullCatalog.length; 
+        
+        // We pick from rawFeedData starting where we last left off conceptually
+        // For simplicity, we just iterate the whole thing and skip seen
+        for (let i = 0; i < rawFeedData.length; i++) {
+            const g = rawFeedData[i];
+            if (g && g.id && !seenIds.has(g.id)) {
+                fullCatalog.push(g);
+                seenIds.add(g.id);
+                processed++;
+                if (processed >= count) break;
+            }
+        }
+        return processed;
+    }
+
+    function startBackgroundSync() {
+        setInterval(() => {
+            const added = processBatch(BACKGROUND_LOAD_SIZE);
+            if (added > 0) {
+                console.log(`Background Sync: Added ${added} new unique games.`);
+                document.getElementById('bg-sync-info').innerText = `Synced ${fullCatalog.length} Total Games`;
+                // If we are in "Home" view and not searching, refresh our reference
+                if (activeView === 'home' && document.getElementById('game-search').value === "") {
+                    currentFilteredView = [...fullCatalog];
+                }
+            }
+        }, BACKGROUND_TICK_MS);
     }
 
     function renderMenu() {
         const menu = document.getElementById('category-nav-list');
-        const cats = [...new Set(fullCatalog.map(g => (g.category || 'Arcade').split(',')[0].trim()))].sort();
+        const cats = ['Action', 'Arcade', 'Driving', 'Puzzle', 'Shooting', 'Sports'];
         cats.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = 'nav-item';
-            btn.innerHTML = `<i class="bi bi-folder2"></i> ${cat}`;
-            btn.onclick = () => {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                btn.classList.add('active');
-                showCategory(cat);
-            };
+            btn.innerHTML = `<i class="bi bi-tag"></i> ${cat}`;
+            btn.onclick = () => showCategory(cat);
             menu.appendChild(btn);
         });
     }
@@ -334,32 +337,25 @@
     function handleSearch() {
         const query = document.getElementById('game-search').value.toLowerCase().trim();
         showSection('home');
-        
         const container = document.getElementById('library-preview');
         container.innerHTML = '';
         
         if (query === "") {
             document.getElementById('main-library-title').innerText = "Browse Library";
-            currentCategoryGames = [...fullCatalog];
+            currentFilteredView = [...fullCatalog];
         } else {
             document.getElementById('main-library-title').innerText = `Search: "${query}"`;
-            currentCategoryGames = fullCatalog.filter(g => g.title.toLowerCase().includes(query));
+            currentFilteredView = fullCatalog.filter(g => g.title.toLowerCase().includes(query));
         }
         
         loadedCount = 0;
-        loadMoreGames(CHUNK_SIZE_INITIAL, 'library-preview');
+        loadMoreGames('library-preview', INITIAL_LOAD_LIMIT);
     }
 
     function showSection(section) {
         activeView = section;
         document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        
-        if(section === 'home') {
-            document.getElementById('view-home').style.display = 'block';
-            document.getElementById('btn-nav-home').classList.add('active');
-            loadedCount = document.getElementById('library-preview').children.length;
-        }
+        if(section === 'home') document.getElementById('view-home').style.display = 'block';
     }
 
     function showCategory(cat) {
@@ -368,29 +364,26 @@
         document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
         const view = document.getElementById('view-category');
         const container = document.getElementById('category-games-container');
-        const title = document.getElementById('category-title');
-        
         view.style.display = 'block';
-        title.innerHTML = `<i class="bi bi-folder2-open text-success"></i> ${cat}`;
+        document.getElementById('category-title').innerText = cat;
         container.innerHTML = '';
         
-        currentCategoryGames = fullCatalog.filter(g => (g.category || 'Arcade').includes(cat));
+        currentFilteredView = fullCatalog.filter(g => (g.category || '').includes(cat));
         loadedCount = 0;
-        loadMoreGames(CHUNK_SIZE_INITIAL, 'category-games-container');
+        loadMoreGames('category-games-container', INITIAL_LOAD_LIMIT);
         window.scrollTo(0,0);
     }
 
-    function loadMoreGames(limit, containerId) {
+    function loadMoreGames(containerId, limit) {
         const container = document.getElementById(containerId);
+        const nextBatch = currentFilteredView.slice(loadedCount, loadedCount + limit);
         
-        if (loadedCount >= GLOBAL_MAX_GAMES) return;
+        if (nextBatch.length === 0) {
+            document.getElementById('scroll-sentinel').style.opacity = '0';
+            return;
+        }
         
-        let remainingSpace = GLOBAL_MAX_GAMES - loadedCount;
-        let actualLimit = Math.min(limit, remainingSpace);
-
-        const nextBatch = currentCategoryGames.slice(loadedCount, loadedCount + actualLimit);
-        if (nextBatch.length === 0) return;
-        
+        document.getElementById('scroll-sentinel').style.opacity = '1';
         let html = '';
         nextBatch.forEach(g => html += createCardHTML(g));
         container.insertAdjacentHTML('beforeend', html);
@@ -402,18 +395,18 @@
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
                 const targetId = activeView === 'home' ? 'library-preview' : 'category-games-container';
-                loadMoreGames(CHUNK_SIZE_SCROLL, targetId);
+                loadMoreGames(targetId, SCROLL_BATCH_SIZE);
             }
-        }, { rootMargin: '200px' });
+        }, { rootMargin: '400px' });
         observer.observe(sentinel);
     }
 
     function createCardHTML(game, isElite = false) {
         return `
-            <div class="game-card" onclick="openGame('${game.url}', '${game.title}')">
+            <div class="game-card" onclick="openGame('${game.url}', '${game.title.replace(/'/g, "\\'")}')">
                 <div class="game-thumb">
                     ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
-                    <img src="${game.thumb}" alt="${game.title}" loading="lazy" onerror="this.src='https://placehold.co/300x200/111/32ff0e?text=Blinchi+Games'">
+                    <img src="${game.thumb}" alt="${game.title}" loading="lazy" onerror="this.src='https://placehold.co/300x200/111/32ff0e?text=Game'">
                 </div>
                 <div class="game-info">
                     <h6>${game.title}</h6>

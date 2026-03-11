@@ -6,336 +6,473 @@
     <title>BLINCHIGAMES | Elite Portal</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
-    <!-- Google AdSense Main Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157317095946191" crossorigin="anonymous"></script>
 
     <style>
         :root {
             --brand: #32ff0e;
+            --brand-glow: rgba(50, 255, 14, 0.4);
             --brand-soft: rgba(50, 255, 14, 0.1);
             --bg-dark: #000000;
-            --surface: #121212;
-            --surface-hover: #1c1c1c;
-            --text-main: #ffffff;
-            --text-secondary: #a1a1a1;
+            --surface: #0a0a0a;
+            --surface-hover: #141414;
+            --border: rgba(255, 255, 255, 0.08);
             --font-main: 'Plus Jakarta Sans', sans-serif;
             --font-display: 'Space Grotesk', sans-serif;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --transition: cubic-bezier(0.2, 0, 0, 1);
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --transition: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body { 
             background: var(--bg-dark); 
-            color: var(--text-main);
+            color: #fff;
             font-family: var(--font-main);
             margin: 0;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER & LOGO */
+        /* --- TECHY LOADING OVERLAY --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-box {
+            border: 1px solid var(--brand-soft);
+            padding: 40px;
+            background: rgba(50, 255, 14, 0.02);
+            border-radius: var(--radius-lg);
+            text-align: center;
+        }
+
+        /* --- NAVBAR --- */
         .navbar {
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
             padding: 15px 0;
         }
 
         .logo { 
             font-family: var(--font-display); 
-            font-size: 1.5rem; 
+            font-size: 1.4rem; 
             font-weight: 800; 
             color: #fff; 
             text-decoration: none;
-            letter-spacing: -1px;
+            text-transform: uppercase;
         }
-        .logo span { color: var(--brand); }
+        .logo span { color: var(--brand); text-shadow: 0 0 10px var(--brand-glow); }
 
-        /* LAYOUT WITH BANNERS */
-        .portal-layout {
-            display: flex;
-            justify-content: center;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            gap: 20px;
-        }
-
-        .ad-column {
-            width: 160px;
-            flex-shrink: 0;
-            display: none; /* Hidden on mobile */
-        }
-
-        @media (min-width: 1200px) {
-            .ad-column { display: block; }
-        }
-
-        .main-content-area {
-            flex: 1;
-            min-width: 0;
-        }
-
-        /* SEARCH BAR */
-        .search-container {
-            max-width: 600px;
-            margin: 40px auto;
-            position: relative;
-        }
         .search-bar {
             background: var(--surface);
-            border: 2px solid rgba(255,255,255,0.05);
-            border-radius: 50px;
-            padding: 15px 25px 15px 55px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             color: #fff;
-            width: 100%;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            width: 300px;
             transition: var(--transition);
         }
-        .search-bar:focus {
-            outline: none;
-            border-color: var(--brand);
-            box-shadow: 0 0 20px var(--brand-soft);
-        }
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
+        .search-bar:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 15px var(--brand-soft); }
 
-        /* GAME GRID */
+        /* --- LAYOUT GRID --- */
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
         }
 
         .game-card {
             background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: var(--radius-md);
             overflow: hidden;
             transition: var(--transition);
             cursor: pointer;
-            border: 1px solid transparent;
             text-decoration: none;
-        }
-        .game-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--brand);
-            box-shadow: 0 10px 30px rgba(50, 255, 14, 0.15);
-        }
-        
-        .game-thumb {
-            width: 100%;
-            aspect-ratio: 4/3;
-            background: #222;
-            overflow: hidden;
             position: relative;
         }
-        .game-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .game-card:hover {
+            border-color: var(--brand);
+            transform: translateY(-5px);
+            background: var(--surface-hover);
+            box-shadow: 0 0 20px var(--brand-soft);
         }
-        
-        .game-info {
-            padding: 12px;
-        }
-        .game-info h3 {
-            font-size: 0.95rem;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #fff;
-        }
+        .game-thumb { aspect-ratio: 16/10; overflow: hidden; background: #111; position: relative; }
+        .game-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .game-info { padding: 12px; }
+        .game-info h3 { font-size: 0.85rem; margin: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* LOADING OVERLAY */
-        #loading-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s;
-        }
-
-        /* STAGE */
+        /* --- GAME STAGE (EPIC STYLE) --- */
         #game-stage {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #000;
             z-index: 9000;
+            overflow-y: auto;
         }
-        .stage-nav {
-            height: 60px;
-            background: #111;
+
+        .stage-header {
+            padding: 15px 30px;
+            background: #0a0a0a;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            align-items: center;
-            padding: 0 20px;
             justify-content: space-between;
+            align-items: center;
         }
-        .iframe-wrapper {
-            height: calc(100vh - 60px);
-            width: 100%;
+
+        .stage-body {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 40px 20px;
+            max-width: 1600px;
+            margin: 0 auto;
         }
+
+        .side-ad-column {
+            width: 160px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .viewport-wrapper {
+            flex-grow: 1;
+            max-width: 1100px;
+            transition: all 0.4s var(--transition);
+        }
+        
+        .viewport-wrapper.theater { 
+            max-width: 100% !important; 
+        }
+
+        .iframe-container {
+            background: #111;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            position: relative;
+            padding-top: 56.25%; /* 16:9 */
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
         #stage-iframe {
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             border: none;
         }
 
-        .ad-placeholder {
-            background: #111;
-            border: 1px dashed #333;
-            height: 300px;
+        .controls-bar {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-tech {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.2s;
+        }
+        .btn-tech:hover { border-color: var(--brand); color: var(--brand); }
+
+        /* Similar Games Section */
+        .similar-section {
+            margin-top: 60px;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-label {
+            font-family: var(--font-mono);
+            color: var(--brand);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* --- UTILS --- */
+        .category-header {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--brand);
+            padding-left: 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            position: sticky;
-            top: 100px;
+            gap: 10px;
         }
+        .category-header h2 { font-size: 1.2rem; text-transform: uppercase; font-weight: 800; margin: 0; }
+        .category-header .count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--brand); opacity: 0.6; }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay">
-    <div class="text-center">
-        <h1 class="logo mb-3" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h1>
-        <div class="spinner-border text-light" role="status"></div>
+    <div class="loader-box">
+        <h1 class="logo mb-4">BLINCHI<span>GAMES</span></h1>
+        <div class="spinner-border text-success" role="status"></div>
+        <p class="mt-4 text-secondary small font-monospace tracking-widest">CONNECTING TO ELITE SERVERS...</p>
     </div>
 </div>
 
 <nav class="navbar">
     <div class="container d-flex justify-content-between align-items-center">
         <a href="#" class="logo" onclick="location.reload()">BLINCHI<span>GAMES</span></a>
-        <div class="d-flex gap-4">
-            <a href="https://www.tiktok.com/@blinchigames3" target="_blank" class="text-white text-decoration-none small fw-bold">TIKTOK</a>
-            <span class="text-secondary small fw-bold">ELITE PORTAL v2</span>
+        <div class="d-flex gap-3 align-items-center">
+            <span class="d-none d-md-inline font-monospace text-secondary small tracking-widest">// GLOBAL ACCESS</span>
+            <input type="text" id="game-search" class="search-bar" placeholder="SEARCH DATABASE..." oninput="handleSearch()">
         </div>
     </div>
 </nav>
 
-<div class="portal-layout">
-    <!-- LEFT BANNER -->
-    <aside class="ad-column">
-        <div class="ad-placeholder">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '6e1109cad98d336d18e23b0a2087bbc8',
-                    'format' : 'iframe',
-                    'height' : 300,
-                    'width' : 160,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content-area">
-        <div class="search-container">
-            <i class="bi bi-search search-icon"></i>
-            <input type="text" id="game-search" class="search-bar" placeholder="Search elite library..." oninput="handleSearch()">
-        </div>
-
-        <h5 class="mb-4 text-secondary small fw-bold text-uppercase tracking-wider">Elite Collection</h5>
-        <div id="game-grid" class="game-grid">
-            <!-- Games injected here -->
-        </div>
-    </main>
-
-    <!-- RIGHT BANNER -->
-    <aside class="ad-column">
-        <div class="ad-placeholder">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '6e1109cad98d336d18e23b0a2087bbc8',
-                    'format' : 'iframe',
-                    'height' : 300,
-                    'width' : 160,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
-        </div>
-    </aside>
+<div class="container my-5">
+    <div id="game-sections">
+        <!-- Sections and games auto-render here -->
+    </div>
 </div>
 
 <!-- GAME STAGE -->
 <div id="game-stage">
-    <div class="stage-nav">
-        <button class="btn btn-dark btn-sm rounded-pill px-3" onclick="closeGame()">
-            <i class="bi bi-arrow-left me-2"></i> Exit Game
-        </button>
-        <span id="active-game-title" class="fw-bold"></span>
-        <div style="width: 100px"></div>
+    <div class="stage-header">
+        <button class="btn-tech" onclick="closeGame()"><i class="bi bi-chevron-left me-2"></i>Exit Portal</button>
+        <span id="active-game-title" class="font-monospace fw-bold text-uppercase tracking-widest"></span>
+        <div style="width: 120px" class="d-none d-md-block text-end font-monospace small text-secondary">ID: <span id="game-id-tag">0000</span></div>
     </div>
-    <div class="iframe-wrapper">
-        <iframe id="stage-iframe" src="" allow="autoplay; fullscreen; keyboard" allowfullscreen></iframe>
+
+    <div class="stage-body">
+        <!-- LEFT AD -->
+        <div class="side-ad-column">
+            <script>
+                atOptions = {
+                    'key' : '6e1109cad98d336d18e23b0a2087bbc8',
+                    'format' : 'iframe',
+                    'height' : 300,
+                    'width' : 160,
+                    'params' : {}
+                };
+            </script>
+            <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+        </div>
+
+        <!-- MAIN VIEWPORT -->
+        <div class="viewport-wrapper" id="viewport-container">
+            <div class="iframe-container">
+                <iframe id="stage-iframe" src="" allow="autoplay; fullscreen; keyboard" allowfullscreen></iframe>
+            </div>
+            <div class="controls-bar">
+                <button class="btn-tech" onclick="toggleTheater()"><i class="bi bi-aspect-ratio me-2"></i>Theater Mode</button>
+                <button class="btn-tech" onclick="toggleFullscreen()"><i class="bi bi-arrows-fullscreen me-2"></i>Fullscreen</button>
+                <button class="btn-tech ms-auto" onclick="window.location.reload()"><i class="bi bi-arrow-repeat"></i></button>
+            </div>
+        </div>
+
+        <!-- RIGHT AD -->
+        <div class="side-ad-column">
+            <script>
+                atOptions = {
+                    'key' : '6e1109cad98d336d18e23b0a2087bbc8',
+                    'format' : 'iframe',
+                    'height' : 300,
+                    'width' : 160,
+                    'params' : {}
+                };
+            </script>
+            <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+        </div>
+    </div>
+
+    <div class="similar-section pb-5">
+        <span class="section-label">// Related Modules (Recommended)</span>
+        <div id="similar-grid" class="game-grid"></div>
     </div>
 </div>
 
 <script>
-    const catalog = [
-        { id: 'basket', title: 'Basket Random', url: 'https://basketrandom.github.io/', thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
-        { id: 'mario', title: 'Super Mario', url: 'https://mukeshkmr776.github.io/super-mario/', thumb: 'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg' },
-        { id: 'majestic', title: 'Majestic Games', url: 'https://majesticwafr.github.io', thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
-        { id: 'retro', title: 'Retro Bowl', url: 'https://game316422.konggames.com/gameframe/index.html?key=316422', thumb: 'https://img.gamemonetize.com/497e2c9f9f9e4f0f8a3d5e3f3e3e3e3e/512x384.jpg' },
-        { id: 'death', title: 'Death Loop', url: 'https://itch.io/embed-upload/11266205?color=000000', thumb: 'https://img.itch.zone/aW1nLzE3Njg1NDUyLnBuZw==/315x250%23c/9f%2BFuB.png' },
-        { id: 'dungeon', title: 'Die in the Dungeon', url: 'https://itch.io/embed-upload/3796541?color=000000', thumb: 'https://img.itch.zone/aW1nLzUzODU0MzIucG5n/315x250%23c/X%2F%2F%2FRq.png' }
+    let catalog = [];
+    // Extensive Feed URLs to ensure variety and category population
+    const feedUrls = [
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Action',
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Driving',
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Arcade',
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Shooting',
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Racing',
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Puzzle'
     ];
 
-    function init() {
-        renderGrid(catalog);
-        setTimeout(() => {
-            const overlay = document.getElementById('loading-overlay');
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.style.display = 'none', 500);
-        }, 800);
+    async function loadData() {
+        try {
+            // Fetch all feeds in parallel
+            const responses = await Promise.all(feedUrls.map(url => 
+                fetch(url).then(res => res.ok ? res.json() : []).catch(() => [])
+            ));
+            
+            // Flatten and remove duplicates by ID
+            const rawData = responses.flat();
+            const uniqueMap = new Map();
+            rawData.forEach(item => {
+                if(item.id && !uniqueMap.has(item.id)) {
+                    uniqueMap.set(item.id, item);
+                }
+            });
+            
+            catalog = Array.from(uniqueMap.values());
+            
+            renderPortal(catalog);
+            
+            // Hide loading overlay
+            const loader = document.getElementById('loading-overlay');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        } catch (e) {
+            console.error("Critical Load Error:", e);
+        }
     }
 
-    function renderGrid(data) {
-        const grid = document.getElementById('game-grid');
-        grid.innerHTML = data.map(game => `
-            <div class="game-card" onclick="openGame('${game.url}', '${game.title}')">
+    function renderPortal(games) {
+        const container = document.getElementById('game-sections');
+        container.innerHTML = '';
+        
+        // Group games by category
+        const categories = {};
+        games.forEach(g => {
+            let cat = g.category || 'Arcade';
+            // Clean up category string (e.g. "Action, Adventure" -> "Action")
+            cat = cat.split(',')[0].trim();
+            if(!categories[cat]) categories[cat] = [];
+            categories[cat].push(g);
+        });
+
+        // Filter out categories with no games and sort them
+        const validCategories = Object.keys(categories)
+            .filter(cat => categories[cat].length > 0)
+            .sort();
+
+        validCategories.forEach(cat => {
+            const section = document.createElement('div');
+            section.className = 'category-container';
+            
+            // Show up to 12 games per category on landing
+            const displayGames = categories[cat].slice(0, 12);
+            
+            section.innerHTML = `
+                <div class="category-header">
+                    <h2>${cat}</h2>
+                    <span class="count">[ ${categories[cat].length} MODULES ]</span>
+                </div>
+                <div class="game-grid">${displayGames.map(g => createCard(g)).join('')}</div>
+            `;
+            container.appendChild(section);
+        });
+    }
+
+    function createCard(game) {
+        return `
+            <div class="game-card" onclick="openGame('${game.id}')">
                 <div class="game-thumb">
-                    <img src="${game.thumb}" alt="${game.title}" loading="lazy">
+                    <img src="${game.thumb || 'https://via.placeholder.com/300x200?text=NO+PREVIEW'}" alt="${game.title}" loading="lazy">
                 </div>
                 <div class="game-info">
                     <h3>${game.title}</h3>
                 </div>
             </div>
-        `).join('');
+        `;
     }
 
     function handleSearch() {
         const query = document.getElementById('game-search').value.toLowerCase().trim();
-        const filtered = catalog.filter(g => g.title.toLowerCase().includes(query));
-        renderGrid(filtered);
+        if (!query) {
+            renderPortal(catalog);
+            return;
+        }
+        const filtered = catalog.filter(g => 
+            g.title.toLowerCase().includes(query) || 
+            (g.category && g.category.toLowerCase().includes(query))
+        );
+        renderPortal(filtered);
     }
 
-    function openGame(url, title) {
-        document.getElementById('game-stage').style.display = 'block';
-        document.getElementById('stage-iframe').src = url;
-        document.getElementById('active-game-title').innerText = title;
+    function openGame(id) {
+        const game = catalog.find(g => g.id.toString() === id.toString());
+        if(!game) return;
+
+        const stage = document.getElementById('game-stage');
+        const iframe = document.getElementById('stage-iframe');
+        const title = document.getElementById('active-game-title');
+        const idTag = document.getElementById('game-id-tag');
+
+        stage.style.display = 'block';
+        iframe.src = game.url;
+        title.innerText = game.title;
+        idTag.innerText = game.id.toString().slice(-4);
         document.body.style.overflow = 'hidden';
+
+        // Recommendation Engine: Find 10 similar games based on category
+        const gameCat = (game.category || '').split(',')[0].trim();
+        const similar = catalog
+            .filter(g => g.id.toString() !== id.toString() && (g.category || '').includes(gameCat))
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 10);
+        
+        // If not enough similar games in category, pull randoms
+        if (similar.length < 10) {
+            const filler = catalog
+                .filter(g => g.id.toString() !== id.toString() && !similar.includes(g))
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 10 - similar.length);
+            similar.push(...filler);
+        }
+
+        document.getElementById('similar-grid').innerHTML = similar.map(g => createCard(g)).join('');
+        stage.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function closeGame() {
-        document.getElementById('game-stage').style.display = 'none';
-        document.getElementById('stage-iframe').src = '';
+        const stage = document.getElementById('game-stage');
+        const iframe = document.getElementById('stage-iframe');
+        stage.style.display = 'none';
+        iframe.src = '';
         document.body.style.overflow = '';
     }
 
-    window.addEventListener('load', init);
+    function toggleTheater() {
+        const viewport = document.getElementById('viewport-container');
+        viewport.classList.toggle('theater');
+    }
+
+    function toggleFullscreen() {
+        const iframe = document.getElementById('stage-iframe');
+        if (iframe.requestFullscreen) {
+            iframe.requestFullscreen();
+        } else if (iframe.webkitRequestFullscreen) {
+            iframe.webkitRequestFullscreen();
+        } else if (iframe.msRequestFullscreen) {
+            iframe.msRequestFullscreen();
+        }
+    }
+
+    // Auto-load on startup
+    window.addEventListener('load', loadData);
 </script>
 
 </body>

@@ -39,6 +39,7 @@
 
         .app-container { display: flex; min-height: 100vh; }
 
+        /* Sidebar Styling */
         .sidebar {
             width: 280px;
             background: var(--sidebar);
@@ -86,11 +87,8 @@
             outline: none;
             margin-left: 8px;
         }
-        .search-input-wrapper i { color: var(--text-secondary); }
 
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 15px; scrollbar-width: none; }
-        .menu-scroll::-webkit-scrollbar { display: none; }
-
         .menu-label {
             font-size: 0.65rem;
             text-transform: uppercase;
@@ -115,25 +113,13 @@
             border: none;
             background: transparent;
             width: 100%;
-            text-align: left;
         }
         .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .nav-item.active { color: var(--brand); background: var(--brand-soft); }
 
+        /* Main Grid Styling */
         .main-content { flex: 1; min-width: 0; position: relative; }
-
-        #loading-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.6s ease;
-        }
-
-        .bouncy-logo { animation: bounce 0.8s infinite alternate; }
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
-
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px; }
         .elite-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 
         .game-card {
@@ -143,103 +129,133 @@
             border: 1px solid rgba(255,255,255,0.05);
             transition: all 0.3s var(--transition);
             cursor: pointer;
-            position: relative;
         }
-        .game-card:hover { transform: translateY(-5px); border-color: var(--brand); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .game-card:hover { transform: translateY(-5px); border-color: var(--brand); }
         .game-thumb { aspect-ratio: 16/10; overflow: hidden; position: relative; }
         .game-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        
         .game-info { padding: 12px; }
         .game-info h6 { margin: 0; font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
         .badge-elite { 
             position: absolute; top: 10px; left: 10px; background: var(--brand); color: #000;
-            font-size: 0.6rem; font-weight: 900; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;
+            font-size: 0.6rem; font-weight: 900; padding: 3px 8px; border-radius: 4px; z-index: 10;
         }
 
-        #scroll-sentinel { height: 120px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .sync-status { font-size: 0.7rem; color: var(--brand); margin-top: 8px; font-weight: bold; opacity: 0.8; }
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 2000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
 
+        /* Game Stage Styling (Adsterra Ready) */
         #game-stage { display: none; position: fixed; inset: 0; background: #000; z-index: 1500; }
-        .stage-header { height: 60px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #222; }
-        .stage-body { display: flex; height: calc(100vh - 60px); }
-        .iframe-container { flex: 1; position: relative; background: #000; }
+        .stage-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: #0b0b0b; border-bottom: 1px solid #1a1a1a; }
+        
+        .stage-body { display: flex; height: calc(100vh - 60px); width: 100%; }
+        
+        .ad-sidebar { 
+            width: 180px; 
+            background: #000; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 20px;
+            overflow: hidden;
+        }
+        
+        .iframe-container { flex: 1; background: #000; position: relative; }
         #stage-iframe { width: 100%; height: 100%; border: none; }
+
+        #scroll-sentinel { height: 100px; display: flex; align-items: center; justify-content: center; color: var(--brand); font-size: 0.7rem; font-weight: bold; }
+
+        @media (max-width: 992px) {
+            .ad-sidebar { display: none; }
+            .sidebar { width: 80px; }
+            .sidebar span, .sidebar .menu-label, .sidebar .search-box { display: none; }
+            .nav-item { justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay">
-    <div class="text-center">
-        <h2 class="logo mb-4 bouncy-logo" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h2>
-        <div class="spinner-border text-success" role="status"></div>
-        <p class="text-secondary mt-3 small opacity-50">Fetching All Game Libraries...</p>
-    </div>
+    <h2 class="logo mb-4" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h2>
+    <div class="spinner-border text-success" role="status"></div>
 </div>
 
 <div class="app-container">
-    <aside id="main-sidebar" class="sidebar">
+    <aside class="sidebar">
         <div class="sidebar-header">
-            <a href="#" class="logo" onclick="showSection('home')">BLINCHI<span>GAMES</span></a>
+            <a href="#" class="logo" onclick="location.reload()">BLINCHI<span>GAMES</span></a>
         </div>
-
         <div class="search-box">
             <div class="search-input-wrapper">
-                <i class="bi bi-search"></i>
-                <input type="text" id="game-search" placeholder="Search across all catalogs..." oninput="handleSearch()">
+                <i class="bi bi-search text-secondary"></i>
+                <input type="text" id="game-search" placeholder="Search games..." oninput="handleSearch()">
             </div>
         </div>
-        
         <div class="menu-scroll">
-            <div class="menu-label">Featured</div>
-            <button class="nav-item active" id="btn-nav-home" onclick="showSection('home')">
-                <i class="bi bi-house-door"></i> Home
-            </button>
-
+            <div class="menu-label">Menu</div>
+            <button class="nav-item active" onclick="showSection('home')"><i class="bi bi-house"></i> <span>Home</span></button>
             <div class="menu-label">Categories</div>
-            <div id="category-nav-list"></div>
-            
-            <div class="menu-label">Follow Us</div>
-            <a href="https://www.tiktok.com/@blinchigames3?lang=en" target="_blank" class="nav-item text-decoration-none">
-                <i class="bi bi-tiktok"></i> TikTok
-            </a>
+            <div id="category-list"></div>
+        </div>
+        <!-- Adsterra Native Banner in Sidebar -->
+        <div class="p-2 mt-auto">
+            <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
         </div>
     </aside>
 
     <main class="main-content">
         <div id="view-home" class="view-section container-fluid py-4">
-            <h2 class="section-title mb-4 font-display fw-bold text-uppercase italic"><i class="bi bi-lightning-charge-fill text-success"></i> Elite Collection</h2>
-            <div id="elite-games-container" class="game-grid elite-grid mb-5"></div>
+            <h2 class="section-title mb-4 font-display fw-bold text-uppercase"><i class="bi bi-lightning-charge-fill text-success"></i> Elite Collection</h2>
+            <div id="elite-games-container" class="game-grid elite-grid"></div>
 
-            <h2 class="section-title mb-4 font-display fw-bold text-uppercase italic" id="main-library-title">Browse Library</h2>
-            <div id="library-preview" class="game-grid"></div>
-        </div>
-
-        <div id="view-category" class="view-section container-fluid py-4" style="display:none">
-            <h2 id="category-title" class="section-title mb-4 font-display fw-bold text-uppercase italic"></h2>
-            <div id="category-games-container" class="game-grid"></div>
-        </div>
-
-        <div id="scroll-sentinel">
-            <div class="spinner-border text-success spinner-border-sm" role="status"></div>
-            <div class="sync-status" id="bg-sync-info">Scanning Catalog...</div>
+            <h2 class="section-title mt-5 mb-4 font-display fw-bold text-uppercase">Game Library</h2>
+            <div id="library-container" class="game-grid"></div>
+            <div id="scroll-sentinel">Syncing Data...</div>
         </div>
     </main>
 </div>
 
+<!-- Game Stage -->
 <div id="game-stage">
     <div class="stage-header">
-        <button class="btn btn-dark btn-sm rounded-pill px-4 fw-bold me-3" onclick="closeGame()"><i class="bi bi-arrow-left"></i> Exit</button>
-        <span id="active-game-title" class="fw-bold text-uppercase small text-secondary"></span>
+        <div class="d-flex align-items-center">
+            <button class="btn btn-dark btn-sm rounded-pill px-4 me-3" onclick="closeGame()"><i class="bi bi-arrow-left"></i> Exit</button>
+            <span id="active-game-title" class="fw-bold text-uppercase small text-secondary"></span>
+        </div>
+        <button class="btn btn-outline-success btn-sm" onclick="toggleFullscreen()"><i class="bi bi-arrows-fullscreen"></i> Fullscreen</button>
     </div>
     <div class="stage-body">
-        <div class="iframe-container">
-            <iframe id="stage-iframe" src="" allow="autoplay; fullscreen; keyboard" allowfullscreen></iframe>
+        <!-- Left Adsterra Sidebar Ad -->
+        <div class="ad-sidebar">
+            <script type="text/javascript">
+                atOptions = { 'key' : '6e1109cad98d336d18e23b0a2087bbc8', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };
+            </script>
+            <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+        </div>
+
+        <div class="iframe-container" id="iframe-parent">
+            <iframe id="stage-iframe" src="" allowfullscreen></iframe>
+        </div>
+
+        <!-- Right Adsterra Sidebar Ad -->
+        <div class="ad-sidebar">
+            <script type="text/javascript">
+                atOptions = { 'key' : '6e1109cad98d336d18e23b0a2087bbc8', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };
+            </script>
+            <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
         </div>
     </div>
 </div>
 
+<!-- Adsterra Native Banner Logic -->
+<script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
+
 <script>
+    // Custom Games from Doc
     const eliteGames = [
         { id: 'basketrandom', title: 'Basket Random', url: 'https://basketrandom.github.io/', thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
         { id: 'supermario', title: 'Super Mario', url: 'https://mukeshkmr776.github.io/super-mario/', thumb: 'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg' },
@@ -251,179 +267,90 @@
         { id: 'littlechef', title: 'Little Chef', url: 'https://itch.io/embed-upload/8133544?color=000000', thumb: 'https://img.itch.zone/aW1nLzEyMzk0MTk3LnBuZw==/315x250%23c/W0mO4H.png' }
     ];
 
-    let rawFeedData = []; 
-    let fullCatalog = []; 
-    let currentFilteredView = []; 
-    
-    let activeView = 'home';
-    let loadedCount = 0; 
-    
-    // Limits adjusted for large collections
-    const INITIAL_CATALOG_LIMIT = 100;
-    const SCROLL_BATCH_SIZE = 20;
-    const BACKGROUND_LOAD_SIZE = 500;
-    const BACKGROUND_TICK_MS = 5000; 
-    
-    const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
-    const seenIds = new Set(eliteGames.map(g => g.id));
+    let fullCatalog = [];
+    let currentView = [];
+    let loadedCount = 0;
+    const BATCH_SIZE = 30;
+
+    // Use live APIs for the RSS feed games
+    const rssFeeds = [
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Action&num=100',
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Driving&num=100',
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Shooting&num=100',
+        'https://api.gamemonetize.com/rssfeed.php?format=json&category=Arcade&num=100'
+    ];
 
     async function init() {
         const eliteContainer = document.getElementById('elite-games-container');
         eliteGames.forEach(g => eliteContainer.innerHTML += createCardHTML(g, true));
 
-        // Aggregate ALL feeds
-        const fetchPromises = feeds.map(url => fetch(url).then(r => r.json()).catch(() => []));
-        const results = await Promise.all(fetchPromises);
-        results.forEach(data => { if (Array.isArray(data)) rawFeedData.push(...data); });
+        // Loading from RSS
+        try {
+            const results = await Promise.all(rssFeeds.map(f => fetch(f).then(r => r.json())));
+            results.forEach(batch => {
+                if(Array.isArray(batch)) fullCatalog.push(...batch);
+            });
+        } catch(e) { console.error("RSS fetch failed", e); }
 
-        // Process a large initial chunk to ensure search and categories are populated
-        processBatch(rawFeedData.length); 
-        
-        currentFilteredView = [...fullCatalog];
-        loadMoreGames('library-preview', INITIAL_CATALOG_LIMIT);
-
-        renderMenu();
+        currentView = [...fullCatalog];
+        renderCategories();
+        loadMore();
         initInfiniteScroll();
-        startBackgroundSync();
-        
-        setTimeout(() => {
-            document.getElementById('loading-overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 600);
-        }, 1200);
+
+        document.getElementById('loading-overlay').style.display = 'none';
     }
 
-    function processBatch(count) {
-        let processed = 0;
-        for (let i = 0; i < rawFeedData.length; i++) {
-            const g = rawFeedData[i];
-            if (g && g.id && !seenIds.has(g.id)) {
-                fullCatalog.push(g);
-                seenIds.add(g.id);
-                processed++;
-                if (processed >= count) break;
-            }
-        }
-        return processed;
+    function createCardHTML(g, isElite = false) {
+        return `
+            <div class="game-card" onclick="openGame('${g.url}', '${g.title.replace(/'/g, "\\'")}')">
+                <div class="game-thumb">
+                    ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
+                    <img src="${g.thumb}" alt="${g.title}" loading="lazy">
+                </div>
+                <div class="game-info"><h6>${g.title}</h6></div>
+            </div>
+        `;
     }
 
-    function startBackgroundSync() {
-        setInterval(() => {
-            // Check if more raw data exists that wasn't processed
-            if (fullCatalog.length < rawFeedData.length) {
-                processBatch(BACKGROUND_LOAD_SIZE);
-                document.getElementById('bg-sync-info').innerText = `Catalog: ${fullCatalog.length} Total Games`;
-            } else {
-                document.getElementById('bg-sync-info').innerText = `All ${fullCatalog.length} games loaded`;
-            }
-        }, BACKGROUND_TICK_MS);
-    }
-
-    function renderMenu() {
-        const menu = document.getElementById('category-nav-list');
-        const cats = ['Action', 'Arcade', 'Driving', 'Puzzle', 'Shooting', 'Sports'];
-        cats.forEach(cat => {
+    function renderCategories() {
+        const cats = ['Action', 'Driving', 'Shooting', 'Arcade', 'Puzzle'];
+        const list = document.getElementById('category-list');
+        cats.forEach(c => {
             const btn = document.createElement('button');
             btn.className = 'nav-item';
-            btn.innerHTML = `<i class="bi bi-tag"></i> ${cat}`;
-            btn.onclick = () => showCategory(cat);
-            menu.appendChild(btn);
+            btn.innerHTML = `<i class="bi bi-tag"></i> <span>${c}</span>`;
+            btn.onclick = () => filterCategory(c);
+            list.appendChild(btn);
         });
     }
 
+    function filterCategory(c) {
+        document.getElementById('library-container').innerHTML = '';
+        currentView = fullCatalog.filter(g => g.category && g.category.includes(c));
+        loadedCount = 0;
+        loadMore();
+    }
+
     function handleSearch() {
-        const query = document.getElementById('game-search').value.toLowerCase().trim();
-        showSection('home');
-        const container = document.getElementById('library-preview');
-        container.innerHTML = '';
-        
-        if (query === "") {
-            document.getElementById('main-library-title').innerText = "Browse Library";
-            currentFilteredView = [...fullCatalog];
-        } else {
-            document.getElementById('main-library-title').innerText = `Search: "${query}"`;
-            currentFilteredView = fullCatalog.filter(g => g.title.toLowerCase().includes(query));
-        }
-        
+        const q = document.getElementById('game-search').value.toLowerCase();
+        document.getElementById('library-container').innerHTML = '';
+        currentView = fullCatalog.filter(g => g.title.toLowerCase().includes(q));
         loadedCount = 0;
-        loadMoreGames('library-preview', INITIAL_CATALOG_LIMIT);
+        loadMore();
     }
 
-    function showSection(section) {
-        activeView = section;
-        document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
-        if(section === 'home') {
-            document.getElementById('view-home').style.display = 'block';
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('btn-nav-home').classList.add('active');
-        }
-    }
-
-    function showCategory(cat) {
-        activeView = 'category';
-        document.getElementById('game-search').value = "";
-        document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
-        const view = document.getElementById('view-category');
-        const container = document.getElementById('category-games-container');
-        view.style.display = 'block';
-        document.getElementById('category-title').innerText = cat;
-        container.innerHTML = '';
-        
-        // Filter based on the selected category
-        currentFilteredView = fullCatalog.filter(g => (g.category || '').toLowerCase().includes(cat.toLowerCase()));
-        
-        loadedCount = 0;
-        // Load initial 100 for this catalog
-        loadMoreGames('category-games-container', INITIAL_CATALOG_LIMIT);
-        window.scrollTo(0,0);
-    }
-
-    function loadMoreGames(containerId, limit) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        const nextBatch = currentFilteredView.slice(loadedCount, loadedCount + limit);
-        
-        if (nextBatch.length === 0) {
-            document.getElementById('scroll-sentinel').style.visibility = 'hidden';
-            return;
-        }
-        
-        document.getElementById('scroll-sentinel').style.visibility = 'visible';
-        let html = '';
-        nextBatch.forEach(g => html += createCardHTML(g));
-        container.insertAdjacentHTML('beforeend', html);
-        loadedCount += nextBatch.length;
-
-        // Check if more games exist in the current filtered set
-        if (loadedCount >= currentFilteredView.length) {
-            document.getElementById('scroll-sentinel').style.visibility = 'hidden';
-        }
+    function loadMore() {
+        const container = document.getElementById('library-container');
+        const next = currentView.slice(loadedCount, loadedCount + BATCH_SIZE);
+        next.forEach(g => container.innerHTML += createCardHTML(g));
+        loadedCount += next.length;
     }
 
     function initInfiniteScroll() {
-        const sentinel = document.getElementById('scroll-sentinel');
         const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting && loadedCount < currentFilteredView.length) {
-                // Determine which container to append to based on the current view
-                const targetId = activeView === 'home' ? 'library-preview' : 'category-games-container';
-                loadMoreGames(targetId, SCROLL_BATCH_SIZE);
-            }
-        }, { rootMargin: '400px' }); // Load sooner as user scrolls
-        observer.observe(sentinel);
-    }
-
-    function createCardHTML(game, isElite = false) {
-        return `
-            <div class="game-card" onclick="openGame('${game.url}', '${game.title.replace(/'/g, "\\'")}')">
-                <div class="game-thumb">
-                    ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
-                    <img src="${game.thumb}" alt="${game.title}" loading="lazy" onerror="this.src='https://placehold.co/300x200/111/32ff0e?text=Game'">
-                </div>
-                <div class="game-info">
-                    <h6>${game.title}</h6>
-                </div>
-            </div>
-        `;
+            if(entries[0].isIntersecting && loadedCount < currentView.length) loadMore();
+        }, { rootMargin: '200px' });
+        observer.observe(document.getElementById('scroll-sentinel'));
     }
 
     function openGame(url, title) {
@@ -439,8 +366,18 @@
         document.body.style.overflow = '';
     }
 
-    window.addEventListener('load', init);
-</script>
+    function toggleFullscreen() {
+        const elem = document.getElementById('iframe-parent');
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    }
 
+    window.onload = init;
+</script>
 </body>
 </html>

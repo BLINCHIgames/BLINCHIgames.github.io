@@ -173,7 +173,7 @@
     <div class="text-center">
         <h2 class="logo mb-4 bouncy-logo" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h2>
         <div class="spinner-border text-success" role="status"></div>
-        <p class="text-secondary mt-3 small opacity-50">Initializing 100-Game Batch...</p>
+        <p class="text-secondary mt-3 small opacity-50">Fetching All Game Libraries...</p>
     </div>
 </div>
 
@@ -186,7 +186,7 @@
         <div class="search-box">
             <div class="search-input-wrapper">
                 <i class="bi bi-search"></i>
-                <input type="text" id="game-search" placeholder="Search games..." oninput="handleSearch()">
+                <input type="text" id="game-search" placeholder="Search across all catalogs..." oninput="handleSearch()">
             </div>
         </div>
         
@@ -222,7 +222,7 @@
 
         <div id="scroll-sentinel">
             <div class="spinner-border text-success spinner-border-sm" role="status"></div>
-            <div class="sync-status" id="bg-sync-info">Background Sync Active</div>
+            <div class="sync-status" id="bg-sync-info">Scanning Catalog...</div>
         </div>
     </main>
 </div>
@@ -258,10 +258,11 @@
     let activeView = 'home';
     let loadedCount = 0; 
     
-    const INITIAL_LOAD_LIMIT = 40;
+    // Limits adjusted for large collections
+    const INITIAL_CATALOG_LIMIT = 100;
     const SCROLL_BATCH_SIZE = 20;
-    const BACKGROUND_LOAD_SIZE = 100;
-    const BACKGROUND_TICK_MS = 20000; 
+    const BACKGROUND_LOAD_SIZE = 500;
+    const BACKGROUND_TICK_MS = 5000; 
     
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
     const seenIds = new Set(eliteGames.map(g => g.id));
@@ -270,16 +271,16 @@
         const eliteContainer = document.getElementById('elite-games-container');
         eliteGames.forEach(g => eliteContainer.innerHTML += createCardHTML(g, true));
 
-        // Initial Data Fetch
+        // Aggregate ALL feeds
         const fetchPromises = feeds.map(url => fetch(url).then(r => r.json()).catch(() => []));
         const results = await Promise.all(fetchPromises);
         results.forEach(data => { if (Array.isArray(data)) rawFeedData.push(...data); });
 
-        // Initial process: Get first set for display
-        processBatch(300); 
+        // Process a large initial chunk to ensure search and categories are populated
+        processBatch(rawFeedData.length); 
         
         currentFilteredView = [...fullCatalog];
-        loadMoreGames('library-preview', INITIAL_LOAD_LIMIT);
+        loadMoreGames('library-preview', INITIAL_CATALOG_LIMIT);
 
         renderMenu();
         initInfiniteScroll();
@@ -307,13 +308,12 @@
 
     function startBackgroundSync() {
         setInterval(() => {
-            const added = processBatch(BACKGROUND_LOAD_SIZE);
-            if (added > 0) {
-                document.getElementById('bg-sync-info').innerText = `Synced ${fullCatalog.length} Total Games`;
-                // If on home and not searching, sync the filtered view too
-                if (activeView === 'home' && document.getElementById('game-search').value === "") {
-                    currentFilteredView = [...fullCatalog];
-                }
+            // Check if more raw data exists that wasn't processed
+            if (fullCatalog.length < rawFeedData.length) {
+                processBatch(BACKGROUND_LOAD_SIZE);
+                document.getElementById('bg-sync-info').innerText = `Catalog: ${fullCatalog.length} Total Games`;
+            } else {
+                document.getElementById('bg-sync-info').innerText = `All ${fullCatalog.length} games loaded`;
             }
         }, BACKGROUND_TICK_MS);
     }
@@ -345,7 +345,7 @@
         }
         
         loadedCount = 0;
-        loadMoreGames('library-preview', INITIAL_LOAD_LIMIT);
+        loadMoreGames('library-preview', INITIAL_CATALOG_LIMIT);
     }
 
     function showSection(section) {
@@ -368,9 +368,12 @@
         document.getElementById('category-title').innerText = cat;
         container.innerHTML = '';
         
+        // Filter based on the selected category
         currentFilteredView = fullCatalog.filter(g => (g.category || '').toLowerCase().includes(cat.toLowerCase()));
+        
         loadedCount = 0;
-        loadMoreGames('category-games-container', INITIAL_LOAD_LIMIT);
+        // Load initial 100 for this catalog
+        loadMoreGames('category-games-container', INITIAL_CATALOG_LIMIT);
         window.scrollTo(0,0);
     }
 
@@ -391,7 +394,7 @@
         container.insertAdjacentHTML('beforeend', html);
         loadedCount += nextBatch.length;
 
-        // Hide sentinel if we've reached the end of the current view
+        // Check if more games exist in the current filtered set
         if (loadedCount >= currentFilteredView.length) {
             document.getElementById('scroll-sentinel').style.visibility = 'hidden';
         }
@@ -401,10 +404,11 @@
         const sentinel = document.getElementById('scroll-sentinel');
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && loadedCount < currentFilteredView.length) {
+                // Determine which container to append to based on the current view
                 const targetId = activeView === 'home' ? 'library-preview' : 'category-games-container';
                 loadMoreGames(targetId, SCROLL_BATCH_SIZE);
             }
-        }, { rootMargin: '200px' });
+        }, { rootMargin: '400px' }); // Load sooner as user scrolls
         observer.observe(sentinel);
     }
 
@@ -426,7 +430,7 @@
         document.getElementById('game-stage').style.display = 'block';
         document.getElementById('stage-iframe').src = url;
         document.getElementById('active-game-title').innerText = `Playing: ${title}`;
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        document.body.style.overflow = 'hidden';
     }
 
     function closeGame() {

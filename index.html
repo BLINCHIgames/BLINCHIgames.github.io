@@ -1,364 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>BLINCHIGAMES | Elite Game Library</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>BLINCHIGAMES | Elite Game Library</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157317095946191" crossorigin="anonymous"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157317095946191" crossorigin="anonymous"></script>
 
-    <style>
-        :root {
-            --brand: #32ff0e;
-            --brand-soft: rgba(50, 255, 14, 0.1);
-            --bg-dark: #050505;
-            --sidebar: #0b0b0b;
-            --surface: #111111;
-            --surface-hover: #1a1a1a;
-            --text-main: #ffffff;
-            --text-secondary: #888888;
-            --font-main: 'Plus Jakarta Sans', sans-serif;
-            --font-display: 'Space Grotesk', sans-serif;
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --transition: cubic-bezier(0.4, 0, 0.2, 1);
-        }
+<style>
 
-        body { 
-            background: var(--bg-dark); 
-            color: var(--text-main);
-            font-family: var(--font-main);
-            margin: 0;
-            overflow-x: hidden;
-        }
+:root{
+--brand:#32ff0e;
+--brand-soft:rgba(50,255,14,.1);
+--bg-dark:#050505;
+--sidebar:#0b0b0b;
+--surface:#111;
+--text-main:#fff;
+--text-secondary:#888;
+--font-main:'Plus Jakarta Sans',sans-serif;
+--font-display:'Space Grotesk',sans-serif;
+--radius-md:16px;
+}
 
-        .app-container { display: flex; min-height: 100vh; }
+body{
+background:var(--bg-dark);
+color:var(--text-main);
+font-family:var(--font-main);
+margin:0;
+overflow-x:hidden;
+}
 
-        /* Sidebar Ad Integration */
-        .sidebar {
-            width: 300px;
-            background: var(--sidebar);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-        }
+.app-container{display:flex;min-height:100vh;}
 
-        .sidebar-header { padding: 30px 25px 15px; }
-        .logo { 
-            font-family: var(--font-display); 
-            font-size: 1.5rem; 
-            font-weight: 800; 
-            color: #fff; 
-            text-decoration: none;
-            letter-spacing: -1px;
-        }
-        .logo span { color: var(--brand); }
+.sidebar{
+width:280px;
+background:var(--sidebar);
+border-right:1px solid rgba(255,255,255,.05);
+height:100vh;
+position:sticky;
+top:0;
+display:flex;
+flex-direction:column;
+}
 
-        .ad-sidebar-container {
-            margin: 15px;
-            padding: 10px;
-            background: #000;
-            border: 1px dashed #333;
-            min-height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            border-radius: 8px;
-        }
+.sidebar-header{padding:30px 25px 15px;}
 
-        .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 15px; scrollbar-width: none; }
-        .menu-scroll::-webkit-scrollbar { display: none; }
+.logo{
+font-family:var(--font-display);
+font-size:1.5rem;
+font-weight:800;
+color:#fff;
+text-decoration:none;
+}
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 18px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            width: 100%;
-            text-align: left;
-        }
-        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .nav-item.active { color: var(--brand); background: var(--brand-soft); }
+.logo span{color:var(--brand);}
 
-        .main-content { flex: 1; min-width: 0; position: relative; }
+.search-box{padding:0 15px 15px;}
 
-        /* Game Stage with Ads */
-        #game-stage { display: none; position: fixed; inset: 0; background: #000; z-index: 1500; }
-        .stage-layout { display: flex; flex-direction: column; height: 100vh; }
-        .stage-header { height: 60px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #222; justify-content: space-between;}
-        
-        .stage-body { display: flex; flex: 1; overflow: hidden; }
-        .iframe-container { flex: 1; position: relative; background: #000; display: flex; flex-direction: column; }
-        #stage-iframe { width: 100%; height: 100%; border: none; }
+.search-input-wrapper{
+background:rgba(255,255,255,.05);
+border-radius:12px;
+padding:8px 12px;
+display:flex;
+align-items:center;
+}
 
-        .ad-bottom-bar {
-            height: 100px;
-            background: #0a0a0a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-top: 1px solid #222;
-        }
+.search-input-wrapper input{
+background:transparent;
+border:none;
+color:white;
+font-size:.85rem;
+width:100%;
+outline:none;
+margin-left:8px;
+}
 
-        .ad-side-pillar {
-            width: 180px;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            border-left: 1px solid #222;
-        }
+.menu-scroll{flex:1;overflow-y:auto;padding:10px 15px;}
 
-        /* Pre-roll Interstitial */
-        #ad-interstitial {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 3000;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+.nav-item{
+display:flex;
+align-items:center;
+gap:12px;
+padding:12px 18px;
+color:var(--text-secondary);
+border-radius:12px;
+font-weight:600;
+font-size:.9rem;
+cursor:pointer;
+border:none;
+background:transparent;
+width:100%;
+text-align:left;
+}
 
-        .interstitial-box {
-            width: 100%;
-            max-width: 600px;
-            background: #111;
-            padding: 20px;
-            border-radius: 20px;
-            border: 1px solid var(--brand);
-            text-align: center;
-        }
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.05);}
+.nav-item.active{color:var(--brand);background:var(--brand-soft);}
 
-        /* Grid System */
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px; }
-        .game-card {
-            background: var(--surface);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s var(--transition);
-            cursor: pointer;
-            position: relative;
-        }
-        .game-card:hover { transform: translateY(-5px); border-color: var(--brand); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .game-thumb { aspect-ratio: 1/1; overflow: hidden; position: relative; }
-        .game-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .game-info { padding: 12px; }
-        .game-info h6 { margin: 0; font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.main-content{flex:1;min-width:0;}
 
-        #loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 5000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s;
-        }
-    </style>
+.game-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+gap:20px;
+padding:20px;
+}
+
+.elite-grid{
+grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+}
+
+.game-card{
+background:var(--surface);
+border-radius:var(--radius-md);
+overflow:hidden;
+border:1px solid rgba(255,255,255,.05);
+cursor:pointer;
+transition:.25s;
+}
+
+.game-card:hover{
+transform:translateY(-4px);
+border-color:var(--brand);
+}
+
+.game-thumb{
+aspect-ratio:16/10;
+overflow:hidden;
+}
+
+.game-thumb img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.game-info{padding:12px;}
+.game-info h6{margin:0;font-size:.85rem;font-weight:700;}
+
+.badge-elite{
+position:absolute;
+top:10px;
+left:10px;
+background:var(--brand);
+color:#000;
+font-size:.6rem;
+font-weight:900;
+padding:3px 8px;
+border-radius:4px;
+}
+
+#game-stage{
+display:none;
+position:fixed;
+inset:0;
+background:#000;
+z-index:1500;
+}
+
+.stage-header{
+height:60px;
+display:flex;
+align-items:center;
+padding:0 20px;
+background:#111;
+border-bottom:1px solid #222;
+}
+
+.stage-body{
+display:grid;
+grid-template-columns:180px 1fr 180px;
+gap:12px;
+height:calc(100vh - 60px);
+padding:10px;
+}
+
+.iframe-container{
+background:#000;
+border-radius:10px;
+overflow:hidden;
+}
+
+#stage-iframe{
+width:100%;
+height:100%;
+border:none;
+}
+
+.side-ad{
+display:flex;
+justify-content:center;
+align-items:flex-start;
+}
+
+.ad-box{
+background:#0c0c0c;
+border:1px solid rgba(255,255,255,.05);
+border-radius:12px;
+padding:8px;
+}
+
+@media(max-width:900px){
+
+.stage-body{
+grid-template-columns:1fr;
+}
+
+.side-ad{
+display:none;
+}
+
+}
+
+</style>
 </head>
+
 <body>
 
-<!-- Pre-roll Ad Overlay -->
-<div id="ad-interstitial">
-    <div class="interstitial-box">
-        <h3 class="text-white mb-3">Loading Game Experience...</h3>
-        <div id="adsterra-interstitial-slot">
-            <!-- PLACE YOUR INTERSTITIAL AD TAG HERE -->
-            <div style="width: 100%; height: 250px; background: #222; display: flex; align-items: center; justify-content: center; color: #555;">
-                [ Adsterra Banner Zone ]
-            </div>
-        </div>
-        <p class="text-secondary mt-3 small">Game will start in <span id="ad-timer">5</span>s</p>
-        <button id="skip-ad-btn" class="btn btn-outline-success btn-sm mt-2" disabled onclick="finishAd()">Skip Ad</button>
-    </div>
-</div>
-
-<div id="loading-overlay">
-    <h2 class="logo mb-4" style="font-size: 3rem;">BLINCHI<span>GAMES</span></h2>
-    <div class="spinner-border text-success"></div>
-</div>
-
 <div class="app-container">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a href="#" class="logo">BLINCHI<span>GAMES</span></a>
-        </div>
 
-        <!-- BIG ADSTERRA SIDEBAR ZONE -->
-        <div class="ad-sidebar-container">
-            <div>
-                <span class="text-secondary small d-block mb-2">SPONSORED</span>
-                <!-- INSERT ADSTERRA 160x600 or 300x250 TAG HERE -->
-                <div id="adsterra-sidebar">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : 'YOUR_ADSTERRA_KEY_HERE',
-                            'format' : 'iframe',
-                            'height' : 250,
-                            'width' : 300,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/YOUR_AD_ID/invoke.js"></script>
-                </div>
-            </div>
-        </div>
-        
-        <div class="menu-scroll">
-            <button class="nav-item active" onclick="location.reload()">
-                <i class="bi bi-house-door"></i> Home
-            </button>
-            <div id="cat-list"></div>
-        </div>
-    </aside>
+<aside class="sidebar">
 
-    <main class="main-content">
-        <div class="container-fluid py-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="font-display fw-bold text-uppercase italic">Elite Games</h2>
-                <div class="badge bg-success">MONETIZED LIVE</div>
-            </div>
-            <div id="grid-container" class="game-grid"></div>
-        </div>
-    </main>
+<div class="sidebar-header">
+<a href="#" class="logo" onclick="showSection('home')">BLINCHI<span>GAMES</span></a>
+</div>
+
+<div class="search-box">
+<div class="search-input-wrapper">
+<i class="bi bi-search"></i>
+<input type="text" id="game-search" placeholder="Search games..." oninput="handleSearch()">
+</div>
+</div>
+
+<div class="menu-scroll">
+
+<button class="nav-item active" id="btn-nav-home" onclick="showSection('home')">
+<i class="bi bi-house-door"></i> Home
+</button>
+
+</div>
+
+</aside>
+
+<main class="main-content">
+
+<div id="view-home">
+
+<h2 class="mb-4 fw-bold">Elite Collection</h2>
+
+<div id="elite-games-container" class="game-grid elite-grid"></div>
+
+<h2 class="mb-4 fw-bold">Browse Library</h2>
+
+<div id="library-preview" class="game-grid"></div>
+
+</div>
+
+</main>
+
 </div>
 
 <div id="game-stage">
-    <div class="stage-layout">
-        <div class="stage-header">
-            <div>
-                <button class="btn btn-dark btn-sm rounded-pill px-4 fw-bold" onclick="closeGame()">
-                    <i class="bi bi-arrow-left"></i> Exit
-                </button>
-                <span id="active-title" class="ms-3 fw-bold text-uppercase small text-secondary"></span>
-            </div>
-            <div class="d-none d-md-block">
-                <!-- HEADER AD SLOT -->
-                <span class="text-secondary tiny me-2">AD:</span>
-                <div style="display:inline-block; width: 468px; height: 60px; background: #000; border: 1px solid #333; vertical-align: middle;"></div>
-            </div>
-        </div>
-        <div class="stage-body">
-            <div class="iframe-container">
-                <iframe id="stage-iframe" src="" allow="autoplay; fullscreen; keyboard" allowfullscreen></iframe>
-            </div>
-            <div class="ad-side-pillar">
-                <span class="text-secondary tiny mb-2">SPONSOR</span>
-                <!-- SKYSCRAPER AD -->
-                <div style="width: 160px; height: 600px; background: #000; border: 1px solid #333;"></div>
-            </div>
-        </div>
-        <div class="ad-bottom-bar">
-            <!-- LEADERBOARD AD -->
-            <div style="width: 728px; height: 90px; background: #000; border: 1px solid #333; display: flex; align-items: center; justify-content: center;">
-                <span class="text-secondary">Adsterra Leaderboard 728x90</span>
-            </div>
-        </div>
-    </div>
+
+<div class="stage-header">
+<button class="btn btn-dark btn-sm me-3" onclick="closeGame()">Exit</button>
+<span id="active-game-title"></span>
+</div>
+
+<div class="stage-body">
+
+<div class="side-ad">
+<div class="ad-box">
+
+<script>
+atOptions = {
+'key' : '6e1109cad98d336d18e23b0a2087bbc8',
+'format' : 'iframe',
+'height' : 300,
+'width' : 160,
+'params' : {}
+};
+</script>
+<script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+
+</div>
+</div>
+
+<div class="iframe-container">
+<iframe id="stage-iframe" allowfullscreen></iframe>
+</div>
+
+<div class="side-ad">
+<div class="ad-box">
+
+<script async data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
+<div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
+
+</div>
+</div>
+
+</div>
+
 </div>
 
 <script>
-    const catalog = [
-        { id: 'basketrandom', title: 'Basket Random', url: 'https://basketrandom.github.io/', thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
-        { id: 'supermario', title: 'Super Mario', url: 'https://mukeshkmr776.github.io/super-mario/', thumb: 'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg' },
-        { id: 'retrobowl', title: 'Retro Bowl', url: 'https://game316422.konggames.com/gameframe/index.html?key=316422', thumb: 'https://img.gamemonetize.com/497e2c9f9f9e4f0f8a3d5e3f3e3e3e3e/512x384.jpg' },
-        { id: 'moto', title: 'Moto X3M', url: 'https://moto-x3m.github.io/', thumb: 'https://img.gamemonetize.com/5u9n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
-        { id: 'drive', title: 'Madalin Stunt Cars 2', url: 'https://madalin-stunt-cars-2.github.io/', thumb: 'https://img.gamemonetize.com/o0v6k9b5l4n2m8a1b3c4d5e6f7g8h9i/512x384.jpg' }
-    ];
 
-    function init() {
-        const grid = document.getElementById('grid-container');
-        catalog.forEach(g => {
-            grid.innerHTML += `
-                <div class="game-card" onclick="triggerAd('${g.url}', '${g.title.replace(/'/g, "\\'")}')">
-                    <div class="game-thumb">
-                        <img src="${g.thumb}" alt="${g.title}">
-                    </div>
-                    <div class="game-info">
-                        <h6>${g.title}</h6>
-                    </div>
-                </div>
-            `;
-        });
+const eliteGames=[
+{id:'basketrandom',title:'Basket Random',url:'https://basketrandom.github.io/',thumb:'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg'},
+{id:'supermario',title:'Super Mario',url:'https://mukeshkmr776.github.io/super-mario/',thumb:'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg'}
+];
 
-        setTimeout(() => {
-            document.getElementById('loading-overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
-        }, 800);
-    }
+let fullCatalog=[];
+let currentFilteredView=[];
+let loadedCount=0;
 
-    let pendingUrl = '';
-    let pendingTitle = '';
+function init(){
 
-    function triggerAd(url, title) {
-        pendingUrl = url;
-        pendingTitle = title;
-        
-        const interstitial = document.getElementById('ad-interstitial');
-        interstitial.style.display = 'flex';
-        
-        let timeLeft = 5;
-        const timerText = document.getElementById('ad-timer');
-        const skipBtn = document.getElementById('skip-ad-btn');
-        
-        skipBtn.disabled = true;
-        timerText.innerText = timeLeft;
+const eliteContainer=document.getElementById("elite-games-container");
 
-        const countdown = setInterval(() => {
-            timeLeft--;
-            timerText.innerText = timeLeft;
-            if(timeLeft <= 0) {
-                clearInterval(countdown);
-                skipBtn.disabled = false;
-                skipBtn.innerText = "Play Game Now";
-            }
-        }, 1000);
-    }
+eliteGames.forEach(g=>{
+eliteContainer.innerHTML+=createCardHTML(g,true);
+});
 
-    function finishAd() {
-        document.getElementById('ad-interstitial').style.display = 'none';
-        openGame(pendingUrl, pendingTitle);
-    }
+currentFilteredView=[...eliteGames];
+loadMoreGames("library-preview",20);
 
-    function openGame(url, title) {
-        document.getElementById('game-stage').style.display = 'block';
-        document.getElementById('stage-iframe').src = url;
-        document.getElementById('active-title').innerText = `Live: ${title}`;
-        document.body.style.overflow = 'hidden';
-    }
+}
 
-    function closeGame() {
-        document.getElementById('game-stage').style.display = 'none';
-        document.getElementById('stage-iframe').src = '';
-        document.body.style.overflow = '';
-    }
+function createCardHTML(game,isElite=false){
 
-    window.onload = init;
+return `
+<div class="game-card" onclick="openGame('${game.url}','${game.title}')">
+
+<div class="game-thumb">
+
+${isElite?'<div class="badge-elite">Elite</div>':''}
+
+<img src="${game.thumb}" loading="lazy">
+
+</div>
+
+<div class="game-info">
+<h6>${game.title}</h6>
+</div>
+
+</div>
+`;
+
+}
+
+function openGame(url,title){
+
+document.getElementById("game-stage").style.display="block";
+
+document.getElementById("stage-iframe").src=url;
+
+document.getElementById("active-game-title").innerText="Playing: "+title;
+
+document.body.style.overflow="hidden";
+
+}
+
+function closeGame(){
+
+document.getElementById("game-stage").style.display="none";
+
+document.getElementById("stage-iframe").src="";
+
+document.body.style.overflow="";
+
+}
+
+window.addEventListener("load",init);
+
 </script>
 
 </body>

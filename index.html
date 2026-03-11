@@ -241,24 +241,28 @@
 
 <script>
     const eliteGames = [
+        { id: 'basketrandom', title: 'Basket Random', url: 'https://cdn.jsdelivr.net/gh/bubbls/ruffle@1520d90d7b2994737acd8f7a633d018f63c22ca7/index.html', thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
+        { id: 'supermario', title: 'Super Mario', url: 'https://mukeshkmr776.github.io/super-mario/', thumb: 'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg' },
+        { id: 'majestic', title: 'Majestic Games', url: 'https://majesticwafr.github.io', thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
+        { id: 'marduinoparty', title: 'Marduino Party', url: 'https://www.hackster.io/gatoninja236/marduino-party-1-3dcda7/embed', thumb: 'https://img.gamemonetize.com/kk2f1i1jbnfvg87cu5d6pso2jj0mb7t7/512x384.jpg' },
+        { id: 'retrobowl', title: 'Retro Bowl', url: 'https://retro-bowl-six.vercel.app', thumb: 'https://img.gamemonetize.com/497e2c9f9f9e4f0f8a3d5e3f3e3e3e3e/512x384.jpg' },
         { id: 'deathloop', title: 'Death Loop (Danganronpa)', url: 'https://itch.io/embed-upload/11266205?color=000000', thumb: 'https://img.itch.zone/aW1nLzE3Njg1NDUyLnBuZw==/315x250%23c/9f%2BFuB.png' },
         { id: 'dungeon', title: 'Die in the Dungeon', url: 'https://itch.io/embed-upload/3796541?color=000000', thumb: 'https://img.itch.zone/aW1nLzUzODU0MzIucG5n/315x250%23c/X%2F%2F%2FRq.png' },
         { id: 'littlechef', title: 'Little Chef', url: 'https://itch.io/embed-upload/8133544?color=000000', thumb: 'https://img.itch.zone/aW1nLzEyMzk0MTk3LnBuZw==/315x250%23c/W0mO4H.png' },
-        { id: 'wbwwb', title: 'We Become What We Behold', url: 'https://itch.io/embed-upload/546107?color=000000', thumb: 'https://img.itch.zone/aW1nLzU0NjEwNy5wbmc=/315x250%23c/yH%2F6pI.png' },
-        { id: 'speedstars', title: 'Speed Stars 2', url: 'https://speedstars2.io/', thumb: 'https://img.gamemonetize.com/9hibl9blop3ss2jxycuxpzoflnl2n16w/512x384.jpg' }
+        { id: 'wbwwb', title: 'We Become What We Behold', url: 'https://itch.io/embed-upload/546107?color=000000', thumb: 'https://img.itch.zone/aW1nLzU0NjEwNy5wbmc=/315x250%23c/yH%2F6pI.png' }
     ];
 
-    let rawFeedData = []; // Untouched raw list from feeds
-    let fullCatalog = []; // Filtered, non-duplicate list available for display
-    let currentFilteredView = []; // What the user is currently seeing (e.g. search or category)
+    let rawFeedData = []; 
+    let fullCatalog = []; 
+    let currentFilteredView = []; 
     
     let activeView = 'home';
-    let loadedCount = 0; // Currently rendered count
+    let loadedCount = 0; 
     
     const INITIAL_LOAD_LIMIT = 100;
     const SCROLL_BATCH_SIZE = 20;
     const BACKGROUND_LOAD_SIZE = 100;
-    const BACKGROUND_TICK_MS = 20000; // 20 seconds
+    const BACKGROUND_TICK_MS = 20000; 
     
     const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
     const seenIds = new Set(eliteGames.map(g => g.id));
@@ -270,11 +274,10 @@
         // Initial Data Fetch
         const fetchPromises = feeds.map(url => fetch(url).then(r => r.json()).catch(() => []));
         const results = await Promise.all(fetchPromises);
-        
         results.forEach(data => { if (Array.isArray(data)) rawFeedData.push(...data); });
 
         // Initial process: Get first set for display
-        processBatch(300); // Process a good chunk initially to ensure we have enough for the first 100 display
+        processBatch(300); 
         
         currentFilteredView = [...fullCatalog];
         loadMoreGames('library-preview', INITIAL_LOAD_LIMIT);
@@ -289,13 +292,8 @@
         }, 1200);
     }
 
-    // Transfers items from rawFeedData to fullCatalog ensuring no duplicates
     function processBatch(count) {
         let processed = 0;
-        let startIndex = fullCatalog.length; 
-        
-        // We pick from rawFeedData starting where we last left off conceptually
-        // For simplicity, we just iterate the whole thing and skip seen
         for (let i = 0; i < rawFeedData.length; i++) {
             const g = rawFeedData[i];
             if (g && g.id && !seenIds.has(g.id)) {
@@ -312,9 +310,7 @@
         setInterval(() => {
             const added = processBatch(BACKGROUND_LOAD_SIZE);
             if (added > 0) {
-                console.log(`Background Sync: Added ${added} new unique games.`);
                 document.getElementById('bg-sync-info').innerText = `Synced ${fullCatalog.length} Total Games`;
-                // If we are in "Home" view and not searching, refresh our reference
                 if (activeView === 'home' && document.getElementById('game-search').value === "") {
                     currentFilteredView = [...fullCatalog];
                 }

@@ -241,15 +241,14 @@
 
 <script>
     const eliteGames = [
-        { id: 'basketrandom', title: 'Basket Random', url: 'https://cdn.jsdelivr.net/gh/bubbls/ruffle@1520d90d7b2994737acd8f7a633d018f63c22ca7/index.html', thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
+        { id: 'basketrandom', title: 'Basket Random', url: 'https://basketrandom.github.io/', thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
         { id: 'supermario', title: 'Super Mario', url: 'https://mukeshkmr776.github.io/super-mario/', thumb: 'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg' },
         { id: 'majestic', title: 'Majestic Games', url: 'https://majesticwafr.github.io', thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
         { id: 'marduinoparty', title: 'Marduino Party', url: 'https://www.hackster.io/gatoninja236/marduino-party-1-3dcda7/embed', thumb: 'https://img.gamemonetize.com/kk2f1i1jbnfvg87cu5d6pso2jj0mb7t7/512x384.jpg' },
-        { id: 'retrobowl', title: 'Retro Bowl', url: 'https://retro-bowl-six.vercel.app', thumb: 'https://img.gamemonetize.com/497e2c9f9f9e4f0f8a3d5e3f3e3e3e3e/512x384.jpg' },
+        { id: 'retrobowl', title: 'Retro Bowl', url: 'https://game316422.konggames.com/gameframe/index.html?key=316422', thumb: 'https://img.gamemonetize.com/497e2c9f9f9e4f0f8a3d5e3f3e3e3e3e/512x384.jpg' },
         { id: 'deathloop', title: 'Death Loop (Danganronpa)', url: 'https://itch.io/embed-upload/11266205?color=000000', thumb: 'https://img.itch.zone/aW1nLzE3Njg1NDUyLnBuZw==/315x250%23c/9f%2BFuB.png' },
         { id: 'dungeon', title: 'Die in the Dungeon', url: 'https://itch.io/embed-upload/3796541?color=000000', thumb: 'https://img.itch.zone/aW1nLzUzODU0MzIucG5n/315x250%23c/X%2F%2F%2FRq.png' },
-        { id: 'littlechef', title: 'Little Chef', url: 'https://itch.io/embed-upload/8133544?color=000000', thumb: 'https://img.itch.zone/aW1nLzEyMzk0MTk3LnBuZw==/315x250%23c/W0mO4H.png' },
-        { id: 'wbwwb', title: 'We Become What We Behold', url: 'https://itch.io/embed-upload/546107?color=000000', thumb: 'https://img.itch.zone/aW1nLzU0NjEwNy5wbmc=/315x250%23c/yH%2F6pI.png' }
+        { id: 'littlechef', title: 'Little Chef', url: 'https://itch.io/embed-upload/8133544?color=000000', thumb: 'https://img.itch.zone/aW1nLzEyMzk0MTk3LnBuZw==/315x250%23c/W0mO4H.png' }
     ];
 
     let rawFeedData = []; 
@@ -259,7 +258,7 @@
     let activeView = 'home';
     let loadedCount = 0; 
     
-    const INITIAL_LOAD_LIMIT = 100;
+    const INITIAL_LOAD_LIMIT = 40;
     const SCROLL_BATCH_SIZE = 20;
     const BACKGROUND_LOAD_SIZE = 100;
     const BACKGROUND_TICK_MS = 20000; 
@@ -311,6 +310,7 @@
             const added = processBatch(BACKGROUND_LOAD_SIZE);
             if (added > 0) {
                 document.getElementById('bg-sync-info').innerText = `Synced ${fullCatalog.length} Total Games`;
+                // If on home and not searching, sync the filtered view too
                 if (activeView === 'home' && document.getElementById('game-search').value === "") {
                     currentFilteredView = [...fullCatalog];
                 }
@@ -351,7 +351,11 @@
     function showSection(section) {
         activeView = section;
         document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
-        if(section === 'home') document.getElementById('view-home').style.display = 'block';
+        if(section === 'home') {
+            document.getElementById('view-home').style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('btn-nav-home').classList.add('active');
+        }
     }
 
     function showCategory(cat) {
@@ -364,7 +368,7 @@
         document.getElementById('category-title').innerText = cat;
         container.innerHTML = '';
         
-        currentFilteredView = fullCatalog.filter(g => (g.category || '').includes(cat));
+        currentFilteredView = fullCatalog.filter(g => (g.category || '').toLowerCase().includes(cat.toLowerCase()));
         loadedCount = 0;
         loadMoreGames('category-games-container', INITIAL_LOAD_LIMIT);
         window.scrollTo(0,0);
@@ -372,28 +376,35 @@
 
     function loadMoreGames(containerId, limit) {
         const container = document.getElementById(containerId);
+        if (!container) return;
+
         const nextBatch = currentFilteredView.slice(loadedCount, loadedCount + limit);
         
         if (nextBatch.length === 0) {
-            document.getElementById('scroll-sentinel').style.opacity = '0';
+            document.getElementById('scroll-sentinel').style.visibility = 'hidden';
             return;
         }
         
-        document.getElementById('scroll-sentinel').style.opacity = '1';
+        document.getElementById('scroll-sentinel').style.visibility = 'visible';
         let html = '';
         nextBatch.forEach(g => html += createCardHTML(g));
         container.insertAdjacentHTML('beforeend', html);
         loadedCount += nextBatch.length;
+
+        // Hide sentinel if we've reached the end of the current view
+        if (loadedCount >= currentFilteredView.length) {
+            document.getElementById('scroll-sentinel').style.visibility = 'hidden';
+        }
     }
 
     function initInfiniteScroll() {
         const sentinel = document.getElementById('scroll-sentinel');
         const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
+            if (entries[0].isIntersecting && loadedCount < currentFilteredView.length) {
                 const targetId = activeView === 'home' ? 'library-preview' : 'category-games-container';
                 loadMoreGames(targetId, SCROLL_BATCH_SIZE);
             }
-        }, { rootMargin: '400px' });
+        }, { rootMargin: '200px' });
         observer.observe(sentinel);
     }
 
@@ -415,11 +426,13 @@
         document.getElementById('game-stage').style.display = 'block';
         document.getElementById('stage-iframe').src = url;
         document.getElementById('active-game-title').innerText = `Playing: ${title}`;
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
     }
 
     function closeGame() {
         document.getElementById('game-stage').style.display = 'none';
         document.getElementById('stage-iframe').src = '';
+        document.body.style.overflow = '';
     }
 
     window.addEventListener('load', init);

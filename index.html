@@ -10,8 +10,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Social Ads & Analytics -->
-    <script src="https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js"></script>
+    <!-- Social Ads Frequency Logic -->
+    <script>
+        (function() {
+            const AD_COOLDOWN = 30 * 60 * 1000; // 30 minutes in milliseconds
+            const lastAdTime = localStorage.getItem('blinchi_last_social_ad');
+            const now = Date.now();
+
+            if (!lastAdTime || (now - lastAdTime) > AD_COOLDOWN) {
+                const script = document.createElement('script');
+                script.src = "https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js";
+                document.head.appendChild(script);
+                localStorage.setItem('blinchi_last_social_ad', now);
+            }
+        })();
+    </script>
+    
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157317095946191" crossorigin="anonymous"></script>
 
     <style>
@@ -205,14 +219,14 @@
     <div id="loading-overlay">
         <h2 class="logo mb-4" style="font-size: 3.5rem;">BLINCHI<span>GAMES</span></h2>
         <div class="spinner-border" style="color: var(--brand); width: 3.5rem; height: 3.5rem;" role="status"></div>
-        <p class="mt-4 text-white opacity-50 fw-bold letter-spacing-1">SYNCING ELITE DATA</p>
+        <p class="mt-4 text-white opacity-50 fw-bold letter-spacing-1">LOADING GAMES</p>
     </div>
 
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="#" class="logo" onclick="location.reload()">
-                    <i class="bi bi-cpu-fill" style="color: var(--brand);"></i> BLINCHI<span>GAMES</span>
+                    <i class="bi bi-controller" style="color: var(--brand);"></i> BLINCHI<span>GAMES</span>
                 </a>
             </div>
             <div class="search-box">

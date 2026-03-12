@@ -3,25 +3,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>BLINCHIGAMES | Elite Game Library</title>
+    <title>BLINCHIGAMES | Home</title>
 
+    <!-- UI Frameworks & Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <!-- Google AdSense Main Script -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157317095946191" crossorigin="anonymous"></script>
 
     <style>
         :root {
-            /* Epic Games Inspired Dark Charcoal Theme */
+            /* True Black Theme with Green/White Highlights */
             --brand: #32ff0e;
             --brand-soft: rgba(50, 255, 14, 0.15);
-            --bg-dark: #121214; /* Deep Charcoal Base */
-            --sidebar: #18181c; /* Slightly lighter side panel */
-            --surface: #202025; /* Card Background */
-            --surface-hover: #2a2a32;
-            --text-main: #f5f5f5;
-            --text-secondary: #a0a0a5;
+            --bg-dark: #000000; /* True Black Base */
+            --sidebar: #050505; /* Pitch Dark sidebar */
+            --surface: #111111; /* Card Background */
+            --surface-hover: #1a1a1a;
+            --text-main: #ffffff;
+            --text-secondary: #aaaaaa;
             --font-main: 'Plus Jakarta Sans', sans-serif;
             --font-display: 'Space Grotesk', sans-serif;
             --radius-lg: 16px;
@@ -57,7 +59,7 @@
             font-family: var(--font-display);
             font-size: 1.6rem;
             font-weight: 800;
-            color: #fff;
+            color: #ffffff;
             text-decoration: none;
             letter-spacing: -1px;
             display: flex;
@@ -124,14 +126,17 @@
             text-align: left;
             margin-bottom: 4px;
         }
-        .nav-item:hover { color: #fff; background: var(--surface); }
+        .nav-item:hover { color: #ffffff; background: var(--surface); }
+        
+        /* Highlighted Active Category State (Green & White) */
         .nav-item.active { 
-            color: var(--brand); 
+            color: #ffffff; 
             background: var(--brand-soft); 
             border-left: 3px solid var(--brand);
             border-radius: 0 8px 8px 0;
             font-weight: 600;
         }
+        .nav-item.active i { color: var(--brand); }
 
         /* --- MAIN CONTENT & GRIDS --- */
         .main-content { flex: 1; min-width: 0; position: relative; padding: 0 20px; }
@@ -141,6 +146,7 @@
             font-size: 1.5rem;
             letter-spacing: -0.5px;
             margin-top: 2rem;
+            color: #ffffff;
         }
 
         .game-grid { 
@@ -151,7 +157,7 @@
         }
         .elite-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
 
-        /* --- EPIC GAMES STYLE CARDS --- */
+        /* --- GAME CARDS --- */
         .game-card {
             background: transparent;
             border-radius: var(--radius-md);
@@ -163,6 +169,7 @@
         }
         .game-card:hover { transform: scale(1.03); z-index: 2; }
         .game-card:hover .game-thumb img { filter: brightness(1.1); }
+        .game-card:hover h6 { color: var(--brand); } /* Title turns green on hover */
         
         .game-thumb { 
             aspect-ratio: 16/9; 
@@ -170,7 +177,8 @@
             position: relative; 
             border-radius: var(--radius-md);
             background: var(--surface);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .game-thumb img { 
             width: 100%; 
@@ -188,6 +196,7 @@
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; 
+            transition: color 0.2s;
         }
         .game-category-label {
             font-size: 0.75rem;
@@ -230,15 +239,34 @@
             height: 60px; 
             display: flex; 
             align-items: center; 
+            justify-content: space-between;
             padding: 0 20px; 
             background: var(--sidebar); 
             border-bottom: 1px solid rgba(255,255,255,0.05); 
         }
+        
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .btn-fullscreen { 
+            background: var(--brand); 
+            color: #000; 
+            border: none; 
+            font-weight: 800; 
+        }
+        .btn-fullscreen:hover { background: #fff; color: #000; }
+
         .stage-body { 
             display: flex; 
             height: calc(100vh - 60px); 
             flex-direction: row; 
         }
+        
+        .game-and-bottom-ad {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #000;
+        }
+
         .iframe-container { 
             flex: 1; 
             position: relative; 
@@ -246,16 +274,28 @@
         }
         #stage-iframe { width: 100%; height: 100%; border: none; }
         
-        /* ADSTERRA SIDEBAR */
+        /* Bottom Native Ad Container */
+        .bottom-ad-container {
+            min-height: 120px;
+            background: var(--sidebar);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            flex-shrink: 0;
+        }
+
+        /* ADSTERRA SIDEBAR (Banner Ads) */
         .ad-sidebar {
-            width: 300px; /* Fixed width for standard ad sizes */
+            width: 250px; 
             background: var(--sidebar);
             border-left: 1px solid rgba(255,255,255,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 10px;
-            gap: 20px;
+            padding: 20px 0;
+            gap: 30px;
             overflow-y: auto;
         }
 
@@ -264,12 +304,20 @@
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: -10px;
+            margin-bottom: -15px;
+        }
+
+        /* Scale up the banner to make it look bigger as requested */
+        .scaled-banner {
+            transform: scale(1.2);
+            transform-origin: top center;
+            margin-bottom: 40px;
         }
 
         /* Responsive */
         @media (max-width: 992px) {
             .ad-sidebar { width: 200px; }
+            .scaled-banner { transform: scale(1); }
         }
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
@@ -288,21 +336,26 @@
                 justify-content: center; 
                 border-left: none; 
                 border-top: 1px solid rgba(255,255,255,0.05); 
+                padding: 10px;
+                gap: 15px;
             }
+            .scaled-banner { transform: scale(0.9); margin-bottom: 0; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Loading Screen -->
     <div id="loading-overlay">
         <div class="text-center">
             <h2 class="logo mb-4 bouncy-logo" style="font-size: 3rem; justify-content: center;">BLINCHI<span>GAMES</span></h2>
             <div class="spinner-border" style="color: var(--brand);" role="status"></div>
-            <p class="text-secondary mt-3 small">Initializing Epic Catalog...</p>
+            <p class="text-secondary mt-3 small text-white">Initializing Epic Catalog...</p>
         </div>
     </div>
 
     <div class="app-container">
+        <!-- Sidebar Navigation -->
         <aside id="main-sidebar" class="sidebar">
             <div class="sidebar-header">
                 <a href="#" class="logo" onclick="showSection('home', document.getElementById('btn-nav-home'))">
@@ -313,14 +366,14 @@
             <div class="search-box">
                 <div class="search-input-wrapper">
                     <i class="bi bi-search"></i>
-                    <input type="text" id="game-search" placeholder="Search store..." oninput="handleSearch()">
+                    <input type="text" id="game-search" placeholder="Search games..." oninput="handleSearch()">
                 </div>
             </div>
 
             <div class="menu-scroll">
                 <div class="menu-label">Discover</div>
                 <button class="nav-item active" id="btn-nav-home" onclick="showSection('home', this)">
-                    <i class="bi bi-grid-fill"></i> Store Home
+                    <i class="bi bi-house-door-fill"></i> Home
                 </button>
 
                 <div class="menu-label">Genres</div>
@@ -333,17 +386,18 @@
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="main-content">
             <div id="view-home" class="view-section py-4">
-                <h2 class="section-title fw-bold text-white mb-4">Featured Elite</h2>
+                <h2 class="section-title fw-bold mb-4">Featured Elite</h2>
                 <div id="elite-games-container" class="game-grid elite-grid mb-5"></div>
 
-                <h2 class="section-title fw-bold text-white mb-4" id="main-library-title">All Games</h2>
+                <h2 class="section-title fw-bold mb-4" id="main-library-title">All Games</h2>
                 <div id="library-preview" class="game-grid"></div>
             </div>
 
             <div id="view-category" class="view-section py-4" style="display:none">
-                <h2 id="category-title" class="section-title fw-bold text-white mb-4"></h2>
+                <h2 id="category-title" class="section-title fw-bold mb-4"></h2>
                 <div id="category-games-container" class="game-grid"></div>
             </div>
 
@@ -354,40 +408,59 @@
         </main>
     </div>
 
+    <!-- Game Playing Stage -->
     <div id="game-stage">
         <div class="stage-header">
-            <button class="btn btn-dark btn-sm rounded-pill px-4 fw-bold me-3" style="background: var(--surface); border: none;" onclick="closeGame()">
-                <i class="bi bi-chevron-left"></i> Back to Store
+            <div class="header-left">
+                <button class="btn btn-dark btn-sm rounded-pill px-4 fw-bold" style="background: var(--surface); border: none; color: #fff;" onclick="closeGame()">
+                    <i class="bi bi-chevron-left"></i> Back to Home
+                </button>
+                <span id="active-game-title" class="fw-bold text-uppercase small text-white"></span>
+            </div>
+            <!-- Fullscreen Button -->
+            <button class="btn btn-sm rounded-pill px-3 btn-fullscreen" onclick="toggleFullscreen()">
+                <i class="bi bi-arrows-fullscreen"></i> Fullscreen
             </button>
-            <span id="active-game-title" class="fw-bold text-uppercase small text-white"></span>
         </div>
         
         <div class="stage-body">
-            <div class="iframe-container">
-                <iframe id="stage-iframe" src="" allow="autoplay; fullscreen; keyboard" allowfullscreen></iframe>
+            <!-- Left Side: Game + Bottom Native Ad -->
+            <div class="game-and-bottom-ad">
+                <div class="iframe-container" id="game-iframe-wrapper">
+                    <iframe id="stage-iframe" src="" allow="autoplay; fullscreen; keyboard" allowfullscreen></iframe>
+                </div>
+                
+                <!-- Bottom Native Ad -->
+                <div class="bottom-ad-container">
+                    <!-- Adsterra Native Ad -->
+                    <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
+                    <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
+                </div>
             </div>
             
+            <!-- Right Side: Adsterra Banner Sidebar -->
             <div class="ad-sidebar">
                 <div class="ad-label">Advertisement</div>
                 
-                <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
-                <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
-
-                <div class="ad-label mt-3">Advertisement</div>
-
-                <script>
-                  atOptions = {
-                    'key' : '6e1109cad98d336d18e23b0a2087bbc8',
-                    'format' : 'iframe',
-                    'height' : 300,
-                    'width' : 160,
-                    'params' : {}
-                  };
-                </script>
-                <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+                <!-- Adsterra Banner Ad (Scaled to look bigger) -->
+                <div class="scaled-banner">
+                    <script>
+                      atOptions = {
+                        'key' : '6e1109cad98d336d18e23b0a2087bbc8',
+                        'format' : 'iframe',
+                        'height' : 300,
+                        'width' : 160,
+                        'params' : {}
+                      };
+                    </script>
+                    <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Social Bar Ad -->
+    <script type="text/javascript" src="https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js"></script>
 
     <script>
         const eliteGames = [
@@ -408,12 +481,22 @@
         let activeView = 'home';
         let loadedCount = 0;
 
+        // 100 Initial Games, 20 More per scroll
         const INITIAL_CATALOG_LIMIT = 100;
         const SCROLL_BATCH_SIZE = 20;
         const BACKGROUND_LOAD_SIZE = 500;
         const BACKGROUND_TICK_MS = 5000;
 
-        const feeds = ['rssfeed.php.json', 'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php'];
+        // Included new feed requested
+        const feeds = [
+            'rssfeed.php.json', 
+            'rssfeed2.php', 
+            'rssfeed3.php', 
+            'rssfeed4.php', 
+            'rssfeed5.php',
+            'https://gamemonetize.com/feed.php?format=0&page=20'
+        ];
+        
         const seenIds = new Set(eliteGames.map(g => g.id));
 
         async function init() {
@@ -469,7 +552,8 @@
 
         function renderMenu() {
             const menu = document.getElementById('category-nav-list');
-            const cats = ['Action', 'Arcade', 'Driving', 'Puzzle', 'Shooting', 'Sports'];
+            // 'Driving' changed to 'Racing'
+            const cats = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports'];
             cats.forEach(cat => {
                 const btn = document.createElement('button');
                 btn.className = 'nav-item';
@@ -497,7 +581,6 @@
             loadMoreGames('library-preview', INITIAL_CATALOG_LIMIT);
         }
 
-        // Updated to handle Active Class highlighting
         function showSection(section, btnElement) {
             activeView = section;
             document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
@@ -511,7 +594,6 @@
             }
         }
 
-        // Updated to handle Active Class highlighting
         function showCategory(cat, btnElement) {
             showSection('category', btnElement);
             document.getElementById('game-search').value = "";
@@ -521,7 +603,13 @@
             document.getElementById('category-title').innerText = cat + " Games";
             container.innerHTML = '';
 
-            currentFilteredView = fullCatalog.filter(g => (g.category || '').toLowerCase().includes(cat.toLowerCase()));
+            // Filter logic supports standard and custom cat names
+            currentFilteredView = fullCatalog.filter(g => {
+                let catName = (g.category || '').toLowerCase();
+                // Map 'driving' feed data to 'Racing' if necessary
+                if(cat.toLowerCase() === 'racing' && catName.includes('driving')) return true; 
+                return catName.includes(cat.toLowerCase());
+            });
 
             loadedCount = 0;
             loadMoreGames('category-games-container', INITIAL_CATALOG_LIMIT);
@@ -562,12 +650,14 @@
         }
 
         function createCardHTML(game, isElite = false) {
-            const catLabel = game.category ? game.category : "Web Game";
+            let catLabel = game.category ? game.category : "Web Game";
+            if(catLabel.toLowerCase() === "driving") catLabel = "Racing"; // rename label for UI
+
             return `
                 <div class="game-card" onclick="openGame('${game.url}', '${game.title.replace(/'/g, "\\'")}')">
                     <div class="game-thumb">
                         ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
-                        <img src="${game.thumb}" alt="${game.title}" loading="lazy" onerror="this.src='https://placehold.co/600x337/202025/32ff0e?text=No+Image'">
+                        <img src="${game.thumb}" alt="${game.title}" loading="lazy" onerror="this.src='https://placehold.co/600x337/111111/32ff0e?text=No+Image'">
                     </div>
                     <div class="game-info">
                         <h6>${game.title}</h6>
@@ -585,9 +675,31 @@
         }
 
         function closeGame() {
+            // Exit fullscreen if active when closing
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
             document.getElementById('game-stage').style.display = 'none';
             document.getElementById('stage-iframe').src = '';
             document.body.style.overflow = '';
+        }
+
+        // Fullscreen functionality targeting just the iframe container
+        function toggleFullscreen() {
+            const gameWrapper = document.getElementById('game-iframe-wrapper');
+            if (!document.fullscreenElement) {
+                if (gameWrapper.requestFullscreen) {
+                    gameWrapper.requestFullscreen();
+                } else if (gameWrapper.webkitRequestFullscreen) { /* Safari */
+                    gameWrapper.webkitRequestFullscreen();
+                } else if (gameWrapper.msRequestFullscreen) { /* IE11 */
+                    gameWrapper.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
         }
 
         window.addEventListener('load', init);

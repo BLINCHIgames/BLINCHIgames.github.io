@@ -283,7 +283,7 @@
         </div>
         <div class="stage-body">
             <div class="game-area">
-                <iframe id="stage-iframe"></iframe>
+                <iframe id="stage-iframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
                 <div class="bg-black text-center p-3 d-flex align-items-center justify-content-center" style="min-height:100px; border-top: 1px solid #222;">
                     <!-- Game Bottom Ad Unit -->
                     <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
@@ -353,10 +353,17 @@
                 if (!Array.isArray(data)) return;
                 
                 data.forEach(g => {
+                    let gameUrl = g.embed || g.url || "";
+                    
+                    // Force HTTPS to prevent Mixed Content blocking in modern browsers
+                    if (gameUrl.startsWith('http://')) {
+                        gameUrl = gameUrl.replace('http://', 'https://');
+                    }
+
                     // Mapping different feed formats
                     const gameObj = {
                         title: g.title || "Elite Game",
-                        url: g.embed || g.url || "",
+                        url: gameUrl,
                         thumb: g.image || g.thumb || "",
                         category: (g.tags || g.category || "Web Game").split(',')[0]
                     };
@@ -418,13 +425,24 @@
             document.getElementById('view-cat').style.display = 'none';
             document.getElementById('home-grid').innerHTML = '';
             activeFilterList = [...masterCatalog];
+            document.getElementById('game-search').value = '';
+            document.getElementById('main-lib-title').innerText = "Global Library";
             renderBatch(PAGE_INIT);
         }
 
         function handleSearch() {
             const query = document.getElementById('game-search').value.toLowerCase();
-            showSection('home', document.getElementById('btn-home'));
+            
+            // Setup the view manually to prevent showSection state collision
+            viewMode = 'home';
+            itemsLoaded = 0;
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('btn-home').classList.add('active');
+            
+            document.getElementById('view-home').style.display = 'block';
+            document.getElementById('view-cat').style.display = 'none';
             document.getElementById('home-grid').innerHTML = '';
+            
             document.getElementById('main-lib-title').innerText = query ? `Search Results: "${query}"` : "Global Library";
             activeFilterList = masterCatalog.filter(g => g.title.toLowerCase().includes(query));
             renderBatch(PAGE_INIT);

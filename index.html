@@ -9,18 +9,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Social Ads Frequency Logic -->
+    <!-- Social Ads — fires once per 20 minutes, never more -->
     <script>
-        (function() {
-            const AD_COOLDOWN = 20 * 60 * 1000; // 20 minutes
-            const lastAdTime = localStorage.getItem('blinchi_last_social_ad');
-            const now = Date.now();
-            if (!lastAdTime || (now - lastAdTime) > AD_COOLDOWN) {
-                const script = document.createElement('script');
-                script.src = "https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js";
+        (function () {
+            const KEY      = 'blinchi_last_social_ad';
+            const COOLDOWN = 20 * 60 * 1000; // 20 minutes in ms
+
+            function fireAd() {
+                const script  = document.createElement('script');
+                script.src    = 'https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js';
+                script.async  = true;
                 document.head.appendChild(script);
-                localStorage.setItem('blinchi_last_social_ad', now);
+                localStorage.setItem(KEY, String(Date.now()));
             }
+
+            function maybeFireAd() {
+                const last = parseInt(localStorage.getItem(KEY) || '0', 10);
+                const now  = Date.now();
+                if (now - last >= COOLDOWN) {
+                    fireAd();
+                }
+            }
+
+            // Check immediately on page load
+            maybeFireAd();
+
+            // Then re-check every 20 minutes while the tab stays open
+            setInterval(maybeFireAd, COOLDOWN);
         })();
     </script>
 
@@ -253,18 +268,20 @@
 </div>
 
 <script>
-// ─── Elite hand-picked games (no GameDistribution) ───────────────────────────
+// ─── Elite hand-picked games ─────────────────────────────────────────────────
 const ELITE_LIST = [
-    { title: 'Majestic Games', category: 'Elite',        url: 'https://majesticwafr.github.io',                                   thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
-    { title: 'Poxel.io',       category: 'Elite IO',     url: 'https://poxel.io/',                                                thumb: '' },
-    { title: 'Speed Stars 2',  category: 'Elite Racing', url: 'https://speedstars2.io/',                                          thumb: '' },
-    { title: 'Basket Random',  category: 'Elite Sports', url: 'https://basketrandom.github.io/',                                  thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
-    { title: 'Super Mario',    category: 'Elite Arcade', url: 'https://mukeshkmr776.github.io/super-mario/',                     thumb: 'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg' },
-    { title: 'Venge.io',       category: 'Elite IO',     url: 'https://play.gamepix.com/venge-io/embed?ref=blinchigames.online',  thumb: '' },
-    { title: 'BasketBros',     category: 'Elite Sports', url: 'https://play.gamepix.com/basketbros/embed?ref=blinchigames.online',thumb: '' },
+    { title: 'Majestic Games', category: 'Elite',        url: 'https://majesticwafr.github.io',                                    thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
+    { title: 'Poxel.io',       category: 'Elite IO',     url: 'https://poxel.io/',                                                 thumb: '' },
+    { title: 'Speed Stars 2',  category: 'Elite Racing', url: 'https://speedstars2.io/',                                           thumb: '' },
+    { title: 'Basket Random',  category: 'Elite Sports', url: 'https://basketrandom.github.io/',                                   thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
+    { title: 'Super Mario',    category: 'Elite Arcade', url: 'https://mukeshkmr776.github.io/super-mario/',                      thumb: 'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg' },
+    { title: 'Venge.io',       category: 'Elite IO',     url: 'https://play.gamepix.com/venge-io/embed?ref=blinchigames.online',   thumb: '' },
+    { title: 'BasketBros',     category: 'Elite Sports', url: 'https://play.gamepix.com/basketbros/embed?ref=blinchigames.online', thumb: '' },
 ];
 
-const GENRES = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
+const GENRES   = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
+const PAGE_INIT = 100;
+const PAGE_STEP = 20;
 
 let masterCatalog = [];
 let activeList    = [];
@@ -272,26 +289,21 @@ let itemsLoaded   = 0;
 let viewMode      = 'home';
 let observer      = null;
 
-const PAGE_INIT = 100;
-const PAGE_STEP = 20;
-
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
     // Render elite strip immediately
     const eg = document.getElementById('elite-grid');
     ELITE_LIST.forEach(g => eg.innerHTML += generateCard(g, true));
 
-    // All external feeds fetched in parallel
     const feedUrls = [
-        'embed.json',       // local file — title, embed, image, tags
-        'g_min.json',       // local file — name, link, image, categories
+        'embed.json',
+        'g_min.json',
         'rssfeed.php.json',
         'rssfeed2.php',
         'rssfeed3.php',
         'rssfeed4.php',
         'rssfeed5.php',
         'https://gamemonetize.com/feed.php?format=0&page=20',
-        // GamePix feed — paginated; fetch first few pages
         'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=1',
         'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=2',
         'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=3',
@@ -300,27 +312,22 @@ async function boot() {
     ];
 
     const results = await Promise.all(
-        feedUrls.map(url =>
-            fetch(url)
-                .then(r => r.json())
-                .catch(() => [])
-        )
+        feedUrls.map(url => fetch(url).then(r => r.json()).catch(() => []))
     );
 
-    // Start with elites in catalog
     masterCatalog = [...ELITE_LIST];
 
     results.forEach((data, idx) => {
         const url = feedUrls[idx];
 
-        // ── g_min.json format: { name, link, image, categories[] } ──
+        // g_min.json — { name, link, image, categories[] }
         if (url.includes('g_min.json')) {
             if (!Array.isArray(data)) return;
             data.forEach(g => {
-                if (!g.link || g.custom) return; // skip non-game entries
+                if (!g.link || g.custom) return;
                 const gameUrl = g.link.startsWith('http://') ? g.link.replace('http://', 'https://') : g.link;
                 masterCatalog.push({
-                    title:    g.name  || 'Game',
+                    title:    g.name || 'Game',
                     url:      gameUrl,
                     thumb:    g.image || '',
                     category: Array.isArray(g.categories) ? g.categories[0] : (g.categories || 'Web Game')
@@ -329,18 +336,20 @@ async function boot() {
             return;
         }
 
-        // ── GamePix feed format: { data: [ { title, url, url_thumbnail, categories[] } ] } ──
+        // GamePix feed — { data: [ { title, url, url_thumbnail, categories[] } ] }
         if (url.includes('gamepix.com')) {
             const items = Array.isArray(data) ? data : (data.data || []);
             items.forEach(g => {
-                const gameUrl = (g.url || '').replace('http://', 'https://');
-                // Convert plain game page URL to embed URL
-                const embedUrl = gameUrl.includes('/embed')
-                    ? gameUrl
-                    : gameUrl.replace('https://play.gamepix.com/', 'https://play.gamepix.com/') + (gameUrl.endsWith('/') ? 'embed' : '/embed') + '?ref=blinchigames.online';
+                let gameUrl = (g.url || '').replace('http://', 'https://');
+                // Ensure embed URL
+                if (gameUrl && !gameUrl.includes('/embed')) {
+                    gameUrl = gameUrl.replace(/\/$/, '') + '/embed?ref=blinchigames.online';
+                } else if (gameUrl && !gameUrl.includes('ref=')) {
+                    gameUrl += (gameUrl.includes('?') ? '&' : '?') + 'ref=blinchigames.online';
+                }
                 masterCatalog.push({
                     title:    g.title || g.name || 'Game',
-                    url:      embedUrl,
+                    url:      gameUrl,
                     thumb:    g.url_thumbnail || g.image || g.thumb || '',
                     category: Array.isArray(g.categories) ? g.categories[0] : (g.category || 'Web Game')
                 });
@@ -348,8 +357,7 @@ async function boot() {
             return;
         }
 
-        // ── embed.json format: { title, embed, image, tags } ──
-        // ── Standard JSON feeds: { title, embed/url, image/thumb, tags/category } ──
+        // embed.json + standard feeds — { title/name, embed/url/link, image/thumb, tags/category }
         if (!Array.isArray(data)) return;
         data.forEach(g => {
             let gameUrl = g.embed || g.url || g.link || '';
@@ -367,26 +375,25 @@ async function boot() {
     // De-duplicate by title (case-insensitive)
     const seen = new Set();
     masterCatalog = masterCatalog.filter(g => {
-        const key = g.title.toLowerCase();
+        const key = (g.title || '').toLowerCase();
         return seen.has(key) ? false : seen.add(key);
     });
 
     initNav();
     showHome();
-
     setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
 }
 
-// ─── Sidebar nav ──────────────────────────────────────────────────────────────
+// ─── Nav ──────────────────────────────────────────────────────────────────────
 function initNav() {
     const container = document.getElementById('cat-nav-container');
     container.innerHTML = '';
     GENRES.forEach(cat => {
         const b = document.createElement('button');
-        b.className    = 'nav-item';
+        b.className     = 'nav-item';
         b.dataset.genre = cat;
-        b.innerHTML    = `<i class="bi bi-caret-right-fill"></i> <span>${cat}</span>`;
-        b.onclick      = () => filterByGenre(cat, b);
+        b.innerHTML     = `<i class="bi bi-caret-right-fill"></i> <span>${cat}</span>`;
+        b.onclick       = () => filterByGenre(cat, b);
         container.appendChild(b);
     });
 }
@@ -408,9 +415,9 @@ function showHome() {
     viewMode    = 'home';
     itemsLoaded = 0;
     hideAllViews();
-    document.getElementById('view-home').style.display   = 'block';
-    document.getElementById('home-grid').innerHTML       = '';
-    document.getElementById('main-lib-title').innerText  = 'Global Library';
+    document.getElementById('view-home').style.display  = 'block';
+    document.getElementById('home-grid').innerHTML      = '';
+    document.getElementById('main-lib-title').innerText = 'Global Library';
     setActiveNav(document.getElementById('btn-home'));
     activeList = [...masterCatalog];
     renderBatch(PAGE_INIT);
@@ -429,12 +436,11 @@ function filterByGenre(genre, btn) {
     viewMode    = 'cat';
     itemsLoaded = 0;
     hideAllViews();
-    document.getElementById('view-cat').style.display        = 'block';
-    document.getElementById('cat-display-title').innerText   = genre + ' Collection';
-    document.getElementById('cat-grid').innerHTML            = '';
+    document.getElementById('view-cat').style.display      = 'block';
+    document.getElementById('cat-display-title').innerText = genre + ' Collection';
+    document.getElementById('cat-grid').innerHTML          = '';
     setActiveNav(btn);
 
-    // Broad match: genre keyword anywhere in category or title
     const q = genre.toLowerCase().replace(' games', '').trim();
     activeList = masterCatalog.filter(g =>
         (g.category || '').toLowerCase().includes(q) ||
@@ -454,9 +460,9 @@ function handleSearch() {
     viewMode    = 'search';
     itemsLoaded = 0;
     hideAllViews();
-    document.getElementById('view-search').style.display        = 'block';
-    document.getElementById('search-display-title').innerText   = `Search Results: "${query}"`;
-    document.getElementById('search-grid').innerHTML            = '';
+    document.getElementById('view-search').style.display      = 'block';
+    document.getElementById('search-display-title').innerText = `Search Results: "${query}"`;
+    document.getElementById('search-grid').innerHTML          = '';
     setActiveNav(null);
 
     activeList = masterCatalog.filter(g =>

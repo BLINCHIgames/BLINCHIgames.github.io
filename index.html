@@ -274,9 +274,7 @@ const ELITE_LIST = [
     { title: 'Poxel.io',       category: 'Elite IO',     url: 'https://poxel.io/',                                                 thumb: '' },
     { title: 'Speed Stars 2',  category: 'Elite Racing', url: 'https://speedstars2.io/',                                           thumb: '' },
     { title: 'Basket Random',  category: 'Elite Sports', url: 'https://basketrandom.github.io/',                                   thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
-    { title: 'Super Mario',    category: 'Elite Arcade', url: 'https://mukeshkmr776.github.io/super-mario/',                      thumb: 'https://img.gamemonetize.com/ykl7foe8q8olus573dq1zubicm5rbbz2/512x384.jpg' },
-    { title: 'Venge.io',       category: 'Elite IO',     url: 'https://play.gamepix.com/venge-io/embed?ref=blinchigames.online',   thumb: '' },
-    { title: 'BasketBros',     category: 'Elite Sports', url: 'https://play.gamepix.com/basketbros/embed?ref=blinchigames.online', thumb: '' },
+
 ];
 
 const GENRES   = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
@@ -303,6 +301,7 @@ async function boot() {
         'rssfeed3.php',
         'rssfeed4.php',
         'rssfeed5.php',
+        'Gamepix.json',
         'https://gamemonetize.com/feed.php?format=0&page=20',
         'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=1',
         'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=2',
@@ -337,8 +336,9 @@ async function boot() {
         }
 
         // GamePix feed — { data: [ { title, url, url_thumbnail, categories[] } ] }
-        if (url.includes('gamepix.com')) {
-            const items = Array.isArray(data) ? data : (data.data || []);
+        // Also handles JSFeed format — { items: [ { title, url, banner_image, category } ] }
+        if (url.includes('gamepix.com') || url.includes('Gamepix.json')) {
+            const items = Array.isArray(data) ? data : (data.data || data.items || []);
             items.forEach(g => {
                 let gameUrl = (g.url || '').replace('http://', 'https://');
                 // Ensure embed URL
@@ -350,7 +350,7 @@ async function boot() {
                 masterCatalog.push({
                     title:    g.title || g.name || 'Game',
                     url:      gameUrl,
-                    thumb:    g.url_thumbnail || g.image || g.thumb || '',
+                    thumb:    g.url_thumbnail || g.banner_image || g.image || g.thumb || '',
                     category: Array.isArray(g.categories) ? g.categories[0] : (g.category || 'Web Game')
                 });
             });
@@ -511,7 +511,7 @@ function generateCard(g, isElite = false) {
         <div class="game-card" onclick="launchGame('${safeUrl}','${safeTitle}')">
             <div class="game-thumb">
                 ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
-                <img src="${img}" loading="lazy" onerror="this.src='https://placehold.co/600x337/111/32ff0e?text=Elite+Game'">
+                <img src="${img}" alt="${g.title || ''}" loading="lazy">
             </div>
             <div class="game-info"><h6>${g.title || ''}</h6></div>
         </div>`;

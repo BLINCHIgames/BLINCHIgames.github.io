@@ -329,18 +329,7 @@
 
     <!-- Top banner ad (728×90) -->
     <div id="stage-banner">
-        <div id="ad-banner-top">
-            <script>
-              atOptions = {
-                'key' : 'e6db54461c44b43e8f8a286f792c9452',
-                'format' : 'iframe',
-                'height' : 90,
-                'width' : 728,
-                'params' : {}
-              };
-            </script>
-            <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
-        </div>
+        <div id="ad-banner-top"></div>
         <button id="banner-collapse-btn" onclick="collapseBanner()">▲ Hide Ad</button>
     </div>
     <div id="banner-expand-strip" onclick="expandBanner()">▼ Show Ad</div>
@@ -392,22 +381,8 @@
 
         <!-- Right ad stack: 160×600 on top, 160×300 below -->
         <div class="stage-ad-right">
-            <div id="ad-right-top">
-                <script>
-                  atOptions = {
-                    'key' : '0d1d9860b64193bffb24174fa1adda1d',
-                    'format' : 'iframe',
-                    'height' : 600,
-                    'width' : 160,
-                    'params' : {}
-                  };
-                </script>
-                <script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script>
-            </div>
-            <div id="ad-right-bottom">
-                <script>atOptions = { 'key' : '6e1109cad98d336d18e23b0a2087bbc8', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };</script>
-                <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
-            </div>
+            <div id="ad-right-top"></div>
+            <div id="ad-right-bottom"></div>
         </div>
     </div>
 </div>
@@ -821,7 +796,7 @@ function expandBanner() {
     sizeIframe();
 }
 
-// ─── Ad refresh — exact 25s, never blank (swap new ad in before removing old) ─
+// ─── Ad refresh — exact 25s, direct DOM inject ────────────────────────────────
 const AD_SLOTS = [
     {
         id: 'ad-banner-top',
@@ -847,55 +822,25 @@ function injectAd(slot) {
     const container = document.getElementById(slot.id);
     if (!container) return;
 
-    // Build a hidden staging div — new ad loads here first
-    const staging = document.createElement('div');
-    staging.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
-    document.body.appendChild(staging);
+    // Clear old ad
+    container.innerHTML = '';
 
+    // Set options then load invoke script
     const s1 = document.createElement('script');
     s1.textContent = `atOptions={'key':'${slot.key}','format':'iframe','height':${slot.height},'width':${slot.width},'params':{}};`;
+    container.appendChild(s1);
+
     const s2 = document.createElement('script');
-    s2.src = slot.src + '?_t=' + Date.now();
-    s2.async = true;
-
-    // Once script fires, wait briefly then swap into view — old ad stays visible until then
-    s2.onload = function () {
-        setTimeout(() => {
-            container.innerHTML = '';
-            // Move children from staging into the real container
-            while (staging.firstChild) container.appendChild(staging.firstChild);
-            staging.remove();
-        }, 800); // 800ms grace for iframe to render inside staging
-    };
-
-    // If network fails, retry once after 2s then give up for this cycle
-    s2.onerror = function () {
-        staging.remove();
-        setTimeout(() => {
-            // Hard fallback: wipe and inject directly
-            container.innerHTML = '';
-            const f1 = document.createElement('script');
-            f1.textContent = s1.textContent;
-            const f2 = document.createElement('script');
-            f2.src = slot.src + '?_t=' + Date.now();
-            f2.async = true;
-            container.appendChild(f1);
-            container.appendChild(f2);
-        }, 2000);
-    };
-
-    staging.appendChild(s1);
-    staging.appendChild(s2);
+    s2.src = slot.src;
+    s2.async = false; // synchronous so it reads atOptions immediately
+    container.appendChild(s2);
 }
 
 function startAdRefresh() {
-    // Initial inject on page load for each slot
+    // Inject all ads immediately on load
     AD_SLOTS.forEach(slot => injectAd(slot));
-
-    // Then refresh all exactly every 25 seconds
-    setInterval(() => {
-        AD_SLOTS.forEach(slot => injectAd(slot));
-    }, 25000);
+    // Refresh every 25 seconds exactly
+    setInterval(() => AD_SLOTS.forEach(slot => injectAd(slot)), 25000);
 }
 
 window.onload = boot;

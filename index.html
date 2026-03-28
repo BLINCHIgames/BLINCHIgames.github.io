@@ -113,7 +113,7 @@
         .game-card:hover { transform: translateY(-6px); }
 
         .game-thumb {
-            aspect-ratio: 16/9; overflow: hidden; border-radius: var(--radius-md);
+            aspect-ratio: 1/1; overflow: hidden; border-radius: var(--radius-md);
             background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.05); position: relative;
         }
@@ -739,7 +739,6 @@ function renderRelated(title, category) {
         const st      = (g.title    || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         const su      = (g.url      || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         const sc      = (g.category || '').replace(/'/g, "\\'");
-        const mv      = getMyVote(g.title || '');
         const el      = document.createElement('div');
         el.className  = 'game-card';
         el.innerHTML  = `
@@ -748,14 +747,6 @@ function renderRelated(title, category) {
             </div>
             <div class="game-info">
                 <h6 onclick="launchGame('${su}','${st}','${sc}')">${g.title||''}</h6>
-            </div>
-            <div class="like-bar">
-                <button class="like-btn ${mv==='like'?'active':''}" onclick="voteCard(this,'like','${st}')">
-                    <i class="bi bi-hand-thumbs-up-fill"></i> <span>${getLikes(g.title||'')}</span>
-                </button>
-                <button class="dislike-btn ${mv==='dislike'?'active':''}" onclick="voteCard(this,'dislike','${st}')">
-                    <i class="bi bi-hand-thumbs-down-fill"></i> <span>${getDislikes(g.title||'')}</span>
-                </button>
             </div>`;
         grid.appendChild(el);
     });

@@ -140,7 +140,7 @@
         .like-btn.active    { background: rgba(50,255,14,0.2);  border-color: var(--brand); color: var(--brand); }
         .dislike-btn.active { background: rgba(255,60,60,0.2);  border-color: #ff3c3c;     color: #ff3c3c; }
 
-        /* ── Inline grid ad slot ── */
+        /* ── Single grid ad slot ── */
         .grid-ad-slot {
             border-radius: var(--radius-md);
             background: var(--surface);
@@ -166,9 +166,9 @@
         /* ═══════════════ GAME STAGE ═══════════════ */
         #game-stage {
             display: none; position: fixed; inset: 0; background: var(--bg-dark);
-            z-index: 2500; flex-direction: column;
+            z-index: 2500; overflow-y: auto; flex-direction: column;
         }
-        #game-stage.open { display: flex; }
+        #game-stage.open { display: block; }
 
         /* Top banner ad */
         #stage-banner {
@@ -203,29 +203,35 @@
             border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
         }
 
-        /* Middle zone: left-ad | game-col | right-ad */
-        .stage-middle { display: flex; flex: 1; min-height: 0; }
+        /* Middle zone: game-col | right-ad-stack */
+        /* The entire #game-stage is now page-scroll, not inner scroll */
+        .stage-middle { display: flex; align-items: flex-start; }
 
-        /* Ad sidebars: 160px ad + ~9px padding each side = 178px total */
-        .stage-ad-left, .stage-ad-right {
-            width: 178px; flex-shrink: 0;
+        /* Right ad stack: 160px ad + 1mm (≈4px) padding each side = 168px */
+        .stage-ad-right {
+            width: 168px; flex-shrink: 0;
             background: var(--sidebar);
-            display: flex; align-items: flex-start; justify-content: center;
-            padding: 9px; overflow: hidden;
+            border-left: 1px solid rgba(255,255,255,0.06);
+            padding: 4px; display: flex; flex-direction: column;
+            align-items: center; gap: 8px;
+            /* Sticky so ads stay visible as user scrolls below-game */
+            position: sticky; top: 0; align-self: flex-start;
         }
-        .stage-ad-left  { border-right: 1px solid rgba(255,255,255,0.06); }
-        .stage-ad-right { border-left:  1px solid rgba(255,255,255,0.06); }
 
-        /* Game column: iframe then scrollable below area */
+        /* Game column: fills all space to the left of ad stack */
         .game-col {
             flex: 1; min-width: 0; display: flex; flex-direction: column;
-            background: #000; overflow-y: auto;
+            background: #000;
         }
         #stage-iframe { width: 100%; border: none; background: #000; flex-shrink: 0; }
 
         /* Below-game zone */
-        #below-game { background: var(--bg-dark); padding: 22px 28px 50px; }
-        #game-like-bar { margin-bottom: 20px; }
+        #below-game { background: var(--bg-dark); padding: 22px 28px 60px; }
+        #game-like-bar { margin-bottom: 16px; }
+        #stage-banner-below {
+            margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
+            background: #0a0a0a; border-radius: 8px; overflow: hidden; min-height: 96px;
+        }
         #related-title {
             font-family: var(--font-display); font-size: 1.2rem;
             margin-bottom: 14px; color: #fff;
@@ -254,7 +260,7 @@
             .sidebar { width: 80px; }
             .sidebar-header, .search-box, .menu-label, .nav-item span { display: none; }
             .nav-item { justify-content: center; padding: 15px; }
-            .stage-ad-left, .stage-ad-right { display: none; }
+            .stage-ad-right { display: none; }
         }
     </style>
 </head>
@@ -350,22 +356,8 @@
         </button>
     </div>
 
-    <!-- Middle: left-ad | game | right-ad -->
+    <!-- Middle: game | right-ad-stack -->
     <div class="stage-middle">
-
-        <!-- Left sidebar ad (160×600) -->
-        <div class="stage-ad-left">
-            <script>
-              atOptions = {
-                'key' : '0d1d9860b64193bffb24174fa1adda1d',
-                'format' : 'iframe',
-                'height' : 600,
-                'width' : 160,
-                'params' : {}
-              };
-            </script>
-            <script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script>
-        </div>
 
         <!-- Game column (iframe + below-game) -->
         <div class="game-col" id="game-col">
@@ -382,16 +374,36 @@
                     </button>
                 </div>
 
+                <!-- Banner ad below like buttons, above related games -->
+                <div id="stage-banner-below">
+                    <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
+                    <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
+                </div>
+
                 <!-- Related games -->
                 <div id="related-title">Related Games</div>
                 <div id="related-grid"></div>
             </div>
         </div>
 
-        <!-- Right sidebar ad (160×300, existing) -->
+        <!-- Right ad stack: 160×600 on top, 160×300 below -->
         <div class="stage-ad-right">
-            <script>atOptions = { 'key' : '6e1109cad98d336d18e23b0a2087bbc8', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };</script>
-            <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+            <div>
+                <script>
+                  atOptions = {
+                    'key' : '0d1d9860b64193bffb24174fa1adda1d',
+                    'format' : 'iframe',
+                    'height' : 600,
+                    'width' : 160,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script>
+            </div>
+            <div>
+                <script>atOptions = { 'key' : '6e1109cad98d336d18e23b0a2087bbc8', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };</script>
+                <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+            </div>
         </div>
     </div>
 </div>
@@ -418,7 +430,6 @@ const ELITE_LIST = [
 const GENRES     = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
 const PAGE_INIT  = 100;
 const PAGE_STEP  = 20;
-const AD_EVERY   = 12;   // Insert a 300×250 ad every N game cards
 
 let masterCatalog = [];
 let activeList    = [];
@@ -518,7 +529,8 @@ function sizeIframe() {
     if (!ifr) return;
     const bannerH  = banner.classList.contains('collapsed') ? 0 : (banner.offsetHeight || 96);
     const available = window.innerHeight - bannerH - 60; // 60 = header
-    ifr.style.height = Math.max(280, Math.round(available * 0.60)) + 'px';
+    // Use 85% of available height — much bigger game screen
+    ifr.style.height = Math.max(400, Math.round(available * 0.85)) + 'px';
 }
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
@@ -546,7 +558,7 @@ function setActiveNav(btn) {
 }
 
 function showHome() {
-    viewMode = 'home'; itemsLoaded = 0;
+    viewMode = 'home'; itemsLoaded = 0; singleAdInjected = false;
     hideAllViews();
     document.getElementById('view-home').style.display  = 'block';
     document.getElementById('home-grid').innerHTML      = '';
@@ -598,29 +610,27 @@ function getActiveGrid() {
     if (viewMode === 'search') return document.getElementById('search-grid');
 }
 
+let singleAdInjected = false;
+
 function renderBatch(count) {
     const grid  = getActiveGrid();
     const batch = activeList.slice(itemsLoaded, itemsLoaded + count);
 
-    batch.forEach((g, i) => {
-        const absoluteIndex = itemsLoaded + i;
+    // One single 300×250 ad at the very start of the home library only
+    if (!singleAdInjected && itemsLoaded === 0 && viewMode === 'home') {
+        singleAdInjected = true;
+        const adDiv = document.createElement('div');
+        adDiv.className = 'grid-ad-slot';
+        const s1 = document.createElement('script');
+        s1.textContent = `atOptions = {'key':'70cf6dd8abb266eb5a0f8dee6db632cf','format':'iframe','height':250,'width':300,'params':{}};`;
+        adDiv.appendChild(s1);
+        const s2 = document.createElement('script');
+        s2.src = 'https://authoritieswoundjoint.com/70cf6dd8abb266eb5a0f8dee6db632cf/invoke.js';
+        adDiv.appendChild(s2);
+        grid.appendChild(adDiv);
+    }
 
-        // Inject 300×250 ad every AD_EVERY cards (skip position 0)
-        if (absoluteIndex > 0 && absoluteIndex % AD_EVERY === 0) {
-            const adDiv = document.createElement('div');
-            adDiv.className = 'grid-ad-slot';
-            // Inject ad via innerHTML trick to fire script
-            adDiv.innerHTML = `<div id="gad-${absoluteIndex}"></div>`;
-            grid.appendChild(adDiv);
-            // Dynamically load the ad script
-            const s1 = document.createElement('script');
-            s1.textContent = `atOptions = {'key':'70cf6dd8abb266eb5a0f8dee6db632cf','format':'iframe','height':250,'width':300,'params':{}};`;
-            adDiv.appendChild(s1);
-            const s2 = document.createElement('script');
-            s2.src = 'https://authoritieswoundjoint.com/70cf6dd8abb266eb5a0f8dee6db632cf/invoke.js';
-            adDiv.appendChild(s2);
-        }
-
+    batch.forEach(g => {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = generateCard(g);
         grid.appendChild(wrapper.firstElementChild);
@@ -639,31 +649,20 @@ function resetObserver() {
     observer.observe(document.getElementById('scroll-sentinel'));
 }
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
+// ─── Card (library — no like/dislike) ────────────────────────────────────────
 function generateCard(g, isElite = false) {
     const img       = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/600x337/111/32ff0e?text=Elite+Game';
     const safeTitle = (g.title    || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     const safeUrl   = (g.url      || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     const safeCat   = (g.category || '').replace(/'/g, "\\'");
-    const likes     = getLikes(g.title || '');
-    const dislikes  = getDislikes(g.title || '');
-    const mv        = getMyVote(g.title || '');
     return `
-        <div class="game-card">
-            <div class="game-thumb" onclick="launchGame('${safeUrl}','${safeTitle}','${safeCat}')">
+        <div class="game-card" onclick="launchGame('${safeUrl}','${safeTitle}','${safeCat}')">
+            <div class="game-thumb">
                 ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
                 <img src="${img}" alt="${g.title || ''}" loading="lazy">
             </div>
             <div class="game-info">
-                <h6 onclick="launchGame('${safeUrl}','${safeTitle}','${safeCat}')">${g.title || ''}</h6>
-            </div>
-            <div class="like-bar">
-                <button class="like-btn ${mv==='like'?'active':''}" onclick="voteCard(this,'like','${safeTitle}')">
-                    <i class="bi bi-hand-thumbs-up-fill"></i> <span>${likes}</span>
-                </button>
-                <button class="dislike-btn ${mv==='dislike'?'active':''}" onclick="voteCard(this,'dislike','${safeTitle}')">
-                    <i class="bi bi-hand-thumbs-down-fill"></i> <span>${dislikes}</span>
-                </button>
+                <h6>${g.title || ''}</h6>
             </div>
         </div>`;
 }
@@ -708,8 +707,8 @@ function launchGame(url, title, category) {
     updateStageLikeBar();
     renderRelated(title, category);
     sizeIframe();
-    const col = document.getElementById('game-col');
-    if (col) col.scrollTop = 0;
+    // Scroll the stage overlay to top
+    document.getElementById('game-stage').scrollTop = 0;
 }
 
 function closeGame() {

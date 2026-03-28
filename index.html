@@ -821,92 +821,81 @@ function expandBanner() {
     sizeIframe();
 }
 
-// ─── Ad refresh — guaranteed load with retry on failure, 20–30s random interval ─
+// ─── Ad refresh — exact 25s, never blank (swap new ad in before removing old) ─
 const AD_SLOTS = [
     {
         id: 'ad-banner-top',
         key: 'e6db54461c44b43e8f8a286f792c9452',
         src: 'https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js',
-        opts: { height: 90, width: 728 }
+        height: 90, width: 728
     },
     {
         id: 'ad-right-top',
         key: '0d1d9860b64193bffb24174fa1adda1d',
         src: 'https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js',
-        opts: { height: 600, width: 160 }
+        height: 600, width: 160
     },
     {
         id: 'ad-right-bottom',
         key: '6e1109cad98d336d18e23b0a2087bbc8',
         src: 'https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js',
-        opts: { height: 300, width: 160 }
-    },
-    {
-        id: 'ad-below-game',
-        key: '6e2b1a830401c523b5ff47a15d91df2c',
-        src: 'https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js',
-        opts: null // uses container div pattern
+        height: 300, width: 160
     }
 ];
 
-function injectAd(slot, attempt) {
-    attempt = attempt || 1;
+function injectAd(slot) {
     const container = document.getElementById(slot.id);
     if (!container) return;
 
-    // Wipe previous content
-    container.innerHTML = '';
+    // Build a hidden staging div — new ad loads here first
+    const staging = document.createElement('div');
+    staging.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+    document.body.appendChild(staging);
 
-    // Options script
     const s1 = document.createElement('script');
-    s1.dataset.adInjected = '1';
-    if (slot.opts) {
-        s1.textContent = `atOptions = {'key':'${slot.key}','format':'iframe','height':${slot.opts.height},'width':${slot.opts.width},'params':{}};`;
-    }
-
-    // Invoke script
+    s1.textContent = `atOptions={'key':'${slot.key}','format':'iframe','height':${slot.height},'width':${slot.width},'params':{}};`;
     const s2 = document.createElement('script');
-    s2.dataset.adInjected = '1';
-    s2.src = slot.src + '?_=' + Date.now(); // cache-bust
+    s2.src = slot.src + '?_t=' + Date.now();
     s2.async = true;
 
-    // For the below-game ad which uses a container div
-    if (!slot.opts) {
-        const d = document.createElement('div');
-        d.id = 'container-' + slot.key;
-        container.appendChild(d);
-    }
-
-    // Verify the ad loaded — if container is still empty after 5s, retry (max 3 attempts)
+    // Once script fires, wait briefly then swap into view — old ad stays visible until then
     s2.onload = function () {
         setTimeout(() => {
-            const hasContent = container.querySelector('iframe') || container.querySelector('ins') || container.querySelector('[id^="container-"]');
-            if (!hasContent && attempt < 3) {
-                injectAd(slot, attempt + 1);
-            }
-        }, 5000);
+            container.innerHTML = '';
+            // Move children from staging into the real container
+            while (staging.firstChild) container.appendChild(staging.firstChild);
+            staging.remove();
+        }, 800); // 800ms grace for iframe to render inside staging
     };
+
+    // If network fails, retry once after 2s then give up for this cycle
     s2.onerror = function () {
-        // Network error — retry after 3s, max 3 attempts
-        if (attempt < 3) setTimeout(() => injectAd(slot, attempt + 1), 3000);
+        staging.remove();
+        setTimeout(() => {
+            // Hard fallback: wipe and inject directly
+            container.innerHTML = '';
+            const f1 = document.createElement('script');
+            f1.textContent = s1.textContent;
+            const f2 = document.createElement('script');
+            f2.src = slot.src + '?_t=' + Date.now();
+            f2.async = true;
+            container.appendChild(f1);
+            container.appendChild(f2);
+        }, 2000);
     };
 
-    if (slot.opts) container.appendChild(s1);
-    container.appendChild(s2);
-}
-
-function refreshAd(slot) {
-    injectAd(slot, 1);
-    const delay = (Math.floor(Math.random() * 11) + 20) * 1000; // 20–30s
-    setTimeout(() => refreshAd(slot), delay);
+    staging.appendChild(s1);
+    staging.appendChild(s2);
 }
 
 function startAdRefresh() {
-    AD_SLOTS.forEach((slot, i) => {
-        // Stagger first refresh so all 4 don't fire simultaneously
-        const delay = (Math.floor(Math.random() * 11) + 20) * 1000 + i * 2000;
-        setTimeout(() => refreshAd(slot), delay);
-    });
+    // Initial inject on page load for each slot
+    AD_SLOTS.forEach(slot => injectAd(slot));
+
+    // Then refresh all exactly every 25 seconds
+    setInterval(() => {
+        AD_SLOTS.forEach(slot => injectAd(slot));
+    }, 25000);
 }
 
 window.onload = boot;

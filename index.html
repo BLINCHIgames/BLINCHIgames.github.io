@@ -329,16 +329,18 @@
 
     <!-- Top banner ad (728×90) -->
     <div id="stage-banner">
-        <script>
-          atOptions = {
-            'key' : 'e6db54461c44b43e8f8a286f792c9452',
-            'format' : 'iframe',
-            'height' : 90,
-            'width' : 728,
-            'params' : {}
-          };
-        </script>
-        <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
+        <div id="ad-banner-top">
+            <script>
+              atOptions = {
+                'key' : 'e6db54461c44b43e8f8a286f792c9452',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+              };
+            </script>
+            <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
+        </div>
         <button id="banner-collapse-btn" onclick="collapseBanner()">▲ Hide Ad</button>
     </div>
     <div id="banner-expand-strip" onclick="expandBanner()">▼ Show Ad</div>
@@ -376,8 +378,10 @@
 
                 <!-- Banner ad below like buttons, above related games -->
                 <div id="stage-banner-below">
-                    <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
-                    <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
+                    <div id="ad-below-game">
+                        <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
+                        <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
+                    </div>
                 </div>
 
                 <!-- Related games -->
@@ -388,7 +392,7 @@
 
         <!-- Right ad stack: 160×600 on top, 160×300 below -->
         <div class="stage-ad-right">
-            <div>
+            <div id="ad-right-top">
                 <script>
                   atOptions = {
                     'key' : '0d1d9860b64193bffb24174fa1adda1d',
@@ -400,7 +404,7 @@
                 </script>
                 <script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script>
             </div>
-            <div>
+            <div id="ad-right-bottom">
                 <script>atOptions = { 'key' : '6e1109cad98d336d18e23b0a2087bbc8', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };</script>
                 <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
             </div>
@@ -519,6 +523,7 @@ async function boot() {
     showHome();
     setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
 
+    startAdRefresh();
     sizeIframe();
     window.addEventListener('resize', sizeIframe);
 }
@@ -786,6 +791,70 @@ function expandBanner() {
     document.getElementById('stage-banner').classList.remove('collapsed');
     document.getElementById('banner-expand-strip').style.display = 'none';
     sizeIframe();
+}
+
+// ─── Ad refresh — reloads each ad slot on a random 20–60s interval ────────────
+const AD_SLOTS = [
+    {
+        id: 'ad-banner-top',
+        html: () => {
+            const s1 = document.createElement('script');
+            s1.textContent = `atOptions = {'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':90,'width':728,'params':{}};`;
+            const s2 = document.createElement('script');
+            s2.src = 'https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js';
+            return [s1, s2];
+        }
+    },
+    {
+        id: 'ad-right-top',
+        html: () => {
+            const s1 = document.createElement('script');
+            s1.textContent = `atOptions = {'key':'0d1d9860b64193bffb24174fa1adda1d','format':'iframe','height':600,'width':160,'params':{}};`;
+            const s2 = document.createElement('script');
+            s2.src = 'https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js';
+            return [s1, s2];
+        }
+    },
+    {
+        id: 'ad-right-bottom',
+        html: () => {
+            const s1 = document.createElement('script');
+            s1.textContent = `atOptions = {'key':'6e1109cad98d336d18e23b0a2087bbc8','format':'iframe','height':300,'width':160,'params':{}};`;
+            const s2 = document.createElement('script');
+            s2.src = 'https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js';
+            return [s1, s2];
+        }
+    },
+    {
+        id: 'ad-below-game',
+        html: () => {
+            const s1 = document.createElement('script');
+            s1.async = true;
+            s1.dataset.cfasync = 'false';
+            s1.src = 'https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js';
+            const d = document.createElement('div');
+            d.id = 'container-6e2b1a830401c523b5ff47a15d91df2c';
+            return [s1, d];
+        }
+    }
+];
+
+function refreshAd(slot) {
+    const container = document.getElementById(slot.id);
+    if (!container) return;
+    // Wipe and re-inject
+    container.innerHTML = '';
+    slot.html().forEach(el => container.appendChild(el));
+    // Schedule next refresh at a new random interval
+    const delay = (Math.floor(Math.random() * 11) + 20) * 1000; // 20–60s
+    setTimeout(() => refreshAd(slot), delay);
+}
+
+function startAdRefresh() {
+    AD_SLOTS.forEach(slot => {
+        const delay = (Math.floor(Math.random() * 11) + 20) * 1000; // stagger initial refresh
+        setTimeout(() => refreshAd(slot), delay);
+    });
 }
 
 window.onload = boot;

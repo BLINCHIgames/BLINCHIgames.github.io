@@ -703,8 +703,17 @@ function updateStageLikeBar() {
 }
 
 // ─── Launch game ──────────────────────────────────────────────────────────────
+let gamesPlayedCount = 0;
+
 function launchGame(url, title, category) {
     currentGame = { url, title, category };
+    gamesPlayedCount++;
+
+    // Every 17 games, clear accumulated DOM/memory without touching localStorage
+    if (gamesPlayedCount % 17 === 0) {
+        cleanPortalCache();
+    }
+
     document.getElementById('game-stage').classList.add('open');
     document.getElementById('stage-iframe').src      = url;
     document.getElementById('stage-title').innerText = 'PLAYING: ' + title;
@@ -718,9 +727,28 @@ function launchGame(url, title, category) {
 
 function closeGame() {
     document.getElementById('game-stage').classList.remove('open');
-    document.getElementById('stage-iframe').src = '';
+    // Fully unload the game iframe to free memory
+    const ifr = document.getElementById('stage-iframe');
+    ifr.src = 'about:blank';
+    setTimeout(() => { ifr.src = ''; }, 100);
     document.body.style.overflow = '';
     currentGame = null;
+    // Clear related grid DOM to free memory
+    document.getElementById('related-grid').innerHTML = '';
+    // Purge any blob/object URLs the browser may have cached for this session
+    cleanPortalCache();
+}
+
+// ─── Portal cache cleaner — clears rendering/script cache without touching game saves ──
+function cleanPortalCache() {
+    // Remove stale script tags injected by ad refreshes (keep only the live ones)
+    document.querySelectorAll('script[data-ad-injected]').forEach(s => s.remove());
+    // Force GC hint by briefly toggling a style
+    const body = document.body;
+    body.style.display = 'none';
+    // eslint-disable-next-line no-unused-expressions
+    body.offsetHeight; // reflow
+    body.style.display = '';
 }
 
 // ─── Related games ────────────────────────────────────────────────────────────
@@ -793,66 +821,90 @@ function expandBanner() {
     sizeIframe();
 }
 
-// ─── Ad refresh — reloads each ad slot on a random 20–60s interval ────────────
+// ─── Ad refresh — guaranteed load with retry on failure, 20–30s random interval ─
 const AD_SLOTS = [
     {
         id: 'ad-banner-top',
-        html: () => {
-            const s1 = document.createElement('script');
-            s1.textContent = `atOptions = {'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':90,'width':728,'params':{}};`;
-            const s2 = document.createElement('script');
-            s2.src = 'https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js';
-            return [s1, s2];
-        }
+        key: 'e6db54461c44b43e8f8a286f792c9452',
+        src: 'https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js',
+        opts: { height: 90, width: 728 }
     },
     {
         id: 'ad-right-top',
-        html: () => {
-            const s1 = document.createElement('script');
-            s1.textContent = `atOptions = {'key':'0d1d9860b64193bffb24174fa1adda1d','format':'iframe','height':600,'width':160,'params':{}};`;
-            const s2 = document.createElement('script');
-            s2.src = 'https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js';
-            return [s1, s2];
-        }
+        key: '0d1d9860b64193bffb24174fa1adda1d',
+        src: 'https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js',
+        opts: { height: 600, width: 160 }
     },
     {
         id: 'ad-right-bottom',
-        html: () => {
-            const s1 = document.createElement('script');
-            s1.textContent = `atOptions = {'key':'6e1109cad98d336d18e23b0a2087bbc8','format':'iframe','height':300,'width':160,'params':{}};`;
-            const s2 = document.createElement('script');
-            s2.src = 'https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js';
-            return [s1, s2];
-        }
+        key: '6e1109cad98d336d18e23b0a2087bbc8',
+        src: 'https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js',
+        opts: { height: 300, width: 160 }
     },
     {
         id: 'ad-below-game',
-        html: () => {
-            const s1 = document.createElement('script');
-            s1.async = true;
-            s1.dataset.cfasync = 'false';
-            s1.src = 'https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js';
-            const d = document.createElement('div');
-            d.id = 'container-6e2b1a830401c523b5ff47a15d91df2c';
-            return [s1, d];
-        }
+        key: '6e2b1a830401c523b5ff47a15d91df2c',
+        src: 'https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js',
+        opts: null // uses container div pattern
     }
 ];
 
-function refreshAd(slot) {
+function injectAd(slot, attempt) {
+    attempt = attempt || 1;
     const container = document.getElementById(slot.id);
     if (!container) return;
-    // Wipe and re-inject
+
+    // Wipe previous content
     container.innerHTML = '';
-    slot.html().forEach(el => container.appendChild(el));
-    // Schedule next refresh at a new random interval
-    const delay = (Math.floor(Math.random() * 11) + 20) * 1000; // 20–60s
+
+    // Options script
+    const s1 = document.createElement('script');
+    s1.dataset.adInjected = '1';
+    if (slot.opts) {
+        s1.textContent = `atOptions = {'key':'${slot.key}','format':'iframe','height':${slot.opts.height},'width':${slot.opts.width},'params':{}};`;
+    }
+
+    // Invoke script
+    const s2 = document.createElement('script');
+    s2.dataset.adInjected = '1';
+    s2.src = slot.src + '?_=' + Date.now(); // cache-bust
+    s2.async = true;
+
+    // For the below-game ad which uses a container div
+    if (!slot.opts) {
+        const d = document.createElement('div');
+        d.id = 'container-' + slot.key;
+        container.appendChild(d);
+    }
+
+    // Verify the ad loaded — if container is still empty after 5s, retry (max 3 attempts)
+    s2.onload = function () {
+        setTimeout(() => {
+            const hasContent = container.querySelector('iframe') || container.querySelector('ins') || container.querySelector('[id^="container-"]');
+            if (!hasContent && attempt < 3) {
+                injectAd(slot, attempt + 1);
+            }
+        }, 5000);
+    };
+    s2.onerror = function () {
+        // Network error — retry after 3s, max 3 attempts
+        if (attempt < 3) setTimeout(() => injectAd(slot, attempt + 1), 3000);
+    };
+
+    if (slot.opts) container.appendChild(s1);
+    container.appendChild(s2);
+}
+
+function refreshAd(slot) {
+    injectAd(slot, 1);
+    const delay = (Math.floor(Math.random() * 11) + 20) * 1000; // 20–30s
     setTimeout(() => refreshAd(slot), delay);
 }
 
 function startAdRefresh() {
-    AD_SLOTS.forEach(slot => {
-        const delay = (Math.floor(Math.random() * 11) + 20) * 1000; // stagger initial refresh
+    AD_SLOTS.forEach((slot, i) => {
+        // Stagger first refresh so all 4 don't fire simultaneously
+        const delay = (Math.floor(Math.random() * 11) + 20) * 1000 + i * 2000;
         setTimeout(() => refreshAd(slot), delay);
     });
 }

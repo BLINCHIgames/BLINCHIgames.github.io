@@ -305,6 +305,13 @@
             <h2 class="section-title">Elite Collection</h2>
             <div id="elite-grid" class="game-grid elite-grid"></div>
             <h2 class="section-title" id="main-lib-title">Global Library</h2>
+            <!-- Static 300×250 library ad — always visible at top of grid -->
+            <div class="game-grid" style="padding-bottom:0;">
+                <div class="grid-ad-slot">
+                    <script>atOptions={'key':'70cf6dd8abb266eb5a0f8dee6db632cf','format':'iframe','height':250,'width':300,'params':{}};</script>
+                    <script src="https://authoritieswoundjoint.com/70cf6dd8abb266eb5a0f8dee6db632cf/invoke.js"></script>
+                </div>
+            </div>
             <div id="home-grid" class="game-grid"></div>
         </div>
 
@@ -329,7 +336,10 @@
 
     <!-- Top banner ad (728×90) -->
     <div id="stage-banner">
-        <div id="ad-banner-top"></div>
+        <div id="ad-banner-top">
+            <script>atOptions={'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':90,'width':728,'params':{}};</script>
+            <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
+        </div>
         <button id="banner-collapse-btn" onclick="collapseBanner()">▲ Hide Ad</button>
     </div>
     <div id="banner-expand-strip" onclick="expandBanner()">▼ Show Ad</div>
@@ -381,8 +391,14 @@
 
         <!-- Right ad stack: 160×600 on top, 160×300 below -->
         <div class="stage-ad-right">
-            <div id="ad-right-top"></div>
-            <div id="ad-right-bottom"></div>
+            <div id="ad-right-top">
+                <script>atOptions={'key':'0d1d9860b64193bffb24174fa1adda1d','format':'iframe','height':600,'width':160,'params':{}};</script>
+                <script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script>
+            </div>
+            <div id="ad-right-bottom">
+                <script>atOptions={'key':'6e1109cad98d336d18e23b0a2087bbc8','format':'iframe','height':300,'width':160,'params':{}};</script>
+                <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+            </div>
         </div>
     </div>
 </div>
@@ -403,7 +419,7 @@ const ELITE_LIST = [
     { title: 'Majestic Games', category: 'Elite',        url: 'https://majesticwafr.github.io',      thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
     { title: 'Poxel.io',       category: 'Elite IO',     url: 'https://poxel.io/',                    thumb: '' },
     { title: 'Speed Stars 2',  category: 'Elite Racing', url: 'https://speedstars2.io/',              thumb: '' },
-    { title: 'Basket Random',  category: 'Elite Sports', url: 'https://basketrandom.github.io/',      thumb: 'https://img.gamemonetize.com/9v4n4c7u9r0n0m1a2b3c4d5e6f7g8h9i/512x384.jpg' },
+    { title: 'Basket Random',  category: 'Elite Sports', url: 'https://basketrandom.github.io/',      thumb: '' },
 ];
 
 const GENRES     = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
@@ -596,20 +612,6 @@ function renderBatch(count) {
     const grid  = getActiveGrid();
     const batch = activeList.slice(itemsLoaded, itemsLoaded + count);
 
-    // One single 300×250 ad at the very start of the home library only
-    if (!singleAdInjected && itemsLoaded === 0 && viewMode === 'home') {
-        singleAdInjected = true;
-        const adDiv = document.createElement('div');
-        adDiv.className = 'grid-ad-slot';
-        const s1 = document.createElement('script');
-        s1.textContent = `atOptions = {'key':'70cf6dd8abb266eb5a0f8dee6db632cf','format':'iframe','height':250,'width':300,'params':{}};`;
-        adDiv.appendChild(s1);
-        const s2 = document.createElement('script');
-        s2.src = 'https://authoritieswoundjoint.com/70cf6dd8abb266eb5a0f8dee6db632cf/invoke.js';
-        adDiv.appendChild(s2);
-        grid.appendChild(adDiv);
-    }
-
     batch.forEach(g => {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = generateCard(g);
@@ -796,51 +798,51 @@ function expandBanner() {
     sizeIframe();
 }
 
-// ─── Ad refresh — exact 25s, direct DOM inject ────────────────────────────────
+// ─── Ad refresh — reload the ad iframes every 25s ─────────────────────────────
+const AD_SLOT_IDS = ['ad-banner-top', 'ad-right-top', 'ad-right-bottom'];
+
+function refreshAds() {
+    AD_SLOT_IDS.forEach(id => {
+        const container = document.getElementById(id);
+        if (!container) return;
+        // Find any iframes the ad network injected and reload them
+        container.querySelectorAll('iframe').forEach(ifr => {
+            try {
+                const src = ifr.src || ifr.getAttribute('src');
+                if (src) {
+                    ifr.src = '';
+                    setTimeout(() => { ifr.src = src; }, 50);
+                }
+            } catch(e) {}
+        });
+        // If no iframe found yet, re-inject the scripts
+        if (!container.querySelector('iframe')) {
+            const slot = AD_SLOTS.find(s => s.id === id);
+            if (slot) injectAd(slot);
+        }
+    });
+}
+
 const AD_SLOTS = [
-    {
-        id: 'ad-banner-top',
-        key: 'e6db54461c44b43e8f8a286f792c9452',
-        src: 'https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js',
-        height: 90, width: 728
-    },
-    {
-        id: 'ad-right-top',
-        key: '0d1d9860b64193bffb24174fa1adda1d',
-        src: 'https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js',
-        height: 600, width: 160
-    },
-    {
-        id: 'ad-right-bottom',
-        key: '6e1109cad98d336d18e23b0a2087bbc8',
-        src: 'https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js',
-        height: 300, width: 160
-    }
+    { id: 'ad-banner-top',   key: 'e6db54461c44b43e8f8a286f792c9452', src: 'https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js', height: 90,  width: 728 },
+    { id: 'ad-right-top',    key: '0d1d9860b64193bffb24174fa1adda1d', src: 'https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js', height: 600, width: 160 },
+    { id: 'ad-right-bottom', key: '6e1109cad98d336d18e23b0a2087bbc8', src: 'https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js', height: 300, width: 160 }
 ];
 
 function injectAd(slot) {
     const container = document.getElementById(slot.id);
     if (!container) return;
-
-    // Clear old ad
     container.innerHTML = '';
-
-    // Set options then load invoke script
     const s1 = document.createElement('script');
     s1.textContent = `atOptions={'key':'${slot.key}','format':'iframe','height':${slot.height},'width':${slot.width},'params':{}};`;
     container.appendChild(s1);
-
     const s2 = document.createElement('script');
     s2.src = slot.src;
-    s2.async = false; // synchronous so it reads atOptions immediately
     container.appendChild(s2);
 }
 
 function startAdRefresh() {
-    // Inject all ads immediately on load
-    AD_SLOTS.forEach(slot => injectAd(slot));
-    // Refresh every 25 seconds exactly
-    setInterval(() => AD_SLOTS.forEach(slot => injectAd(slot)), 25000);
+    setInterval(refreshAds, 25000);
 }
 
 window.onload = boot;

@@ -9,6 +9,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <!-- Popunder — fires once per day -->
+    <script>
+        (function () {
+            const KEY     = 'blinchi_last_popunder';
+            const ONE_DAY = 24 * 60 * 60 * 1000;
+            const last    = parseInt(localStorage.getItem(KEY) || '0', 10);
+            if (Date.now() - last >= ONE_DAY) {
+                const s = document.createElement('script');
+                s.src   = 'https://authoritieswoundjoint.com/17/c4/34/17c434ad4a5c24351595e12ab0dcf7fa.js';
+                s.async = true;
+                document.head.appendChild(s);
+                localStorage.setItem(KEY, String(Date.now()));
+            }
+        })();
+    </script>
+
     <!-- Social Ads — fires once per 20 minutes, never more -->
     <script>
         (function () {
@@ -514,7 +530,6 @@ async function boot() {
     showHome();
     setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
 
-    startAdRefresh();
     sizeIframe();
     window.addEventListener('resize', sizeIframe);
 }
@@ -796,53 +811,6 @@ function expandBanner() {
     document.getElementById('stage-banner').classList.remove('collapsed');
     document.getElementById('banner-expand-strip').style.display = 'none';
     sizeIframe();
-}
-
-// ─── Ad refresh — reload the ad iframes every 25s ─────────────────────────────
-const AD_SLOT_IDS = ['ad-banner-top', 'ad-right-top', 'ad-right-bottom'];
-
-function refreshAds() {
-    AD_SLOT_IDS.forEach(id => {
-        const container = document.getElementById(id);
-        if (!container) return;
-        // Find any iframes the ad network injected and reload them
-        container.querySelectorAll('iframe').forEach(ifr => {
-            try {
-                const src = ifr.src || ifr.getAttribute('src');
-                if (src) {
-                    ifr.src = '';
-                    setTimeout(() => { ifr.src = src; }, 50);
-                }
-            } catch(e) {}
-        });
-        // If no iframe found yet, re-inject the scripts
-        if (!container.querySelector('iframe')) {
-            const slot = AD_SLOTS.find(s => s.id === id);
-            if (slot) injectAd(slot);
-        }
-    });
-}
-
-const AD_SLOTS = [
-    { id: 'ad-banner-top',   key: 'e6db54461c44b43e8f8a286f792c9452', src: 'https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js', height: 90,  width: 728 },
-    { id: 'ad-right-top',    key: '0d1d9860b64193bffb24174fa1adda1d', src: 'https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js', height: 600, width: 160 },
-    { id: 'ad-right-bottom', key: '6e1109cad98d336d18e23b0a2087bbc8', src: 'https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js', height: 300, width: 160 }
-];
-
-function injectAd(slot) {
-    const container = document.getElementById(slot.id);
-    if (!container) return;
-    container.innerHTML = '';
-    const s1 = document.createElement('script');
-    s1.textContent = `atOptions={'key':'${slot.key}','format':'iframe','height':${slot.height},'width':${slot.width},'params':{}};`;
-    container.appendChild(s1);
-    const s2 = document.createElement('script');
-    s2.src = slot.src;
-    container.appendChild(s2);
-}
-
-function startAdRefresh() {
-    setInterval(refreshAds, 25000);
 }
 
 window.onload = boot;

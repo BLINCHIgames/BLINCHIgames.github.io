@@ -9,20 +9,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Popunder — fires once per day -->
+    <!-- Popunder — fires on first click once per day, shows notice overlay -->
     <script>
         (function () {
             const KEY     = 'blinchi_last_popunder';
             const ONE_DAY = 24 * 60 * 60 * 1000;
             const last    = parseInt(localStorage.getItem(KEY) || '0', 10);
             if (Date.now() - last >= ONE_DAY) {
-                const s = document.createElement('script');
-                s.src   = 'https://authoritieswoundjoint.com/17/c4/34/17c434ad4a5c24351595e12ab0dcf7fa.js';
-                s.async = true;
-                document.head.appendChild(s);
-                localStorage.setItem(KEY, String(Date.now()));
+                function firePopunder() {
+                    document.removeEventListener('click', firePopunder, true);
+                    const s = document.createElement('script');
+                    s.src   = 'https://authoritieswoundjoint.com/17/c4/34/17c434ad4a5c24351595e12ab0dcf7fa.js';
+                    s.async = true;
+                    document.head.appendChild(s);
+                    localStorage.setItem(KEY, String(Date.now()));
+                    // Show the notice overlay
+                    const notice = document.getElementById('popunder-notice');
+                    if (notice) notice.classList.add('show');
+                }
+                document.addEventListener('click', firePopunder, true);
             }
         })();
+
+        function closePopunderNotice() {
+            const notice = document.getElementById('popunder-notice');
+            if (notice) notice.classList.remove('show');
+        }
     </script>
 
     <!-- Social Ads — fires once per 20 minutes, never more -->
@@ -278,9 +290,75 @@
             .nav-item { justify-content: center; padding: 15px; }
             .stage-ad-right { display: none; }
         }
+
+        /* ── Popunder notice overlay ── */
+        #popunder-notice {
+            display: none; position: fixed; inset: 0; z-index: 9500;
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            align-items: center; justify-content: center;
+        }
+        #popunder-notice.show { display: flex; }
+        .popunder-box {
+            background: #111; border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px; padding: 36px 40px; text-align: center;
+            max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        .popunder-box .pu-icon { font-size: 2.4rem; margin-bottom: 14px; }
+        .popunder-box h3 { font-family: var(--font-display); font-size: 1.3rem; color: #fff; margin-bottom: 10px; }
+        .popunder-box p  { color: #aaa; font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
+        .pu-btn {
+            background: var(--brand); color: #000; border: none;
+            border-radius: 30px; padding: 11px 32px;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            font-family: var(--font-main); transition: opacity 0.2s;
+        }
+        .pu-btn:hover { opacity: 0.85; }
+
+        /* ── Adblock wall ── */
+        #adblock-wall {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: #000; align-items: center; justify-content: center;
+        }
+        #adblock-wall.show { display: flex; }
+        .adblock-box {
+            background: #111; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 40px 44px; text-align: center;
+            max-width: 460px; width: 90%;
+        }
+        .adblock-box .ab-icon { font-size: 3rem; margin-bottom: 16px; }
+        .adblock-box h2 { font-family: var(--font-display); font-size: 1.5rem; color: #fff; margin-bottom: 12px; }
+        .adblock-box p  { color: #aaa; font-size: 0.92rem; line-height: 1.65; margin-bottom: 28px; }
+        .ab-btn {
+            background: var(--brand); color: #000; border: none;
+            border-radius: 30px; padding: 12px 36px;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            font-family: var(--font-main); transition: opacity 0.2s;
+        }
+        .ab-btn:hover { opacity: 0.85; }
     </style>
 </head>
 <body>
+
+<!-- Popunder notice overlay -->
+<div id="popunder-notice">
+    <div class="popunder-box">
+        <div class="pu-icon">📢</div>
+        <h3>Just One Quick Ad</h3>
+        <p>A new tab has opened with an ad. This happens once per day and is how we keep BlinchiGames free for everyone. Thank you for your support!</p>
+        <button class="pu-btn" onclick="closePopunderNotice()">Got it, thanks!</button>
+    </div>
+</div>
+
+<!-- Adblock wall -->
+<div id="adblock-wall">
+    <div class="adblock-box">
+        <div class="ab-icon">🚫</div>
+        <h2>Ad Blocker Detected</h2>
+        <p>BlinchiGames is completely free to play. To keep it that way, we rely on ads to cover server and running costs. Please disable your ad blocker and refresh the page to continue.</p>
+        <button class="ab-btn" onclick="window.location.reload()">I've disabled it — Refresh</button>
+    </div>
+</div>
 
 <div id="loading-overlay">
     <h2 class="logo mb-4" style="font-size: 3.5rem;">BLINCHI<span>GAMES</span></h2>
@@ -289,7 +367,6 @@
 </div>
 
 <!-- ═══ MAIN PORTAL ═══ -->
-<div class="app-container">
     <aside class="sidebar">
         <div class="sidebar-header">
             <a href="#" class="logo" onclick="location.reload()">
@@ -530,6 +607,7 @@ async function boot() {
     showHome();
     setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
 
+    detectAdblock();
     sizeIframe();
     window.addEventListener('resize', sizeIframe);
 }
@@ -811,6 +889,25 @@ function expandBanner() {
     document.getElementById('stage-banner').classList.remove('collapsed');
     document.getElementById('banner-expand-strip').style.display = 'none';
     sizeIframe();
+}
+
+// ─── Adblock detection ────────────────────────────────────────────────────────
+function detectAdblock() {
+    // Create a bait element that adblocks typically hide/remove
+    const bait = document.createElement('div');
+    bait.setAttribute('class', 'ad-banner ad adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links');
+    bait.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;';
+    document.body.appendChild(bait);
+
+    setTimeout(() => {
+        const blocked = !bait || bait.offsetHeight === 0 || bait.offsetParent === null ||
+            window.getComputedStyle(bait).display === 'none' ||
+            window.getComputedStyle(bait).visibility === 'hidden';
+        bait.remove();
+        if (blocked) {
+            document.getElementById('adblock-wall').classList.add('show');
+        }
+    }, 200);
 }
 
 window.onload = boot;

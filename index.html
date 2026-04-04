@@ -1626,23 +1626,28 @@ function setVote(title, type) {
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
-async function boot() {
-    const eg = document.getElementById('elite-grid');
-    ELITE_LIST.forEach(g => eg.innerHTML += generateCard(g, true));
+function boot() {
+    try {
+        var eg = document.getElementById('elite-grid');
+        if (eg) ELITE_LIST.forEach(function(g) { eg.innerHTML += generateCard(g, true); });
+        initNav();
+        showHome();
+    } catch(e) { console.error('Boot init error:', e); }
 
-    // Hide loading overlay immediately — don't wait for feeds
-    initNav();
-    showHome();
-    document.getElementById('loading-overlay').style.display = 'none';
+    // Hide loading immediately — never wait on external resources
+    var ov = document.getElementById('loading-overlay');
+    if (ov) ov.style.display = 'none';
 
-    detectAdblock();
     sizeIframe();
     window.addEventListener('resize', sizeIframe);
-    // Init auth in background — never blocks page load
-    initAuth().catch(() => {});
+    detectAdblock();
 
-    // Fetch game feeds in background with a 10s timeout per request
-    const feedUrls = [
+    // Auth and ads run after page is visible
+    setTimeout(function() { try { initAuth(); } catch(e) {} }, 800);
+    setTimeout(loadAds, 1200);
+
+    // Load game feeds in background
+    var feedUrls = [
         'embed.json', 'g_min.json', 'rssfeed.php.json',
         'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php',
         'Gamepix.json',
@@ -1654,65 +1659,64 @@ async function boot() {
         'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=5',
     ];
 
-    function fetchWithTimeout(url, ms) {
+    function fetchSafe(url) {
         return Promise.race([
-            fetch(url).then(r => r.json()).catch(() => []),
-            new Promise(res => setTimeout(() => res([]), ms))
+            fetch(url).then(function(r){ return r.json(); }).catch(function(){ return []; }),
+            new Promise(function(res){ setTimeout(function(){ res([]); }, 8000); })
         ]);
     }
 
-    Promise.all(feedUrls.map(url => fetchWithTimeout(url, 10000))).then(results => {
+    Promise.all(feedUrls.map(fetchSafe)).then(function(results) {
+        masterCatalog = ELITE_LIST.slice();
+        results.forEach(function(data, idx) {
+            var url = feedUrls[idx];
 
-    masterCatalog = [...ELITE_LIST];
+            if (url.includes('g_min.json')) {
+                if (!Array.isArray(data)) return;
+                data.forEach(function(g) {
+                    if (!g.link || g.custom) return;
+                    var gameUrl = g.link.startsWith('http://') ? g.link.replace('http://', 'https://') : g.link;
+                    masterCatalog.push({ title: g.name||'Game', url: gameUrl, thumb: g.image||'', category: Array.isArray(g.categories)?g.categories[0]:(g.categories||'Web Game') });
+                });
+                return;
+            }
 
-    results.forEach((data, idx) => {
-        const url = feedUrls[idx];
+            if (url.includes('gamepix.com') || url.includes('Gamepix.json')) {
+                var items = Array.isArray(data) ? data : (data.data || data.items || []);
+                items.forEach(function(g) {
+                    var gameUrl = (g.url||'').replace('http://','https://');
+                    if (gameUrl && !gameUrl.includes('/embed')) gameUrl = gameUrl.replace(/\/$/, '') + '/embed?ref=blinchigames.online';
+                    else if (gameUrl && !gameUrl.includes('ref=')) gameUrl += (gameUrl.includes('?')?'&':'?') + 'ref=blinchigames.online';
+                    masterCatalog.push({ title: g.title||g.name||'Game', url: gameUrl, thumb: g.url_thumbnail||g.banner_image||g.image||g.thumb||'', category: Array.isArray(g.categories)?g.categories[0]:(g.category||'Web Game') });
+                });
+                return;
+            }
 
-        if (url.includes('g_min.json')) {
             if (!Array.isArray(data)) return;
-            data.forEach(g => {
-                if (!g.link || g.custom) return;
-                const gameUrl = g.link.startsWith('http://') ? g.link.replace('http://', 'https://') : g.link;
-                masterCatalog.push({ title: g.name || 'Game', url: gameUrl, thumb: g.image || '', category: Array.isArray(g.categories) ? g.categories[0] : (g.categories || 'Web Game') });
+            data.forEach(function(g) {
+                var gameUrl = g.embed||g.url||g.link||'';
+                if (!gameUrl) return;
+                if (gameUrl.startsWith('http://')) gameUrl = gameUrl.replace('http://','https://');
+                masterCatalog.push({ title: g.title||g.name||'Game', url: gameUrl, thumb: g.image||g.thumb||'', category: ((g.tags||g.category||g.categories||'Web Game')+'').split(',')[0].trim() });
             });
-            return;
-        }
-
-        if (url.includes('gamepix.com') || url.includes('Gamepix.json')) {
-            const items = Array.isArray(data) ? data : (data.data || data.items || []);
-            items.forEach(g => {
-                let gameUrl = (g.url || '').replace('http://', 'https://');
-                if (gameUrl && !gameUrl.includes('/embed')) gameUrl = gameUrl.replace(/\/$/, '') + '/embed?ref=blinchigames.online';
-                else if (gameUrl && !gameUrl.includes('ref=')) gameUrl += (gameUrl.includes('?') ? '&' : '?') + 'ref=blinchigames.online';
-                masterCatalog.push({ title: g.title || g.name || 'Game', url: gameUrl, thumb: g.url_thumbnail || g.banner_image || g.image || g.thumb || '', category: Array.isArray(g.categories) ? g.categories[0] : (g.category || 'Web Game') });
-            });
-            return;
-        }
-
-        if (!Array.isArray(data)) return;
-        data.forEach(g => {
-            let gameUrl = g.embed || g.url || g.link || '';
-            if (!gameUrl) return;
-            if (gameUrl.startsWith('http://')) gameUrl = gameUrl.replace('http://', 'https://');
-            masterCatalog.push({ title: g.title || g.name || 'Game', url: gameUrl, thumb: g.image || g.thumb || '', category: ((g.tags || g.category || g.categories || 'Web Game') + '').split(',')[0].trim() });
         });
-    });
 
-        const seen = new Set();
-        masterCatalog = masterCatalog.filter(g => {
-            const key = (g.title || '').toLowerCase();
+        // Deduplicate
+        var seen = new Set();
+        masterCatalog = masterCatalog.filter(function(g) {
+            var key = (g.title||'').toLowerCase();
             return seen.has(key) ? false : seen.add(key);
         });
 
-        // Refresh the home grid silently in the background
+        // Silently refresh grid with all games
         if (viewMode === 'home') {
             itemsLoaded = 0; singleAdInjected = false;
             document.getElementById('home-grid').innerHTML = '';
-            activeList = [...masterCatalog];
+            activeList = masterCatalog.slice();
             renderBatch(PAGE_INIT);
             resetObserver();
         }
-    });
+    }).catch(function(){});
 }
 
 function sizeIframe() {
@@ -2062,8 +2066,6 @@ function loadAds() {
     });
 }
 
-// Load ads 1 second after page is visible so they never delay anything
-setTimeout(loadAds, 1000);
 </script>
 </body>
 </html>

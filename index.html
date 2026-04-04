@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Popunder — fires on first click once per day, shows notice overlay -->
+    <!-- Popunder — fires on first click once per day -->
     <script>
         (function () {
             const KEY     = 'blinchi_last_popunder';
@@ -23,21 +23,19 @@
                     s.async = true;
                     document.head.appendChild(s);
                     localStorage.setItem(KEY, String(Date.now()));
-                    // Show the notice overlay
                     const notice = document.getElementById('popunder-notice');
                     if (notice) notice.classList.add('show');
                 }
                 document.addEventListener('click', firePopunder, true);
             }
         })();
-
         function closePopunderNotice() {
             const notice = document.getElementById('popunder-notice');
             if (notice) notice.classList.remove('show');
         }
     </script>
 
-    <!-- Social Ads — fires once per 20 minutes, never more -->
+    <!-- Social Ads — fires once per 20 minutes -->
     <script>
         (function () {
             const KEY      = 'blinchi_last_social_ad';
@@ -80,206 +78,68 @@
         body { background: var(--bg-dark); color: var(--text-main); font-family: var(--font-main); margin: 0; overflow-x: hidden; }
         .app-container { display: flex; min-height: 100vh; }
 
-        /* ── Left nav sidebar ── */
-        .sidebar {
-            width: 280px; background: var(--sidebar);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            height: 100vh; position: sticky; top: 0;
-            display: flex; flex-direction: column; z-index: 1000;
-        }
+        .sidebar { width: 280px; background: var(--sidebar); border-right: 1px solid rgba(255,255,255,0.05); height: 100vh; position: sticky; top: 0; display: flex; flex-direction: column; z-index: 1000; }
         .sidebar-header { padding: 30px 25px 15px; }
-        .logo {
-            font-family: var(--font-display); font-size: 1.6rem; font-weight: 800;
-            color: #ffffff; text-decoration: none; display: flex; align-items: center; gap: 10px;
-        }
+        .logo { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: #ffffff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--brand); }
         .search-box { padding: 0 20px 20px; }
-        .search-input-wrapper {
-            background: var(--surface); border-radius: var(--radius-md);
-            padding: 12px 16px; display: flex; align-items: center;
-            border: 1px solid transparent; transition: 0.2s;
-        }
+        .search-input-wrapper { background: var(--surface); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: center; border: 1px solid transparent; transition: 0.2s; }
         .search-input-wrapper:focus-within { border-color: var(--brand); }
-        .search-input-wrapper input {
-            background: transparent; border: none; color: white;
-            width: 100%; outline: none; margin-left: 10px; font-size: 0.9rem;
-        }
+        .search-input-wrapper input { background: transparent; border: none; color: white; width: 100%; outline: none; margin-left: 10px; font-size: 0.9rem; }
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 15px; scrollbar-width: none; }
-        .menu-label {
-            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px;
-            color: var(--text-secondary); font-weight: 800; margin: 20px 15px 10px;
-        }
-        .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 18px;
-            color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md);
-            font-weight: 500; transition: all 0.2s; cursor: pointer; border: none;
-            background: transparent; width: 100%; text-align: left; margin-bottom: 4px;
-        }
+        .menu-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-secondary); font-weight: 800; margin: 20px 15px 10px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 18px; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md); font-weight: 500; transition: all 0.2s; cursor: pointer; border: none; background: transparent; width: 100%; text-align: left; margin-bottom: 4px; }
         .nav-item:hover { color: #ffffff; background: var(--surface); }
-        .nav-item.active {
-            color: #ffffff; background: var(--brand-soft);
-            border-left: 4px solid var(--brand);
-            border-radius: 4px var(--radius-md) var(--radius-md) 4px;
-        }
+        .nav-item.active { color: #ffffff; background: var(--brand-soft); border-left: 4px solid var(--brand); border-radius: 4px var(--radius-md) var(--radius-md) 4px; }
 
-        /* ── Main content ── */
         .main-content { flex: 1; min-width: 0; padding: 0 40px; }
         .section-title { font-family: var(--font-display); font-size: 1.75rem; margin-top: 2rem; margin-bottom: 1.5rem; color: #ffffff; }
         #view-home .section-title:first-child { margin-top: 1rem; }
 
-        /* ── Game grid ── */
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 28px; padding: 10px 0 40px;
-        }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 28px; padding: 10px 0 40px; }
         .elite-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-
-        .game-card {
-            border-radius: var(--radius-md); transition: transform 0.3s var(--transition);
-            cursor: pointer; display: flex; flex-direction: column; position: relative;
-        }
+        .game-card { border-radius: var(--radius-md); transition: transform 0.3s var(--transition); cursor: pointer; display: flex; flex-direction: column; position: relative; }
         .game-card:hover { transform: translateY(-6px); }
-
-        .game-thumb {
-            aspect-ratio: 1/1; overflow: hidden; border-radius: var(--radius-md);
-            background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.05); position: relative;
-        }
+        .game-thumb { aspect-ratio: 1/1; overflow: hidden; border-radius: var(--radius-md); background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); position: relative; }
         .game-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: 0.4s; display: block; }
         .game-card:hover .game-thumb img { transform: scale(1.05); }
-
         .game-info { padding: 10px 5px 4px; }
-        .game-info h6 {
-            margin: 0 0 8px; font-size: 1rem; font-weight: 600;
-            color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .game-info h6 { margin: 0 0 8px; font-size: 1rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ── Like / Dislike ── */
         .like-bar { display: flex; align-items: center; gap: 8px; padding: 0 5px 12px; }
-        .like-btn, .dislike-btn {
-            display: flex; align-items: center; gap: 5px;
-            background: var(--surface); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 30px; padding: 5px 11px; cursor: pointer;
-            color: var(--text-secondary); font-size: 0.78rem; font-weight: 600;
-            transition: all 0.2s; user-select: none; font-family: var(--font-main);
-        }
-        .like-btn:hover    { background: rgba(50,255,14,0.15);  border-color: var(--brand); color: var(--brand); }
-        .dislike-btn:hover { background: rgba(255,60,60,0.15);  border-color: #ff3c3c;     color: #ff3c3c; }
-        .like-btn.active    { background: rgba(50,255,14,0.2);  border-color: var(--brand); color: var(--brand); }
-        .dislike-btn.active { background: rgba(255,60,60,0.2);  border-color: #ff3c3c;     color: #ff3c3c; }
+        .like-btn, .dislike-btn { display: flex; align-items: center; gap: 5px; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 30px; padding: 5px 11px; cursor: pointer; color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; transition: all 0.2s; user-select: none; font-family: var(--font-main); }
+        .like-btn:hover    { background: rgba(50,255,14,0.15); border-color: var(--brand); color: var(--brand); }
+        .dislike-btn:hover { background: rgba(255,60,60,0.15); border-color: #ff3c3c; color: #ff3c3c; }
+        .like-btn.active    { background: rgba(50,255,14,0.2); border-color: var(--brand); color: var(--brand); }
+        .dislike-btn.active { background: rgba(255,60,60,0.2); border-color: #ff3c3c; color: #ff3c3c; }
 
-        /* ── Single grid ad slot ── */
-        .grid-ad-slot {
-            border-radius: var(--radius-md);
-            background: var(--surface);
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; min-height: 140px;
-        }
+        .grid-ad-slot { border-radius: var(--radius-md); background: var(--surface); border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 140px; }
+        .badge-elite { position: absolute; top: 10px; left: 10px; background: var(--brand); color: #000; font-size: 0.7rem; font-weight: 800; padding: 5px 14px; border-radius: 30px; z-index: 10; text-transform: uppercase; box-shadow: 0 4px 15px rgba(50,255,14,0.4); }
 
-        .badge-elite {
-            position: absolute; top: 10px; left: 10px;
-            background: var(--brand); color: #000;
-            font-size: 0.7rem; font-weight: 800; padding: 5px 14px; border-radius: 30px;
-            z-index: 10; text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(50, 255, 14, 0.4);
-        }
-
-        #loading-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 3000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        #loading-overlay { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #scroll-sentinel { height: 150px; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 50px; }
 
-        /* ═══════════════ GAME STAGE ═══════════════ */
-        #game-stage {
-            display: none; position: fixed; inset: 0; background: var(--bg-dark);
-            z-index: 2500; overflow-y: auto; flex-direction: column;
-        }
+        #game-stage { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 2500; overflow-y: auto; }
         #game-stage.open { display: block; }
-
-        /* Top banner ad */
-        #stage-banner {
-            background: #0a0a0a;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex; align-items: center; justify-content: center;
-            min-height: 96px; overflow: hidden; position: relative; flex-shrink: 0;
-            transition: min-height 0.3s ease;
-        }
+        #stage-banner { background: #0a0a0a; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; min-height: 96px; overflow: hidden; position: relative; transition: min-height 0.3s ease; }
         #stage-banner.collapsed { min-height: 0 !important; height: 0; overflow: hidden; }
-        #banner-collapse-btn {
-            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-            background: rgba(255,255,255,0.08); border: none; color: #aaa;
-            border-radius: 8px; padding: 4px 10px; font-size: 0.72rem; cursor: pointer;
-            transition: background 0.2s; font-family: var(--font-main);
-        }
+        #banner-collapse-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.08); border: none; color: #aaa; border-radius: 8px; padding: 4px 10px; font-size: 0.72rem; cursor: pointer; transition: background 0.2s; font-family: var(--font-main); }
         #banner-collapse-btn:hover { background: rgba(255,255,255,0.18); color: #fff; }
-
-        /* Thin re-expand strip */
-        #banner-expand-strip {
-            display: none; background: #0a0a0a;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            text-align: center; padding: 5px 0; cursor: pointer;
-            color: #444; font-size: 0.72rem; flex-shrink: 0;
-        }
+        #banner-expand-strip { display: none; background: #0a0a0a; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; padding: 5px 0; cursor: pointer; color: #444; font-size: 0.72rem; }
         #banner-expand-strip:hover { color: #888; }
-
-        /* Stage header */
-        .stage-header {
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; background: var(--sidebar);
-            border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
-        }
-
-        /* Middle zone: game-col | right-ad-stack */
-        /* The entire #game-stage is now page-scroll, not inner scroll */
+        .stage-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--sidebar); border-bottom: 1px solid rgba(255,255,255,0.08); }
         .stage-middle { display: flex; align-items: flex-start; }
-
-        /* Right ad stack: 160px ad + 1mm (≈4px) padding each side = 168px */
-        .stage-ad-right {
-            width: 168px; flex-shrink: 0;
-            background: var(--sidebar);
-            border-left: 1px solid rgba(255,255,255,0.06);
-            padding: 4px; display: flex; flex-direction: column;
-            align-items: center; gap: 8px;
-            /* Sticky so ads stay visible as user scrolls below-game */
-            position: sticky; top: 0; align-self: flex-start;
-        }
-
-        /* Game column: fills all space to the left of ad stack */
-        .game-col {
-            flex: 1; min-width: 0; display: flex; flex-direction: column;
-            background: #000;
-        }
+        .stage-ad-right { width: 168px; flex-shrink: 0; background: var(--sidebar); border-left: 1px solid rgba(255,255,255,0.06); padding: 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: sticky; top: 0; align-self: flex-start; }
+        .game-col { flex: 1; min-width: 0; display: flex; flex-direction: column; background: #000; }
         #stage-iframe { width: 100%; border: none; background: #000; flex-shrink: 0; }
-
-        /* Below-game zone */
         #below-game { background: var(--bg-dark); padding: 22px 28px 60px; }
         #game-like-bar { margin-bottom: 16px; }
-        #stage-banner-below {
-            margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
-            background: #0a0a0a; border-radius: 8px; overflow: hidden; min-height: 96px;
-        }
-        #related-title {
-            font-family: var(--font-display); font-size: 1.2rem;
-            margin-bottom: 14px; color: #fff;
-        }
-        #related-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 18px;
-        }
+        #stage-banner-below { margin-bottom: 20px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-radius: 8px; overflow: hidden; min-height: 96px; }
+        #related-title { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 14px; color: #fff; }
+        #related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; }
 
-        /* Fullscreen prompt overlay */
-        #fs-prompt {
-            display: none; position: fixed; inset: 0; z-index: 9000;
-            background: rgba(0,0,0,0.72); align-items: center; justify-content: center;
-        }
-        .fs-prompt-box {
-            background: #111; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 18px; padding: 32px 40px; text-align: center; max-width: 380px;
-        }
+        #fs-prompt { display: none; position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.72); align-items: center; justify-content: center; }
+        .fs-prompt-box { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 32px 40px; text-align: center; max-width: 380px; }
         .fs-prompt-box p:first-child { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
         .fs-prompt-box p:last-of-type { color: #aaa; font-size: 0.9rem; margin-bottom: 24px; }
         .fs-btn-yes { background: var(--brand); color: #000; border: none; border-radius: 30px; padding: 10px 28px; font-weight: 700; cursor: pointer; margin-right: 10px; }
@@ -292,56 +152,193 @@
             .stage-ad-right { display: none; }
         }
 
-        /* ── Popunder notice overlay ── */
-        #popunder-notice {
-            display: none; position: fixed; inset: 0; z-index: 9500;
-            background: rgba(255,255,255,0.18);
-            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-            align-items: center; justify-content: center;
-        }
+        #popunder-notice { display: none; position: fixed; inset: 0; z-index: 9500; background: rgba(255,255,255,0.18); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; }
         #popunder-notice.show { display: flex; }
-        .popunder-box {
-            background: #111; border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 20px; padding: 36px 40px; text-align: center;
-            max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-        }
+        .popunder-box { background: #111; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 36px 40px; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
         .popunder-box .pu-icon { font-size: 2.4rem; margin-bottom: 14px; }
         .popunder-box h3 { font-family: var(--font-display); font-size: 1.3rem; color: #fff; margin-bottom: 10px; }
         .popunder-box p  { color: #aaa; font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
-        .pu-btn {
-            background: var(--brand); color: #000; border: none;
-            border-radius: 30px; padding: 11px 32px;
-            font-weight: 700; font-size: 0.95rem; cursor: pointer;
-            font-family: var(--font-main); transition: opacity 0.2s;
-        }
+        .pu-btn { background: var(--brand); color: #000; border: none; border-radius: 30px; padding: 11px 32px; font-weight: 700; font-size: 0.95rem; cursor: pointer; font-family: var(--font-main); transition: opacity 0.2s; }
         .pu-btn:hover { opacity: 0.85; }
 
-        /* ── Adblock wall ── */
-        #adblock-wall {
-            display: none; position: fixed; inset: 0; z-index: 9999;
-            background: #000; align-items: center; justify-content: center;
-        }
+        #adblock-wall { display: none; position: fixed; inset: 0; z-index: 9999; background: #000; align-items: center; justify-content: center; }
         #adblock-wall.show { display: flex; }
-        .adblock-box {
-            background: #111; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 40px 44px; text-align: center;
-            max-width: 460px; width: 90%;
-        }
+        .adblock-box { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px 44px; text-align: center; max-width: 460px; width: 90%; }
         .adblock-box .ab-icon { font-size: 3rem; margin-bottom: 16px; }
         .adblock-box h2 { font-family: var(--font-display); font-size: 1.5rem; color: #fff; margin-bottom: 12px; }
         .adblock-box p  { color: #aaa; font-size: 0.92rem; line-height: 1.65; margin-bottom: 28px; }
-        .ab-btn {
-            background: var(--brand); color: #000; border: none;
-            border-radius: 30px; padding: 12px 36px;
-            font-weight: 700; font-size: 1rem; cursor: pointer;
-            font-family: var(--font-main); transition: opacity 0.2s;
-        }
+        .ab-btn { background: var(--brand); color: #000; border: none; border-radius: 30px; padding: 12px 36px; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: var(--font-main); transition: opacity 0.2s; }
         .ab-btn:hover { opacity: 0.85; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 9400; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 22px; padding: 36px 40px; width: 90%; max-width: 420px; position: relative; }
+        .modal-box h2 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 6px; }
+        .modal-box p.sub { color: #aaa; font-size: 0.88rem; margin-bottom: 24px; }
+        .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: #aaa; font-size: 1.3rem; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #aaa; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input { width: 100%; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 11px 14px; color: #fff; font-size: 0.95rem; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+        .form-group input:focus { border-color: var(--brand); }
+        .btn-primary-brand { width: 100%; background: var(--brand); color: #000; border: none; border-radius: 12px; padding: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 4px; transition: opacity 0.2s; }
+        .btn-primary-brand:hover { opacity: 0.85; }
+        .modal-switch { text-align: center; margin-top: 18px; color: #aaa; font-size: 0.88rem; }
+        .modal-switch a { color: var(--brand); cursor: pointer; text-decoration: none; }
+        .modal-error { color: #ff5555; font-size: 0.85rem; margin-top: 8px; display: none; }
+        .modal-success { color: var(--brand); font-size: 0.85rem; margin-top: 8px; display: none; }
+
+        #comments-panel { display: none; position: fixed; right: 0; top: 0; bottom: 0; width: 380px; background: #0d0d0d; border-left: 1px solid rgba(255,255,255,0.08); z-index: 3000; flex-direction: column; }
+        #comments-panel.show { display: flex; }
+        .cpanel-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .cpanel-header h3 { font-family: var(--font-display); font-size: 1.1rem; margin: 0; }
+        .cpanel-close { background: none; border: none; color: #aaa; font-size: 1.4rem; cursor: pointer; }
+        .comments-list { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+        .comment-item { background: #1a1a1a; border-radius: 12px; padding: 12px 14px; }
+        .comment-author { font-size: 0.8rem; font-weight: 700; color: var(--brand); margin-bottom: 4px; }
+        .comment-text { font-size: 0.9rem; color: #ddd; line-height: 1.5; }
+        .comment-time { font-size: 0.75rem; color: #555; margin-top: 5px; }
+        .comment-input-area { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 10px; align-items: flex-end; }
+        .comment-input-area textarea { flex: 1; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 12px; color: #fff; font-size: 0.9rem; resize: none; outline: none; font-family: var(--font-main); min-height: 42px; max-height: 100px; }
+        .comment-input-area textarea:focus { border-color: var(--brand); }
+        .comment-send-btn { background: var(--brand); color: #000; border: none; border-radius: 12px; padding: 10px 16px; cursor: pointer; font-weight: 700; font-size: 0.9rem; }
+        .login-prompt-comment { padding: 20px; text-align: center; color: #aaa; font-size: 0.9rem; }
+        .login-prompt-comment a { color: var(--brand); cursor: pointer; }
+
+        #top-right-chip { position: fixed; top: 16px; right: 20px; z-index: 2000; display: flex; align-items: center; gap: 10px; }
+        .online-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brand); display: inline-block; margin-right: 5px; box-shadow: 0 0 6px var(--brand); }
+
+        /* ═══ BLINCHILIVE ═══ */
+        #bl-overlay { display:none; position:fixed; inset:0; z-index:4000; background:#080808; flex-direction:column; }
+        #bl-overlay.open { display:flex; }
+        .bl-topbar { height:56px; background:#050505; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; padding:0 20px; gap:16px; flex-shrink:0; }
+        .bl-logo { font-family:var(--font-display); font-size:1.15rem; font-weight:800; color:#fff; }
+        .bl-logo em { color:var(--brand); font-style:normal; }
+        .bl-topbar-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+        .bl-coins-pill { display:flex; align-items:center; gap:6px; background:#111; border:1px solid rgba(50,255,14,0.25); border-radius:20px; padding:5px 12px; font-size:0.82rem; }
+        .bl-coins-pill span { color:var(--brand); font-weight:800; }
+        .bl-user-pill { display:flex; align-items:center; gap:6px; background:#111; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:5px 12px; font-size:0.82rem; cursor:pointer; }
+
+        .bl-body { display:flex; flex:1; min-height:0; }
+        .bl-nav { width:200px; background:#050505; border-right:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; padding:12px 10px; gap:2px; flex-shrink:0; overflow-y:auto; }
+        .bl-nav-section { font-size:0.65rem; text-transform:uppercase; letter-spacing:1.5px; color:#333; font-weight:800; padding:14px 10px 6px; }
+        .bl-nav-btn { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; cursor:pointer; color:#888; font-size:0.88rem; font-weight:500; border:none; background:transparent; width:100%; text-align:left; transition:all 0.15s; position:relative; }
+        .bl-nav-btn:hover { background:#111; color:#fff; }
+        .bl-nav-btn.active { background:var(--brand-soft); color:var(--brand); border-left:3px solid var(--brand); border-radius:3px 10px 10px 3px; }
+        .bl-badge { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:#ff3c3c; color:#fff; font-size:0.65rem; font-weight:800; border-radius:10px; padding:1px 6px; }
+
+        .bl-main { flex:1; min-width:0; overflow-y:auto; }
+        .bl-tab { display:none; padding:28px 32px 60px; }
+        .bl-tab.active { display:block; }
+        .bl-page-title { font-family:var(--font-display); font-size:1.6rem; font-weight:800; margin-bottom:4px; }
+        .bl-page-sub { color:#555; font-size:0.88rem; margin-bottom:28px; }
+
+        /* Cards */
+        .bl-card { background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:20px 22px; margin-bottom:12px; }
+        .bl-card-row { display:flex; align-items:center; gap:14px; }
+        .bl-avatar { width:44px; height:44px; border-radius:50%; background:#1a1a1a; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1rem; color:var(--brand); flex-shrink:0; border:2px solid rgba(50,255,14,0.2); }
+        .bl-avatar.lg { width:72px; height:72px; font-size:1.6rem; }
+        .bl-avatar.group { border-radius:14px; font-size:1.4rem; }
+
+        /* Feed */
+        .bl-feed-item { background:#111; border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:16px 18px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
+        .bl-feed-game-thumb { width:52px; height:52px; border-radius:10px; object-fit:cover; background:#222; flex-shrink:0; }
+        .bl-feed-text { flex:1; }
+        .bl-feed-name { font-weight:700; font-size:0.92rem; color:#fff; }
+        .bl-feed-desc { font-size:0.82rem; color:#555; margin-top:2px; }
+        .bl-join-btn { background:var(--brand); color:#000; border:none; border-radius:8px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+
+        /* Friends */
+        .bl-friend-row { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .bl-friend-info { flex:1; }
+        .bl-friend-name { font-weight:600; font-size:0.92rem; }
+        .bl-friend-status { font-size:0.78rem; color:#444; margin-top:2px; }
+        .bl-friend-status.online { color:var(--brand); }
+        .bl-friend-actions { display:flex; gap:6px; }
+        .bl-icon-btn { background:#1a1a1a; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 10px; color:#aaa; cursor:pointer; font-size:0.85rem; transition:all 0.15s; }
+        .bl-icon-btn:hover { background:var(--brand); color:#000; border-color:var(--brand); }
+        .bl-icon-btn.red:hover { background:#ff3c3c; border-color:#ff3c3c; color:#fff; }
+
+        /* Chat */
+        .bl-chat-layout { display:flex; gap:0; height:calc(100vh - 120px); }
+        .bl-convo-list { width:240px; background:#0d0d0d; border-radius:14px 0 0 14px; border:1px solid rgba(255,255,255,0.06); overflow-y:auto; flex-shrink:0; }
+        .bl-convo-item { display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s; }
+        .bl-convo-item:hover { background:#161616; }
+        .bl-convo-item.active { background:var(--brand-soft); }
+        .bl-convo-name { font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .bl-convo-preview { font-size:0.75rem; color:#444; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+        .bl-chat-window { flex:1; background:#0d0d0d; border-radius:0 14px 14px 0; border:1px solid rgba(255,255,255,0.06); border-left:none; display:flex; flex-direction:column; }
+        .bl-chat-header { padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:10px; }
+        .bl-chat-header-title { font-weight:700; font-size:0.95rem; }
+        .bl-chat-header-sub { font-size:0.75rem; color:#444; margin-top:1px; }
+        .bl-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:8px; }
+        .bl-msg { max-width:68%; }
+        .bl-msg.me { align-self:flex-end; }
+        .bl-msg.them { align-self:flex-start; }
+        .bl-msg-bubble { padding:10px 14px; border-radius:16px; font-size:0.88rem; line-height:1.5; }
+        .bl-msg.me   .bl-msg-bubble { background:var(--brand); color:#000; border-radius:16px 16px 4px 16px; }
+        .bl-msg.them .bl-msg-bubble { background:#1a1a1a; color:#fff; border-radius:16px 16px 16px 4px; }
+        .bl-msg-saved { background:rgba(50,255,14,0.1); border:1px solid rgba(50,255,14,0.2) !important; }
+        .bl-msg-meta { font-size:0.7rem; color:#333; margin-top:3px; display:flex; align-items:center; gap:6px; }
+        .bl-msg.me .bl-msg-meta { justify-content:flex-end; }
+        .bl-save-btn { font-size:0.68rem; cursor:pointer; opacity:0.6; border:none; background:none; color:inherit; padding:0; }
+        .bl-save-btn:hover { opacity:1; color:var(--brand); }
+        .bl-snapping { font-size:0.7rem; color:#ff6b35; font-weight:600; }
+        .bl-chat-input { padding:12px 14px; border-top:1px solid rgba(255,255,255,0.06); display:flex; gap:8px; align-items:center; }
+        .bl-chat-input input { flex:1; background:#1a1a1a; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:9px 14px; color:#fff; outline:none; font-size:0.88rem; }
+        .bl-chat-input input:focus { border-color:var(--brand); }
+        .bl-send-btn { background:var(--brand); color:#000; border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.9rem; flex-shrink:0; }
+
+        /* Achievements */
+        .bl-ach-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-bottom:24px; }
+        .bl-ach-card { background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:16px; }
+        .bl-ach-card.unlocked { border-color:rgba(50,255,14,0.3); background:#0d1a0d; }
+        .bl-ach-icon { font-size:1.8rem; margin-bottom:8px; }
+        .bl-ach-name { font-weight:700; font-size:0.9rem; margin-bottom:3px; }
+        .bl-ach-desc { font-size:0.78rem; color:#555; margin-bottom:8px; }
+        .bl-ach-coins { font-size:0.78rem; color:var(--brand); font-weight:700; }
+        .bl-ach-unlocked-tag { font-size:0.72rem; color:var(--brand); font-weight:800; margin-top:4px; }
+        .bl-prog-bar { background:#222; border-radius:30px; height:5px; overflow:hidden; margin-top:8px; }
+        .bl-prog-fill { height:100%; background:var(--brand); border-radius:30px; transition:width 0.5s; }
+
+        /* Challenges */
+        .bl-challenge-card { background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:18px 20px; display:flex; align-items:center; gap:16px; margin-bottom:10px; }
+        .bl-challenge-icon { font-size:1.8rem; flex-shrink:0; }
+        .bl-challenge-info { flex:1; }
+        .bl-challenge-name { font-weight:700; font-size:0.92rem; margin-bottom:2px; }
+        .bl-challenge-desc { font-size:0.8rem; color:#555; margin-bottom:8px; }
+        .bl-challenge-coins { font-size:0.8rem; color:var(--brand); font-weight:700; }
+        .bl-challenge-done { color:var(--brand); font-size:1.4rem; }
+
+        /* Groups */
+        .bl-group-card { background:#111; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:16px 18px; display:flex; align-items:center; gap:14px; margin-bottom:10px; cursor:pointer; transition:border-color 0.2s; }
+        .bl-group-card:hover { border-color:rgba(50,255,14,0.3); }
+
+        /* Profile */
+        .bl-profile-banner { background:linear-gradient(135deg,#0a1a0a,#060d06); border:1px solid rgba(50,255,14,0.15); border-radius:18px; padding:28px; display:flex; align-items:center; gap:22px; margin-bottom:22px; }
+        .bl-stat { text-align:center; }
+        .bl-stat-val { font-family:var(--font-display); font-size:1.3rem; font-weight:800; color:var(--brand); }
+        .bl-stat-label { font-size:0.72rem; color:#444; margin-top:2px; }
+        .bl-coins-banner { background:linear-gradient(135deg,#1a1800,#0d0d00); border:1px solid rgba(50,255,14,0.2); border-radius:14px; padding:18px 22px; display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+
+        /* Input styles */
+        .bl-input { width:100%; background:#1a1a1a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 14px; color:#fff; font-size:0.9rem; outline:none; box-sizing:border-box; }
+        .bl-input:focus { border-color:var(--brand); }
+        .bl-btn { background:var(--brand); color:#000; border:none; border-radius:10px; padding:10px 20px; font-weight:700; font-size:0.88rem; cursor:pointer; transition:opacity 0.2s; }
+        .bl-btn:hover { opacity:0.85; }
+        .bl-btn-ghost { background:#1a1a1a; color:#aaa; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 20px; font-size:0.88rem; cursor:pointer; }
+
+        /* Ad slot in live */
+        .bl-ad-slot { display:flex; align-items:center; justify-content:center; background:#0d0d0d; border-radius:10px; border:1px solid rgba(255,255,255,0.04); margin:20px 0; overflow:hidden; min-height:66px; }
+
+        /* Notification toast */
+        #bl-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#111; border:1px solid rgba(50,255,14,0.3); border-radius:12px; padding:12px 20px; color:#fff; font-size:0.88rem; font-weight:600; z-index:9999; display:none; white-space:nowrap; box-shadow:0 8px 30px rgba(0,0,0,0.5); }
+        #bl-toast.show { display:block; animation:fadeInUp 0.3s ease; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
     </style>
 </head>
 <body>
 
-<!-- Popunder notice overlay -->
 <div id="popunder-notice">
     <div class="popunder-box">
         <div class="pu-icon">📢</div>
@@ -351,7 +348,6 @@
     </div>
 </div>
 
-<!-- Adblock wall -->
 <div id="adblock-wall">
     <div class="adblock-box">
         <div class="ab-icon">🚫</div>
@@ -367,7 +363,18 @@
     <p class="mt-4 text-white opacity-50 fw-bold letter-spacing-1">LOADING GAMES</p>
 </div>
 
-<!-- ═══ MAIN PORTAL ═══ -->
+<div id="top-right-chip">
+    <div id="signin-nudge" style="display:flex;align-items:center;gap:8px;background:#1a1a1a;border:1px solid rgba(50,255,14,0.3);border-radius:20px;padding:6px 14px;cursor:pointer;" onclick="openAuthModal()">
+        <i class="bi bi-person-circle" style="color:var(--brand);font-size:1rem;"></i>
+        <span style="font-size:0.82rem;font-weight:600;color:#ccc;">Sign in / Register</span>
+    </div>
+    <div id="profile-chip" style="display:none;align-items:center;gap:8px;background:#1a1a1a;border:1px solid rgba(50,255,14,0.3);border-radius:20px;padding:6px 14px;cursor:pointer;" onclick="openAuthModal()">
+        <div class="online-dot"></div>
+        <span id="profile-chip-name" style="font-size:0.85rem;font-weight:700;color:#fff;"></span>
+        <span style="font-size:0.8rem;color:var(--brand);font-weight:700;">🪙 <span id="profile-chip-coins">0</span></span>
+    </div>
+</div>
+
 <div class="app-container">
     <aside class="sidebar">
         <div class="sidebar-header">
@@ -388,6 +395,10 @@
             </button>
             <div class="menu-label">Elite Categories</div>
             <div id="cat-nav-container"></div>
+            <div class="menu-label">BlinchiLive</div>
+            <button class="nav-item" id="btn-live" onclick="openBlinchiLive()">
+                <i class="bi bi-broadcast" style="color:var(--brand);"></i> <span>BlinchiLive</span>
+            </button>
             <div class="menu-label">Social</div>
             <a href="https://www.tiktok.com/@blinchigames3" target="_blank" class="nav-item">
                 <i class="bi bi-tiktok"></i> <span>TikTok</span>
@@ -400,7 +411,6 @@
             <h2 class="section-title">Elite Collection</h2>
             <div id="elite-grid" class="game-grid elite-grid"></div>
             <h2 class="section-title" id="main-lib-title">Global Library</h2>
-            <!-- Static 300×250 library ad — always visible at top of grid -->
             <div class="game-grid" style="padding-bottom:0;">
                 <div class="grid-ad-slot">
                     <script>atOptions={'key':'70cf6dd8abb266eb5a0f8dee6db632cf','format':'iframe','height':250,'width':300,'params':{}};</script>
@@ -409,27 +419,21 @@
             </div>
             <div id="home-grid" class="game-grid"></div>
         </div>
-
         <div id="view-cat" style="display:none">
             <h2 id="cat-display-title" class="section-title"></h2>
             <div id="cat-grid" class="game-grid"></div>
         </div>
-
         <div id="view-search" style="display:none">
             <h2 id="search-display-title" class="section-title"></h2>
             <div id="search-grid" class="game-grid"></div>
         </div>
-
         <div id="scroll-sentinel">
             <div class="spinner-border" style="color: var(--brand);" role="status"></div>
         </div>
     </main>
 </div>
 
-<!-- ═══ GAME STAGE ═══ -->
 <div id="game-stage">
-
-    <!-- Top banner ad (728×90) -->
     <div id="stage-banner">
         <div id="ad-banner-top">
             <script>atOptions={'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':90,'width':728,'params':{}};</script>
@@ -438,8 +442,6 @@
         <button id="banner-collapse-btn" onclick="collapseBanner()">▲ Hide Ad</button>
     </div>
     <div id="banner-expand-strip" onclick="expandBanner()">▼ Show Ad</div>
-
-    <!-- Header bar -->
     <div class="stage-header">
         <div class="d-flex align-items-center">
             <button class="btn btn-dark rounded-pill px-4 fw-bold border-secondary" onclick="closeGame()">
@@ -451,16 +453,10 @@
             <i class="bi bi-arrows-fullscreen me-2"></i> FULLSCREEN
         </button>
     </div>
-
-    <!-- Middle: game | right-ad-stack -->
     <div class="stage-middle">
-
-        <!-- Game column (iframe + below-game) -->
         <div class="game-col" id="game-col">
             <iframe id="stage-iframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
-
             <div id="below-game">
-                <!-- Like / dislike for current game -->
                 <div id="game-like-bar" class="like-bar">
                     <button class="like-btn" id="stage-like-btn" onclick="voteGame('like')">
                         <i class="bi bi-hand-thumbs-up-fill"></i> <span id="stage-like-count">0</span>
@@ -468,23 +464,20 @@
                     <button class="dislike-btn" id="stage-dislike-btn" onclick="voteGame('dislike')">
                         <i class="bi bi-hand-thumbs-down-fill"></i> <span id="stage-dislike-count">0</span>
                     </button>
+                    <button class="like-btn" onclick="openComments()" style="margin-left:auto;">
+                        <i class="bi bi-chat-dots-fill"></i> <span id="stage-comment-count">0</span>
+                    </button>
                 </div>
-
-                <!-- Banner ad below like buttons, above related games -->
                 <div id="stage-banner-below">
                     <div id="ad-below-game">
                         <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
                         <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
                     </div>
                 </div>
-
-                <!-- Related games -->
                 <div id="related-title">Related Games</div>
                 <div id="related-grid"></div>
             </div>
         </div>
-
-        <!-- Right ad stack: 160×600 on top, 160×300 below -->
         <div class="stage-ad-right">
             <div id="ad-right-top">
                 <script>atOptions={'key':'0d1d9860b64193bffb24174fa1adda1d','format':'iframe','height':600,'width':160,'params':{}};</script>
@@ -498,7 +491,6 @@
     </div>
 </div>
 
-<!-- Fullscreen / collapse prompt -->
 <div id="fs-prompt">
     <div class="fs-prompt-box">
         <p>Collapse the ad banner?</p>
@@ -508,42 +500,343 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="auth-modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeAuthModal()">×</button>
+        <div id="auth-signin-view">
+            <h2>Welcome back</h2>
+            <p class="sub">Sign in to your BlinchiUser account</p>
+            <div class="form-group"><label>Email</label><input type="email" id="signin-email" placeholder="Enter email"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="signin-pass" placeholder="Enter password"></div>
+            <p class="modal-error" id="signin-error"></p>
+            <button class="btn-primary-brand" onclick="doSignIn()">Sign In</button>
+            <div class="modal-switch">Don't have an account? <a onclick="switchAuth('signup')">Create one</a></div>
+        </div>
+        <div id="auth-signup-view" style="display:none">
+            <h2>Join BlinchiGames</h2>
+            <p class="sub">Create your free BlinchiUser account</p>
+            <div class="form-group"><label>Username</label><input type="text" id="signup-username" placeholder="Choose a username"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="signup-email" placeholder="Enter email"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="signup-pass" placeholder="Min 6 characters"></div>
+            <p class="modal-error" id="signup-error"></p>
+            <p class="modal-success" id="signup-success"></p>
+            <button class="btn-primary-brand" onclick="doSignUp()">Create Account</button>
+            <div class="modal-switch">Already have an account? <a onclick="switchAuth('signin')">Sign in</a></div>
+        </div>
+    </div>
+</div>
+
+<div id="comments-panel">
+    <div class="cpanel-header">
+        <h3><i class="bi bi-chat-dots-fill me-2" style="color:var(--brand);"></i>Comments</h3>
+        <button class="cpanel-close" onclick="closeComments()">×</button>
+    </div>
+    <div class="comments-list" id="comments-list">
+        <div style="text-align:center;color:#444;padding:40px 0;font-size:0.9rem;">Loading comments...</div>
+    </div>
+    <div class="comment-input-area" id="comment-input-area" style="display:none;">
+        <textarea id="comment-text" placeholder="Write a comment..." rows="1"></textarea>
+        <button class="comment-send-btn" onclick="submitComment()"><i class="bi bi-send-fill"></i></button>
+    </div>
+    <div class="login-prompt-comment" id="comment-login-prompt" style="display:none;">
+        <a onclick="openAuthModal()">Sign in</a> to leave a comment
+    </div>
+</div>
+
+<div id="bl-toast"></div>
+
+<!-- ═══ BLINCHILIVE OVERLAY ═══ -->
+<div id="bl-overlay">
+    <div class="bl-topbar">
+        <button class="bl-btn-ghost" style="padding:6px 14px;font-size:0.82rem;" onclick="closeBlinchiLive()">
+            <i class="bi bi-arrow-left me-1"></i> Back
+        </button>
+        <span class="bl-logo">Blinchi<em>Live</em></span>
+        <div class="bl-topbar-right">
+            <div class="bl-coins-pill">🪙 <span id="bl-coins">0</span> BlinchiCoins</div>
+            <div class="bl-user-pill" id="bl-user-pill" style="display:none" onclick="blSwitchTab('profile')">
+                <div class="online-dot"></div>
+                <span id="bl-username-disp"></span>
+            </div>
+            <button class="bl-btn" id="bl-signin-btn" style="padding:6px 16px;font-size:0.82rem;" onclick="closeBlinchiLive();openAuthModal()">Sign In</button>
+        </div>
+    </div>
+    <div class="bl-body">
+        <nav class="bl-nav">
+            <div class="bl-nav-section">Main</div>
+            <button class="bl-nav-btn active" data-tab="feed"         onclick="blSwitchTab('feed')">        <i class="bi bi-house-fill"></i> Home Feed</button>
+            <button class="bl-nav-btn"         data-tab="profile"      onclick="blSwitchTab('profile')">     <i class="bi bi-person-fill"></i> My Profile</button>
+            <button class="bl-nav-btn"         data-tab="challenges"   onclick="blSwitchTab('challenges')">  <i class="bi bi-lightning-fill"></i> Daily Challenges</button>
+            <button class="bl-nav-btn"         data-tab="achievements" onclick="blSwitchTab('achievements')"><i class="bi bi-trophy-fill"></i> Achievements</button>
+            <div class="bl-nav-section">Social</div>
+            <button class="bl-nav-btn"         data-tab="friends"      onclick="blSwitchTab('friends')">     <i class="bi bi-people-fill"></i> Friends</button>
+            <button class="bl-nav-btn"         data-tab="messages"     onclick="blSwitchTab('messages')">    <i class="bi bi-chat-fill"></i> Messages <span class="bl-badge" id="bl-msg-badge" style="display:none">!</span></button>
+            <button class="bl-nav-btn"         data-tab="groups"       onclick="blSwitchTab('groups')">      <i class="bi bi-collection-fill"></i> Groups</button>
+        </nav>
+
+        <div class="bl-main">
+
+            <!-- HOME FEED -->
+            <div class="bl-tab active" id="bl-tab-feed">
+                <div class="bl-page-title">Home Feed</div>
+                <div class="bl-page-sub">See what your friends are playing right now</div>
+                <div id="bl-feed-content"><div class="bl-card" style="text-align:center;color:#333;padding:40px;">Sign in to see your friends' activity</div></div>
+                <div class="bl-ad-slot">
+                    <script>atOptions={'key':'1e3e91cd06644324483015b483316475','format':'iframe','height':60,'width':468,'params':{}};</script>
+                    <script src="https://authoritieswoundjoint.com/1e3e91cd06644324483015b483316475/invoke.js"></script>
+                </div>
+            </div>
+
+            <!-- PROFILE -->
+            <div class="bl-tab" id="bl-tab-profile">
+                <div id="bl-profile-content">
+                    <div style="text-align:center;color:#333;padding:80px 0;">
+                        <div style="font-size:3rem;margin-bottom:16px;">👤</div>
+                        <p>Sign in to view your profile</p>
+                        <button class="bl-btn" style="margin-top:12px;" onclick="closeBlinchiLive();openAuthModal()">Sign In</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAILY CHALLENGES -->
+            <div class="bl-tab" id="bl-tab-challenges">
+                <div class="bl-page-title">Daily Challenges</div>
+                <div class="bl-page-sub">Complete challenges to earn BlinchiCoins — resets at midnight</div>
+                <div id="bl-challenges-locked" style="text-align:center;color:#333;padding:60px 0;">
+                    <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
+                    <p>Sign in to unlock daily challenges</p>
+                    <button class="bl-btn" style="margin-top:12px;" onclick="closeBlinchiLive();openAuthModal()">Sign In</button>
+                </div>
+                <div id="bl-challenges-list" style="display:none;"></div>
+            </div>
+
+            <!-- ACHIEVEMENTS -->
+            <div class="bl-tab" id="bl-tab-achievements">
+                <div class="bl-page-title">Achievements</div>
+                <div class="bl-page-sub">Unlock achievements to earn BlinchiCoins</div>
+                <div id="bl-ach-locked" style="text-align:center;color:#333;padding:60px 0;">
+                    <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
+                    <p>Sign in to track achievements</p>
+                    <button class="bl-btn" style="margin-top:12px;" onclick="closeBlinchiLive();openAuthModal()">Sign In</button>
+                </div>
+                <div id="bl-ach-list" style="display:none;"></div>
+            </div>
+
+            <!-- FRIENDS -->
+            <div class="bl-tab" id="bl-tab-friends">
+                <div class="bl-page-title">Friends</div>
+                <div class="bl-page-sub">Add friends, see what they're playing, send join codes</div>
+                <div id="bl-friends-locked" style="text-align:center;color:#333;padding:60px 0;">
+                    <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
+                    <p>Sign in to add friends</p>
+                    <button class="bl-btn" style="margin-top:12px;" onclick="closeBlinchiLive();openAuthModal()">Sign In</button>
+                </div>
+                <div id="bl-friends-content" style="display:none;">
+                    <div style="display:flex;gap:10px;margin-bottom:20px;">
+                        <input class="bl-input" id="bl-friend-search" placeholder="Search by username...">
+                        <button class="bl-btn" onclick="blSearchFriend()">Add</button>
+                    </div>
+                    <div id="bl-friend-search-result" style="margin-bottom:16px;"></div>
+                    <div style="font-weight:700;font-size:0.95rem;margin-bottom:12px;">Your Friends</div>
+                    <div id="bl-friends-list"></div>
+                </div>
+                <div class="bl-ad-slot">
+                    <script>atOptions={'key':'1e3e91cd06644324483015b483316475','format':'iframe','height':60,'width':468,'params':{}};</script>
+                    <script src="https://authoritieswoundjoint.com/1e3e91cd06644324483015b483316475/invoke.js"></script>
+                </div>
+            </div>
+
+            <!-- MESSAGES -->
+            <div class="bl-tab" id="bl-tab-messages">
+                <div class="bl-page-title">Messages</div>
+                <div class="bl-page-sub">Chats disappear after 24h unless you save them ⚡</div>
+                <div id="bl-messages-locked" style="text-align:center;color:#333;padding:60px 0;">
+                    <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
+                    <p>Sign in to message friends</p>
+                    <button class="bl-btn" style="margin-top:12px;" onclick="closeBlinchiLive();openAuthModal()">Sign In</button>
+                </div>
+                <div id="bl-messages-content" style="display:none;">
+                    <div class="bl-chat-layout">
+                        <div class="bl-convo-list" id="bl-convo-list">
+                            <div style="padding:16px;color:#333;font-size:0.82rem;">No conversations yet</div>
+                        </div>
+                        <div class="bl-chat-window">
+                            <div class="bl-chat-header" id="bl-chat-header">
+                                <div style="color:#333;font-size:0.88rem;">Select a friend to chat</div>
+                            </div>
+                            <div class="bl-messages" id="bl-chat-messages">
+                                <div style="margin:auto;color:#222;font-size:0.85rem;">👆 Select a conversation</div>
+                            </div>
+                            <div class="bl-chat-input" id="bl-chat-input-row" style="display:none;">
+                                <input class="bl-input" style="border-radius:20px;" id="bl-chat-input" placeholder="Type a message... (disappears in 24h)" onkeydown="if(event.key==='Enter')blSendMessage()">
+                                <button class="bl-send-btn" onclick="blSendMessage()"><i class="bi bi-send-fill"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GROUPS -->
+            <div class="bl-tab" id="bl-tab-groups">
+                <div class="bl-page-title">Groups</div>
+                <div class="bl-page-sub">Create and join gaming groups</div>
+                <div id="bl-groups-locked" style="text-align:center;color:#333;padding:60px 0;">
+                    <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
+                    <p>Sign in to create or join groups</p>
+                    <button class="bl-btn" style="margin-top:12px;" onclick="closeBlinchiLive();openAuthModal()">Sign In</button>
+                </div>
+                <div id="bl-groups-content" style="display:none;">
+                    <div style="display:flex;gap:10px;margin-bottom:24px;">
+                        <input class="bl-input" id="bl-group-name" placeholder="New group name...">
+                        <button class="bl-btn" onclick="blCreateGroup()">Create</button>
+                    </div>
+                    <div id="bl-groups-list"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// ─── Elite hand-picked games ─────────────────────────────────────────────────
+// ─── Supabase ─────────────────────────────────────────────────────────────────
+const SUPA_URL = 'https://ezdiptkyfwttxjuxkusg.supabase.co';
+const SUPA_KEY = 'sb_publishable_ORNNniNlw9b8a9I6VAh9Tw_w4QZPDBU';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+let currentUser = null, currentProfile = null;
+
+async function initAuth() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) await onSignedIn(session.user);
+    sb.auth.onAuthStateChange(async (event, session) => {
+        if (session) await onSignedIn(session.user);
+        else onSignedOut();
+    });
+}
+async function onSignedIn(user) {
+    currentUser = user;
+    let { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    if (!prof) {
+        const username = user.user_metadata?.username || 'Player' + Math.floor(Math.random()*9999);
+        const { data: np } = await sb.from('profiles').insert({ id: user.id, username, email: user.email, coins: 0, games_played: 0 }).select().single();
+        prof = np;
+    }
+    currentProfile = prof;
+    updateAuthUI();
+    blShowAuth();
+}
+function onSignedOut() { currentUser = null; currentProfile = null; updateAuthUI(); blShowAuth(); }
+function updateAuthUI() {
+    const nudge = document.getElementById('signin-nudge');
+    const chip  = document.getElementById('profile-chip');
+    const label = document.getElementById('nav-account-label');
+    if (currentProfile) {
+        if (nudge) nudge.style.display = 'none';
+        if (chip)  chip.style.display  = 'flex';
+        document.getElementById('profile-chip-name').textContent  = currentProfile.username;
+        document.getElementById('profile-chip-coins').textContent = currentProfile.coins || 0;
+        if (label) label.textContent = currentProfile.username;
+    } else {
+        if (nudge) nudge.style.display = 'flex';
+        if (chip)  chip.style.display  = 'none';
+        if (label) label.textContent = 'Sign In';
+    }
+}
+function openAuthModal()  { document.getElementById('auth-modal').classList.add('show'); }
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
+function switchAuth(v) {
+    document.getElementById('auth-signin-view').style.display = v === 'signin' ? '' : 'none';
+    document.getElementById('auth-signup-view').style.display = v === 'signup' ? '' : 'none';
+}
+async function doSignIn() {
+    const email = document.getElementById('signin-email').value.trim();
+    const pass  = document.getElementById('signin-pass').value;
+    const errEl = document.getElementById('signin-error');
+    errEl.style.display = 'none';
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
+    else closeAuthModal();
+}
+async function doSignUp() {
+    const username = document.getElementById('signup-username').value.trim();
+    const email    = document.getElementById('signup-email').value.trim();
+    const pass     = document.getElementById('signup-pass').value;
+    const errEl    = document.getElementById('signup-error');
+    const okEl     = document.getElementById('signup-success');
+    errEl.style.display = 'none'; okEl.style.display = 'none';
+    if (!username || !email || !pass) { errEl.textContent = 'All fields required'; errEl.style.display = 'block'; return; }
+    if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.style.display = 'block'; return; }
+    const { data: existing } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+    if (existing) { errEl.textContent = 'Username already taken'; errEl.style.display = 'block'; return; }
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { username } } });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+    if (data.user) await sb.from('profiles').upsert({ id: data.user.id, username, email, coins: 0, games_played: 0 });
+    okEl.textContent = 'Account created! Check your email to verify, then sign in.';
+    okEl.style.display = 'block';
+}
+
+// ─── Comments ─────────────────────────────────────────────────────────────────
+function openComments() {
+    document.getElementById('comments-panel').classList.add('show');
+    document.getElementById('comment-input-area').style.display   = currentUser ? 'flex' : 'none';
+    document.getElementById('comment-login-prompt').style.display = currentUser ? 'none' : 'block';
+    loadComments();
+}
+function closeComments() { document.getElementById('comments-panel').classList.remove('show'); }
+async function loadComments() {
+    if (!currentGame) return;
+    const list = document.getElementById('comments-list');
+    list.innerHTML = '<div style="text-align:center;color:#444;padding:30px;font-size:0.85rem;">Loading...</div>';
+    const { data } = await sb.from('comments').select('*, profiles(username)').eq('game_title', currentGame.title).order('created_at', { ascending: false }).limit(50);
+    if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;color:#444;padding:40px 0;">No comments yet. Be the first!</div>'; document.getElementById('stage-comment-count').textContent = '0'; return; }
+    document.getElementById('stage-comment-count').textContent = data.length;
+    list.innerHTML = data.map(c => `<div class="comment-item"><div class="comment-author">@${c.profiles?.username||'BlinchiUser'}</div><div class="comment-text">${escHtml(c.body)}</div><div class="comment-time">${timeAgo(c.created_at)}</div></div>`).join('');
+}
+async function submitComment() {
+    if (!currentUser || !currentGame) return;
+    const ta = document.getElementById('comment-text');
+    const body = ta.value.trim();
+    if (!body) return;
+    ta.value = '';
+    await sb.from('comments').insert({ user_id: currentUser.id, game_title: currentGame.title, body });
+    loadComments();
+    blProgressChallenge('comment_count', 1);
+}
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function timeAgo(ts) {
+    if (!ts) return '';
+    const d = Math.round((Date.now() - new Date(ts)) / 1000);
+    if (d < 60) return 'just now';
+    if (d < 3600) return Math.floor(d/60) + 'm ago';
+    if (d < 86400) return Math.floor(d/3600) + 'h ago';
+    return Math.floor(d/86400) + 'd ago';
+}
+
+// ─── Game portal ──────────────────────────────────────────────────────────────
 const ELITE_LIST = [
     { title: 'Majestic Games', category: 'Elite',        url: 'https://majesticwafr.github.io',      thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
     { title: 'Poxel.io',       category: 'Elite IO',     url: 'https://poxel.io/',                    thumb: '' },
     { title: 'Speed Stars 2',  category: 'Elite Racing', url: 'https://speedstars2.io/',              thumb: '' },
     { title: 'Basket Random',  category: 'Elite Sports', url: 'https://basketrandom.github.io/',      thumb: '' },
 ];
+const GENRES = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
+const PAGE_INIT = 100, PAGE_STEP = 20;
+let masterCatalog = [], activeList = [], itemsLoaded = 0, viewMode = 'home', observer = null, currentGame = null;
 
-const GENRES     = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
-const PAGE_INIT  = 100;
-const PAGE_STEP  = 20;
-
-let masterCatalog = [];
-let activeList    = [];
-let itemsLoaded   = 0;
-let viewMode      = 'home';
-let observer      = null;
-let currentGame   = null;
-
-// ─── Vote storage (localStorage per browser) ─────────────────────────────────
 function getLikes(t)    { return parseInt(localStorage.getItem('vl_' + t) || '0', 10); }
 function getDislikes(t) { return parseInt(localStorage.getItem('vd_' + t) || '0', 10); }
 function getMyVote(t)   { return localStorage.getItem('vm_' + t) || ''; }
-
 function setVote(title, type) {
     const prev = getMyVote(title);
     if (prev === type) return;
-    if (prev === 'like')    localStorage.setItem('vl_' + title, Math.max(0, getLikes(title)    - 1));
+    if (prev === 'like')    localStorage.setItem('vl_' + title, Math.max(0, getLikes(title) - 1));
     if (prev === 'dislike') localStorage.setItem('vd_' + title, Math.max(0, getDislikes(title) - 1));
-    if (type === 'like')    localStorage.setItem('vl_' + title, getLikes(title)    + 1);
+    if (type === 'like')    localStorage.setItem('vl_' + title, getLikes(title) + 1);
     if (type === 'dislike') localStorage.setItem('vd_' + title, getDislikes(title) + 1);
     localStorage.setItem('vm_' + title, type);
 }
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
     const eg = document.getElementById('elite-grid');
     ELITE_LIST.forEach(g => eg.innerHTML += generateCard(g, true));
@@ -565,10 +858,8 @@ async function boot() {
     );
 
     masterCatalog = [...ELITE_LIST];
-
     results.forEach((data, idx) => {
         const url = feedUrls[idx];
-
         if (url.includes('g_min.json')) {
             if (!Array.isArray(data)) return;
             data.forEach(g => {
@@ -578,7 +869,6 @@ async function boot() {
             });
             return;
         }
-
         if (url.includes('gamepix.com') || url.includes('Gamepix.json')) {
             const items = Array.isArray(data) ? data : (data.data || data.items || []);
             items.forEach(g => {
@@ -589,7 +879,6 @@ async function boot() {
             });
             return;
         }
-
         if (!Array.isArray(data)) return;
         data.forEach(g => {
             let gameUrl = g.embed || g.url || g.link || '';
@@ -608,30 +897,26 @@ async function boot() {
     initNav();
     showHome();
     setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
-
     detectAdblock();
     sizeIframe();
     window.addEventListener('resize', sizeIframe);
+    initAuth().catch(() => {});
 }
 
 function sizeIframe() {
-    const ifr    = document.getElementById('stage-iframe');
+    const ifr = document.getElementById('stage-iframe');
     const banner = document.getElementById('stage-banner');
     if (!ifr) return;
-    const bannerH  = banner.classList.contains('collapsed') ? 0 : (banner.offsetHeight || 96);
-    const available = window.innerHeight - bannerH - 60; // 60 = header
-    // Use 85% of available height — much bigger game screen
-    ifr.style.height = Math.max(400, Math.round(available * 0.85)) + 'px';
+    const bannerH = banner.classList.contains('collapsed') ? 0 : (banner.offsetHeight || 96);
+    ifr.style.height = Math.max(400, Math.round((window.innerHeight - bannerH - 60) * 0.85)) + 'px';
 }
 
-// ─── Nav ──────────────────────────────────────────────────────────────────────
 function initNav() {
     const container = document.getElementById('cat-nav-container');
     container.innerHTML = '';
     GENRES.forEach(cat => {
         const b = document.createElement('button');
         b.className = 'nav-item';
-        b.dataset.genre = cat;
         b.innerHTML = `<i class="bi bi-caret-right-fill"></i> <span>${cat}</span>`;
         b.onclick = () => filterByGenre(cat, b);
         container.appendChild(b);
@@ -639,20 +924,19 @@ function initNav() {
 }
 
 function hideAllViews() {
-    document.getElementById('view-home').style.display   = 'none';
-    document.getElementById('view-cat').style.display    = 'none';
-    document.getElementById('view-search').style.display = 'none';
+    ['view-home','view-cat','view-search'].forEach(id => document.getElementById(id).style.display = 'none');
 }
 function setActiveNav(btn) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     if (btn) btn.classList.add('active');
 }
 
+let singleAdInjected = false;
 function showHome() {
     viewMode = 'home'; itemsLoaded = 0; singleAdInjected = false;
     hideAllViews();
-    document.getElementById('view-home').style.display  = 'block';
-    document.getElementById('home-grid').innerHTML      = '';
+    document.getElementById('view-home').style.display = 'block';
+    document.getElementById('home-grid').innerHTML = '';
     document.getElementById('main-lib-title').innerText = 'Global Library';
     setActiveNav(document.getElementById('btn-home'));
     activeList = [...masterCatalog];
@@ -665,59 +949,48 @@ function showSection(type, btn) {
     showHome();
     setActiveNav(btn || document.getElementById('btn-home'));
 }
-
 function filterByGenre(genre, btn) {
     viewMode = 'cat'; itemsLoaded = 0;
     hideAllViews();
-    document.getElementById('view-cat').style.display      = 'block';
+    document.getElementById('view-cat').style.display = 'block';
     document.getElementById('cat-display-title').innerText = genre + ' Collection';
-    document.getElementById('cat-grid').innerHTML          = '';
+    document.getElementById('cat-grid').innerHTML = '';
     setActiveNav(btn);
     const q = genre.toLowerCase().replace(' games', '').trim();
-    activeList = masterCatalog.filter(g => (g.category || '').toLowerCase().includes(q) || (g.title || '').toLowerCase().includes(q));
+    activeList = masterCatalog.filter(g => (g.category||'').toLowerCase().includes(q) || (g.title||'').toLowerCase().includes(q));
     renderBatch(PAGE_INIT);
     resetObserver();
     window.scrollTo(0, 0);
 }
-
 function handleSearch() {
     const query = document.getElementById('game-search').value.toLowerCase().trim();
     if (!query) { showHome(); return; }
     viewMode = 'search'; itemsLoaded = 0;
     hideAllViews();
-    document.getElementById('view-search').style.display      = 'block';
+    document.getElementById('view-search').style.display = 'block';
     document.getElementById('search-display-title').innerText = `Search Results: "${query}"`;
-    document.getElementById('search-grid').innerHTML          = '';
+    document.getElementById('search-grid').innerHTML = '';
     setActiveNav(null);
-    activeList = masterCatalog.filter(g => (g.title || '').toLowerCase().includes(query) || (g.category || '').toLowerCase().includes(query));
+    activeList = masterCatalog.filter(g => (g.title||'').toLowerCase().includes(query) || (g.category||'').toLowerCase().includes(query));
     renderBatch(PAGE_INIT);
     resetObserver();
 }
-
-// ─── Render ───────────────────────────────────────────────────────────────────
 function getActiveGrid() {
     if (viewMode === 'home')   return document.getElementById('home-grid');
     if (viewMode === 'cat')    return document.getElementById('cat-grid');
     if (viewMode === 'search') return document.getElementById('search-grid');
 }
-
-let singleAdInjected = false;
-
 function renderBatch(count) {
-    const grid  = getActiveGrid();
+    const grid = getActiveGrid();
     const batch = activeList.slice(itemsLoaded, itemsLoaded + count);
-
     batch.forEach(g => {
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = generateCard(g);
-        grid.appendChild(wrapper.firstElementChild);
+        const w = document.createElement('div');
+        w.innerHTML = generateCard(g);
+        grid.appendChild(w.firstElementChild);
     });
-
     itemsLoaded += batch.length;
-    document.getElementById('scroll-sentinel').style.visibility =
-        itemsLoaded < activeList.length ? 'visible' : 'hidden';
+    document.getElementById('scroll-sentinel').style.visibility = itemsLoaded < activeList.length ? 'visible' : 'hidden';
 }
-
 function resetObserver() {
     if (observer) observer.disconnect();
     observer = new IntersectionObserver(entries => {
@@ -725,196 +998,529 @@ function resetObserver() {
     }, { rootMargin: '400px' });
     observer.observe(document.getElementById('scroll-sentinel'));
 }
-
-// ─── Card (library — no like/dislike) ────────────────────────────────────────
 function generateCard(g, isElite = false) {
     const img       = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Elite+Game';
     const safeTitle = (g.title    || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     const safeUrl   = (g.url      || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     const safeCat   = (g.category || '').replace(/'/g, "\\'");
-    return `
-        <div class="game-card" onclick="launchGame('${safeUrl}','${safeTitle}','${safeCat}')">
-            <div class="game-thumb">
-                ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
-                <img src="${img}" alt="${g.title || ''}" loading="lazy">
-            </div>
-            <div class="game-info">
-                <h6>${g.title || ''}</h6>
-            </div>
-        </div>`;
+    return `<div class="game-card" onclick="launchGame('${safeUrl}','${safeTitle}','${safeCat}')">
+        <div class="game-thumb">${isElite ? '<div class="badge-elite">Elite</div>' : ''}<img src="${img}" alt="${g.title||''}" loading="lazy"></div>
+        <div class="game-info"><h6>${g.title||''}</h6></div>
+    </div>`;
 }
 
-// ─── Voting on library cards ──────────────────────────────────────────────────
-function voteCard(btn, type, title) {
-    setVote(title, type);
-    const bar = btn.closest('.like-bar');
-    const lb  = bar.querySelector('.like-btn');
-    const db  = bar.querySelector('.dislike-btn');
-    const mv  = getMyVote(title);
-    lb.classList.toggle('active', mv === 'like');
-    db.classList.toggle('active', mv === 'dislike');
-    lb.querySelector('span').textContent = getLikes(title);
-    db.querySelector('span').textContent = getDislikes(title);
-    if (currentGame && currentGame.title === title) updateStageLikeBar();
-}
-
-// ─── Voting inside the stage ─────────────────────────────────────────────────
-function voteGame(type) {
-    if (!currentGame) return;
-    setVote(currentGame.title, type);
-    updateStageLikeBar();
-}
+function voteGame(type) { if (!currentGame) return; setVote(currentGame.title, type); updateStageLikeBar(); }
 function updateStageLikeBar() {
     if (!currentGame) return;
-    const t  = currentGame.title;
-    const mv = getMyVote(t);
-    document.getElementById('stage-like-btn').classList.toggle('active',    mv === 'like');
+    const t = currentGame.title, mv = getMyVote(t);
+    document.getElementById('stage-like-btn').classList.toggle('active', mv === 'like');
     document.getElementById('stage-dislike-btn').classList.toggle('active', mv === 'dislike');
     document.getElementById('stage-like-count').textContent    = getLikes(t);
     document.getElementById('stage-dislike-count').textContent = getDislikes(t);
 }
 
-// ─── Launch game ──────────────────────────────────────────────────────────────
 let gamesPlayedCount = 0;
-
 function launchGame(url, title, category) {
     currentGame = { url, title, category };
-    gamesPlayedCount++;
-
-    // Every 17 games, clear accumulated DOM/memory without touching localStorage
-    if (gamesPlayedCount % 17 === 0) {
-        cleanPortalCache();
-    }
-
+    if (++gamesPlayedCount % 17 === 0) cleanPortalCache();
     document.getElementById('game-stage').classList.add('open');
-    document.getElementById('stage-iframe').src      = url;
+    document.getElementById('stage-iframe').src = url;
     document.getElementById('stage-title').innerText = 'PLAYING: ' + title;
     document.body.style.overflow = 'hidden';
     updateStageLikeBar();
     renderRelated(title, category);
     sizeIframe();
-    // Scroll the stage overlay to top
     document.getElementById('game-stage').scrollTop = 0;
+    blStartGameTimer();
+    if (currentUser) blBroadcastActivity();
 }
-
 function closeGame() {
+    blStopGameTimer();
     document.getElementById('game-stage').classList.remove('open');
-    // Fully unload the game iframe to free memory
     const ifr = document.getElementById('stage-iframe');
     ifr.src = 'about:blank';
     setTimeout(() => { ifr.src = ''; }, 100);
     document.body.style.overflow = '';
     currentGame = null;
-    // Clear related grid DOM to free memory
     document.getElementById('related-grid').innerHTML = '';
-    // Purge any blob/object URLs the browser may have cached for this session
     cleanPortalCache();
 }
-
-// ─── Portal cache cleaner — clears rendering/script cache without touching game saves ──
 function cleanPortalCache() {
-    // Remove stale script tags injected by ad refreshes (keep only the live ones)
     document.querySelectorAll('script[data-ad-injected]').forEach(s => s.remove());
-    // Force GC hint by briefly toggling a style
-    const body = document.body;
-    body.style.display = 'none';
-    // eslint-disable-next-line no-unused-expressions
-    body.offsetHeight; // reflow
-    body.style.display = '';
+    const body = document.body; body.style.display = 'none'; body.offsetHeight; body.style.display = '';
 }
-
-// ─── Related games ────────────────────────────────────────────────────────────
 function renderRelated(title, category) {
     const grid = document.getElementById('related-grid');
     grid.innerHTML = '';
     const cat = (category || '').toLowerCase();
-    const related = masterCatalog
-        .filter(g => g.title !== title &&
-            ((g.category || '').toLowerCase() === cat ||
-             (g.category || '').toLowerCase().includes(cat) ||
-             cat.includes((g.category || '').toLowerCase())))
-        .slice(0, 18);
-
-    if (!related.length) {
-        grid.innerHTML = '<p style="color:#555;font-size:0.9rem;">No related games found.</p>';
-        return;
-    }
+    const related = masterCatalog.filter(g => g.title !== title && ((g.category||'').toLowerCase() === cat || (g.category||'').toLowerCase().includes(cat) || cat.includes((g.category||'').toLowerCase()))).slice(0, 18);
+    if (!related.length) { grid.innerHTML = '<p style="color:#555;font-size:0.9rem;">No related games found.</p>'; return; }
     related.forEach(g => {
-        const img     = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Game';
-        const st      = (g.title    || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        const su      = (g.url      || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        const sc      = (g.category || '').replace(/'/g, "\\'");
-        const el      = document.createElement('div');
-        el.className  = 'game-card';
-        el.innerHTML  = `
-            <div class="game-thumb" onclick="launchGame('${su}','${st}','${sc}')">
-                <img src="${img}" alt="${g.title||''}" loading="lazy">
-            </div>
-            <div class="game-info">
-                <h6 onclick="launchGame('${su}','${st}','${sc}')">${g.title||''}</h6>
-            </div>`;
+        const img = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Game';
+        const st = (g.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const su = (g.url||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const sc = (g.category||'').replace(/'/g,"\\'");
+        const el = document.createElement('div');
+        el.className = 'game-card';
+        el.innerHTML = `<div class="game-thumb" onclick="launchGame('${su}','${st}','${sc}')"><img src="${img}" alt="${g.title||''}" loading="lazy"></div><div class="game-info"><h6 onclick="launchGame('${su}','${st}','${sc}')">${g.title||''}</h6></div>`;
         grid.appendChild(el);
     });
 }
 
-// ─── Fullscreen with banner-collapse prompt ───────────────────────────────────
 function handleFullscreen() {
-    const banner = document.getElementById('stage-banner');
-    if (!banner.classList.contains('collapsed')) {
-        document.getElementById('fs-prompt').style.display = 'flex';
-    } else {
-        doFullscreen();
-    }
+    if (!document.getElementById('stage-banner').classList.contains('collapsed')) document.getElementById('fs-prompt').style.display = 'flex';
+    else doFullscreen();
 }
-function fsPromptYes() {
-    document.getElementById('fs-prompt').style.display = 'none';
-    collapseBanner();
-    doFullscreen();
-}
-function fsPromptNo() {
-    document.getElementById('fs-prompt').style.display = 'none';
-    doFullscreen();
-}
+function fsPromptYes() { document.getElementById('fs-prompt').style.display = 'none'; collapseBanner(); doFullscreen(); }
+function fsPromptNo()  { document.getElementById('fs-prompt').style.display = 'none'; doFullscreen(); }
 function doFullscreen() {
     const ifr = document.getElementById('stage-iframe');
-    if      (ifr.requestFullscreen)       ifr.requestFullscreen();
+    if (ifr.requestFullscreen) ifr.requestFullscreen();
     else if (ifr.webkitRequestFullscreen) ifr.webkitRequestFullscreen();
-    else if (ifr.msRequestFullscreen)     ifr.msRequestFullscreen();
 }
+function collapseBanner() { document.getElementById('stage-banner').classList.add('collapsed'); document.getElementById('banner-expand-strip').style.display = 'block'; sizeIframe(); }
+function expandBanner()   { document.getElementById('stage-banner').classList.remove('collapsed'); document.getElementById('banner-expand-strip').style.display = 'none'; sizeIframe(); }
 
-function collapseBanner() {
-    document.getElementById('stage-banner').classList.add('collapsed');
-    document.getElementById('banner-expand-strip').style.display = 'block';
-    sizeIframe();
-}
-function expandBanner() {
-    document.getElementById('stage-banner').classList.remove('collapsed');
-    document.getElementById('banner-expand-strip').style.display = 'none';
-    sizeIframe();
-}
-
-// ─── Adblock detection ────────────────────────────────────────────────────────
 function detectAdblock() {
-    // Create a bait element that adblocks typically hide/remove
     const bait = document.createElement('div');
     bait.setAttribute('class', 'ad-banner ad adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links');
     bait.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;';
     document.body.appendChild(bait);
-
     setTimeout(() => {
-        const blocked = !bait || bait.offsetHeight === 0 || bait.offsetParent === null ||
-            window.getComputedStyle(bait).display === 'none' ||
-            window.getComputedStyle(bait).visibility === 'hidden';
+        const blocked = !bait || bait.offsetHeight === 0 || bait.offsetParent === null || window.getComputedStyle(bait).display === 'none' || window.getComputedStyle(bait).visibility === 'hidden';
         bait.remove();
-        if (blocked) {
-            document.getElementById('adblock-wall').classList.add('show');
-        }
+        if (blocked) document.getElementById('adblock-wall').classList.add('show');
     }, 200);
+}
+
+// ─── BlinchiLive ──────────────────────────────────────────────────────────────
+function openBlinchiLive() {
+    document.getElementById('bl-overlay').classList.add('open');
+    blRefreshCurrentTab();
+    if (currentGame) blBroadcastActivity();
+}
+function closeBlinchiLive() {
+    document.getElementById('bl-overlay').classList.remove('open');
+}
+function blSwitchTab(tab) {
+    document.querySelectorAll('.bl-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.bl-nav-btn').forEach(b => b.classList.remove('active'));
+    const el = document.getElementById('bl-tab-' + tab);
+    if (el) el.classList.add('active');
+    document.querySelectorAll(`.bl-nav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
+    blRefreshTab(tab);
+}
+function blRefreshCurrentTab() {
+    const active = document.querySelector('.bl-tab.active');
+    if (active) blRefreshTab(active.id.replace('bl-tab-', ''));
+}
+function blRefreshTab(tab) {
+    if (!currentUser) return;
+    if (tab === 'feed')         blLoadFeed();
+    if (tab === 'profile')      blRenderProfile();
+    if (tab === 'friends')      blLoadFriends();
+    if (tab === 'messages')     blLoadConvos();
+    if (tab === 'groups')       blLoadGroups();
+    if (tab === 'challenges')   blLoadChallenges();
+    if (tab === 'achievements') blLoadAchievements();
+}
+function blShowAuth() {
+    ['friends','messages','groups','challenges','achievements'].forEach(s => {
+        const locked  = document.getElementById('bl-' + s + '-locked');
+        const content = document.getElementById('bl-' + s + '-content') || document.getElementById('bl-' + s + '-list');
+        if (locked)  locked.style.display  = currentProfile ? 'none' : '';
+        if (content) content.style.display = currentProfile ? 'block' : 'none';
+    });
+    const userPill  = document.getElementById('bl-user-pill');
+    const signinBtn = document.getElementById('bl-signin-btn');
+    const unameDisp = document.getElementById('bl-username-disp');
+    const coinsDisp = document.getElementById('bl-coins');
+    if (currentProfile) {
+        if (userPill)  userPill.style.display  = 'flex';
+        if (signinBtn) signinBtn.style.display = 'none';
+        if (unameDisp) unameDisp.textContent   = currentProfile.username;
+        if (coinsDisp) coinsDisp.textContent   = currentProfile.coins || 0;
+        blRenderProfile();
+        blLoadChallenges();
+        blLoadAchievements();
+    } else {
+        if (userPill)  userPill.style.display  = 'none';
+        if (signinBtn) signinBtn.style.display = '';
+        if (coinsDisp) coinsDisp.textContent   = 0;
+    }
+}
+
+function blToast(msg) {
+    const t = document.getElementById('bl-toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── Feed ─────────────────────────────────────────────────────────────────────
+async function blLoadFeed() {
+    if (!currentUser) return;
+    const el = document.getElementById('bl-feed-content');
+    const { data: friends } = await sb.from('friendships').select('friend_id').eq('user_id', currentUser.id).eq('status', 'accepted');
+    if (!friends || !friends.length) { el.innerHTML = '<div class="bl-card" style="text-align:center;color:#333;padding:40px;">Add friends to see their activity here!</div>'; return; }
+    const ids = friends.map(f => f.friend_id);
+    const { data: acts } = await sb.from('activity').select('*, profiles(username)').in('user_id', ids).order('updated_at', { ascending: false });
+    if (!acts || !acts.length) { el.innerHTML = '<div class="bl-card" style="text-align:center;color:#333;padding:40px;">None of your friends are playing right now.</div>'; return; }
+    el.innerHTML = acts.map(a => {
+        const mins = Math.round((Date.now() - new Date(a.updated_at)) / 60000);
+        const when = mins < 1 ? 'just now' : mins < 60 ? mins + 'm ago' : Math.floor(mins/60) + 'h ago';
+        return `<div class="bl-feed-item">
+            <div class="bl-avatar">${(a.profiles?.username||'?')[0].toUpperCase()}</div>
+            <div class="bl-feed-text">
+                <div class="bl-feed-name"><span class="online-dot"></span>@${a.profiles?.username}</div>
+                <div class="bl-feed-desc">Playing <strong style="color:#ccc">${escHtml(a.game_title||'')}</strong> · ${when}</div>
+            </div>
+            <button class="bl-join-btn" onclick="closeBlinchiLive();launchGame('${(a.game_url||'').replace(/'/g,"\\'")}','${escHtml(a.game_title||'')}','')">▶ Play</button>
+        </div>`;
+    }).join('');
+}
+
+async function blBroadcastActivity() {
+    if (!currentUser || !currentGame) return;
+    await sb.from('activity').upsert({ user_id: currentUser.id, game_title: currentGame.title, game_url: currentGame.url, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+}
+
+// ─── Profile ──────────────────────────────────────────────────────────────────
+function blRenderProfile() {
+    if (!currentProfile) return;
+    const el = document.getElementById('bl-profile-content');
+    const init = (currentProfile.username||'?')[0].toUpperCase();
+    el.innerHTML = `
+        <div class="bl-profile-banner">
+            <div class="bl-avatar lg">${init}</div>
+            <div style="flex:1;">
+                <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;">${escHtml(currentProfile.username)}</div>
+                <div style="color:#444;font-size:0.82rem;margin-top:2px;">BlinchiUser</div>
+                <div style="display:flex;gap:24px;margin-top:14px;">
+                    <div class="bl-stat"><div class="bl-stat-val">${currentProfile.games_played||0}</div><div class="bl-stat-label">Games Played</div></div>
+                    <div class="bl-stat"><div class="bl-stat-val">${currentProfile.coins||0}</div><div class="bl-stat-label">BlinchiCoins</div></div>
+                </div>
+            </div>
+            <button class="bl-btn-ghost" onclick="sb.auth.signOut();closeBlinchiLive()">Sign Out</button>
+        </div>
+        <div class="bl-coins-banner">
+            <div style="font-size:2.2rem;">🪙</div>
+            <div>
+                <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--brand);">${currentProfile.coins||0}</div>
+                <div style="color:#444;font-size:0.82rem;">BlinchiCoins — spendable in custom games (coming soon)</div>
+            </div>
+        </div>`;
+}
+
+// ─── Friends ──────────────────────────────────────────────────────────────────
+async function blLoadFriends() {
+    if (!currentUser) return;
+    const { data } = await sb.from('friendships').select('friend_id, status, profiles!friendships_friend_id_fkey(username)').eq('user_id', currentUser.id);
+    const el = document.getElementById('bl-friends-list');
+    if (!data || !data.length) { el.innerHTML = '<div style="color:#333;font-size:0.88rem;padding:16px 0;">No friends yet — search above to add someone!</div>'; return; }
+    el.innerHTML = data.map(f => `
+        <div class="bl-friend-row">
+            <div class="bl-avatar">${(f.profiles?.username||'?')[0].toUpperCase()}</div>
+            <div class="bl-friend-info">
+                <div class="bl-friend-name">@${escHtml(f.profiles?.username||'')}</div>
+                <div class="bl-friend-status ${f.status==='accepted'?'online':''}">${f.status==='accepted'?'● Online':'Pending'}</div>
+            </div>
+            <div class="bl-friend-actions">
+                <button class="bl-icon-btn" title="Message" onclick="blOpenDM('${f.friend_id}','${escHtml(f.profiles?.username||'')}')"><i class="bi bi-chat-fill"></i></button>
+                <button class="bl-icon-btn" title="Send join code" onclick="blSendJoinCode('${f.friend_id}')"><i class="bi bi-controller"></i></button>
+                <button class="bl-icon-btn red" title="Remove" onclick="blRemoveFriend('${f.friend_id}')"><i class="bi bi-x"></i></button>
+            </div>
+        </div>`).join('');
+}
+
+async function blSearchFriend() {
+    const q = document.getElementById('bl-friend-search').value.trim();
+    if (!q) return;
+    const res = document.getElementById('bl-friend-search-result');
+    const { data } = await sb.from('profiles').select('id,username').ilike('username', q).limit(5);
+    if (!data || !data.length) { res.innerHTML = '<div style="color:#444;font-size:0.82rem;">No users found</div>'; return; }
+    res.innerHTML = data.filter(u => u.id !== currentUser?.id).map(u => `
+        <div class="bl-friend-row">
+            <div class="bl-avatar">${u.username[0].toUpperCase()}</div>
+            <div class="bl-friend-info"><div class="bl-friend-name">@${escHtml(u.username)}</div></div>
+            <button class="bl-btn" style="padding:6px 14px;font-size:0.8rem;" onclick="blAddFriend('${u.id}','${escHtml(u.username)}')">Add</button>
+        </div>`).join('');
+}
+
+async function blAddFriend(friendId, friendUsername) {
+    if (!currentUser) { closeBlinchiLive(); openAuthModal(); return; }
+    await sb.from('friendships').upsert([
+        { user_id: currentUser.id, friend_id: friendId, status: 'accepted' },
+        { user_id: friendId, friend_id: currentUser.id, status: 'accepted' }
+    ], { onConflict: 'user_id,friend_id' });
+    document.getElementById('bl-friend-search-result').innerHTML = `<div style="color:var(--brand);font-size:0.82rem;">✓ Added @${escHtml(friendUsername)}!</div>`;
+    blLoadFriends();
+    blAwardCoins(5, 'Added a friend');
+    blToast('🤝 Friend added!');
+}
+
+async function blRemoveFriend(friendId) {
+    if (!currentUser) return;
+    await sb.from('friendships').delete().eq('user_id', currentUser.id).eq('friend_id', friendId);
+    await sb.from('friendships').delete().eq('user_id', friendId).eq('friend_id', currentUser.id);
+    blLoadFriends();
+    blToast('Friend removed');
+}
+
+async function blSendJoinCode(friendId) {
+    if (!currentGame) { blToast('Open a game first to send a join code!'); return; }
+    const code = currentGame.url;
+    await sb.from('messages').insert({ sender_id: currentUser.id, receiver_id: friendId, body: `🎮 Join code: Play "${currentGame.title}" with me! ${code}`, expires_at: new Date(Date.now() + 86400000).toISOString() });
+    blToast('🎮 Join code sent!');
+}
+
+// ─── Messages (Snapchat-style: 24h expiry unless saved) ───────────────────────
+let blActiveFriendId = null, blActiveFriendName = null, blRealtimeSub = null;
+
+async function blLoadConvos() {
+    if (!currentUser) return;
+    const { data: friends } = await sb.from('friendships').select('friend_id, profiles!friendships_friend_id_fkey(username)').eq('user_id', currentUser.id).eq('status', 'accepted');
+    const el = document.getElementById('bl-convo-list');
+    if (!friends || !friends.length) { el.innerHTML = '<div style="padding:16px;color:#333;font-size:0.82rem;">Add friends to chat with them</div>'; return; }
+    el.innerHTML = friends.map(f => `
+        <div class="bl-convo-item ${blActiveFriendId===f.friend_id?'active':''}" onclick="blOpenDM('${f.friend_id}','${escHtml(f.profiles?.username||'')}')">
+            <div class="bl-avatar" style="width:34px;height:34px;font-size:0.85rem;flex-shrink:0;">${(f.profiles?.username||'?')[0].toUpperCase()}</div>
+            <div style="min-width:0;">
+                <div class="bl-convo-name">@${escHtml(f.profiles?.username||'')}</div>
+                <div class="bl-convo-preview bl-snapping">⚡ 24h snap chat</div>
+            </div>
+        </div>`).join('');
+}
+
+async function blOpenDM(friendId, friendUsername) {
+    blActiveFriendId   = friendId;
+    blActiveFriendName = friendUsername;
+    blSwitchTab('messages');
+    document.getElementById('bl-chat-header').innerHTML = `
+        <div class="bl-avatar" style="width:32px;height:32px;font-size:0.82rem;flex-shrink:0;">${friendUsername[0].toUpperCase()}</div>
+        <div>
+            <div class="bl-chat-header-title">@${escHtml(friendUsername)}</div>
+            <div class="bl-chat-header-sub bl-snapping">⚡ Messages disappear after 24h unless saved</div>
+        </div>`;
+    document.getElementById('bl-chat-input-row').style.display = 'flex';
+    await blLoadMessages();
+    // Realtime
+    if (blRealtimeSub) blRealtimeSub.unsubscribe();
+    const chan = [currentUser.id, friendId].sort().join('-');
+    blRealtimeSub = sb.channel('dm-' + chan)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => blLoadMessages())
+        .subscribe();
+    // Mark convos
+    blLoadConvos();
+}
+
+async function blLoadMessages() {
+    if (!currentUser || !blActiveFriendId) return;
+    // Auto-delete expired unsaved messages
+    await sb.from('messages').delete().lt('expires_at', new Date().toISOString()).eq('saved', false).or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`);
+    const { data } = await sb.from('messages')
+        .select('*')
+        .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${blActiveFriendId}),and(sender_id.eq.${blActiveFriendId},receiver_id.eq.${currentUser.id})`)
+        .order('created_at', { ascending: true })
+        .limit(100);
+    const el = document.getElementById('bl-chat-messages');
+    if (!data || !data.length) { el.innerHTML = '<div style="margin:auto;color:#222;font-size:0.85rem;">Say something! Messages snap after 24h ⚡</div>'; return; }
+    el.innerHTML = data.map(m => {
+        const isMe = m.sender_id === currentUser.id;
+        const expires = m.expires_at ? Math.max(0, Math.round((new Date(m.expires_at) - Date.now()) / 3600000)) : null;
+        const snapInfo = !m.saved && expires !== null ? `<span class="bl-snapping">⚡ ${expires}h left</span>` : (m.saved ? '<span style="color:var(--brand);">💾 saved</span>' : '');
+        return `<div class="bl-msg ${isMe?'me':'them'}">
+            <div class="bl-msg-bubble ${m.saved?'bl-msg-saved':''}">${escHtml(m.body)}</div>
+            <div class="bl-msg-meta">
+                ${timeAgo(m.created_at)} ${snapInfo}
+                ${!m.saved ? `<button class="bl-save-btn" onclick="blSaveMessage('${m.id}')" title="Save this message">💾</button>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+    el.scrollTop = el.scrollHeight;
+}
+
+async function blSendMessage() {
+    if (!currentUser || !blActiveFriendId) return;
+    const input = document.getElementById('bl-chat-input');
+    const body = input.value.trim();
+    if (!body) return;
+    input.value = '';
+    const expires = new Date(Date.now() + 86400000).toISOString(); // 24h
+    await sb.from('messages').insert({ sender_id: currentUser.id, receiver_id: blActiveFriendId, body, expires_at: expires, saved: false });
+}
+
+async function blSaveMessage(msgId) {
+    await sb.from('messages').update({ saved: true, expires_at: null }).eq('id', msgId);
+    blToast('💾 Message saved permanently!');
+    blLoadMessages();
+}
+
+// ─── Groups ───────────────────────────────────────────────────────────────────
+async function blLoadGroups() {
+    if (!currentUser) return;
+    const { data } = await sb.from('group_members').select('groups(id,name,emoji,member_count)').eq('user_id', currentUser.id);
+    const el = document.getElementById('bl-groups-list');
+    if (!data || !data.length) { el.innerHTML = '<div style="color:#333;font-size:0.88rem;padding:16px 0;">No groups yet — create one above!</div>'; return; }
+    el.innerHTML = data.map(gm => `
+        <div class="bl-group-card">
+            <div class="bl-avatar group" style="width:46px;height:46px;font-size:1.4rem;">${gm.groups?.emoji||'🎮'}</div>
+            <div style="flex:1;">
+                <div style="font-weight:700;font-size:0.95rem;">${escHtml(gm.groups?.name||'')}</div>
+                <div style="font-size:0.78rem;color:#444;">${gm.groups?.member_count||1} member${(gm.groups?.member_count||1)>1?'s':''}</div>
+            </div>
+            <i class="bi bi-chevron-right" style="color:#333;"></i>
+        </div>`).join('');
+}
+
+async function blCreateGroup() {
+    if (!currentUser) { closeBlinchiLive(); openAuthModal(); return; }
+    const name = document.getElementById('bl-group-name').value.trim();
+    if (!name) return;
+    const emojis = ['🎮','🕹️','🏆','⚡','🔥','💥','🌟','🚀','👾','🎯'];
+    const emoji = emojis[Math.floor(Math.random()*emojis.length)];
+    const { data: group } = await sb.from('groups').insert({ name, emoji, created_by: currentUser.id, member_count: 1 }).select().single();
+    if (group) {
+        await sb.from('group_members').insert({ group_id: group.id, user_id: currentUser.id });
+        document.getElementById('bl-group-name').value = '';
+        blLoadGroups();
+        blAwardCoins(10, 'Created a group');
+        blToast('🎮 Group created!');
+    }
+}
+
+// ─── Daily Challenges ─────────────────────────────────────────────────────────
+const BL_CHALLENGE_TEMPLATES = [
+    { icon:'🎮', name:'Play 3 games',          desc:'Play any 3 games today',                  coins:15, type:'play_count',   target:3 },
+    { icon:'⏱️', name:'Play for 10 minutes',   desc:'Stay in any game for 10+ minutes',        coins:20, type:'play_time',    target:600 },
+    { icon:'💬', name:'Leave 2 comments',      desc:'Comment on any 2 games',                  coins:10, type:'comment_count',target:2 },
+    { icon:'👍', name:'Like 5 games',           desc:'Like any 5 games from the library',       coins:10, type:'like_count',   target:5 },
+    { icon:'🤝', name:'Add a friend',           desc:'Add another BlinchiUser today',           coins:25, type:'friend_count', target:1 },
+    { icon:'🏆', name:'Play 5 different games', desc:'Explore 5 games from the library',        coins:30, type:'play_count',   target:5 },
+    { icon:'💾', name:'Save a chat message',    desc:'Save a message before it snaps',          coins:15, type:'save_msg',     target:1 },
+    { icon:'👥', name:'Create a group',         desc:'Start a BlinchiLive gaming group',        coins:20, type:'group_count',  target:1 },
+];
+
+async function blLoadChallenges() {
+    if (!currentUser) return;
+    const today = new Date().toISOString().split('T')[0];
+    let { data: challenges } = await sb.from('daily_challenges').select('*').eq('user_id', currentUser.id).eq('date', today);
+    if (!challenges || !challenges.length) {
+        const picked = [...BL_CHALLENGE_TEMPLATES].sort(() => Math.random()-0.5).slice(0,3);
+        const toInsert = picked.map(c => ({ user_id: currentUser.id, date: today, type: c.type, target: c.target, coins: c.coins, progress: 0, completed: false }));
+        const { data: inserted } = await sb.from('daily_challenges').insert(toInsert).select();
+        challenges = inserted || [];
+    }
+    const el = document.getElementById('bl-challenges-list');
+    if (!el) return;
+    el.innerHTML = challenges.map(c => {
+        const tmpl = BL_CHALLENGE_TEMPLATES.find(t => t.type === c.type) || BL_CHALLENGE_TEMPLATES[0];
+        const pct  = Math.min(100, Math.round(((c.progress||0) / c.target) * 100));
+        return `<div class="bl-challenge-card">
+            <div class="bl-challenge-icon">${tmpl.icon}</div>
+            <div class="bl-challenge-info">
+                <div class="bl-challenge-name">${tmpl.name}</div>
+                <div class="bl-challenge-desc">${tmpl.desc}</div>
+                <div class="bl-prog-bar"><div class="bl-prog-fill" style="width:${pct}%"></div></div>
+                <div style="font-size:0.72rem;color:#333;margin-top:4px;">${c.progress||0}/${c.target}</div>
+                <div class="bl-challenge-coins">🪙 ${c.coins} BlinchiCoins</div>
+            </div>
+            ${c.completed ? '<div class="bl-challenge-done">✅</div>' : ''}
+        </div>`;
+    }).join('');
+}
+
+async function blProgressChallenge(type, increment) {
+    if (!currentUser) return;
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await sb.from('daily_challenges').select('*').eq('user_id', currentUser.id).eq('date', today).eq('type', type).eq('completed', false);
+    if (!data) return;
+    for (const c of data) {
+        const newProg = (c.progress||0) + increment;
+        const completed = newProg >= c.target;
+        await sb.from('daily_challenges').update({ progress: newProg, completed }).eq('id', c.id);
+        if (completed) { await blAwardCoins(c.coins, 'Daily challenge'); blToast('🏆 Challenge completed! +' + c.coins + ' BlinchiCoins'); }
+    }
+}
+
+// ─── Achievements ─────────────────────────────────────────────────────────────
+const BL_ACHIEVEMENTS = [
+    { id:'first_game',    icon:'🎮', name:'First Play',         desc:'Play your first game',             coins:5,   type:'play_count',   target:1 },
+    { id:'ten_games',     icon:'🕹️', name:'Gamer',              desc:'Play 10 different games',          coins:20,  type:'play_count',   target:10 },
+    { id:'fifty_games',   icon:'🏆', name:'Elite Gamer',         desc:'Play 50 different games',          coins:100, type:'play_count',   target:50 },
+    { id:'first_comment', icon:'💬', name:'Commentator',         desc:'Leave your first comment',         coins:5,   type:'comment_count',target:1 },
+    { id:'first_friend',  icon:'🤝', name:'Social Butterfly',    desc:'Add your first friend',            coins:15,  type:'friend_count', target:1 },
+    { id:'coin_100',      icon:'🪙', name:'Coin Collector',      desc:'Earn 100 BlinchiCoins',            coins:25,  type:'coins',        target:100 },
+    { id:'first_group',   icon:'👥', name:'Group Founder',       desc:'Create your first group',          coins:20,  type:'group_count',  target:1 },
+    { id:'play_hour',     icon:'⏱️', name:'Marathon',            desc:'Play for 1 hour total',            coins:30,  type:'play_time',    target:3600 },
+    { id:'saved_msg',     icon:'💾', name:'Memory Keeper',       desc:'Save your first chat message',     coins:10,  type:'save_msg',     target:1 },
+];
+
+async function blLoadAchievements() {
+    if (!currentUser) return;
+    const { data: unlocked } = await sb.from('user_achievements').select('achievement_id').eq('user_id', currentUser.id);
+    const unlockedIds = new Set((unlocked||[]).map(a => a.achievement_id));
+    const el = document.getElementById('bl-ach-list');
+    if (!el) return;
+    el.innerHTML = `<div class="bl-ach-grid">${BL_ACHIEVEMENTS.map(a => `
+        <div class="bl-ach-card ${unlockedIds.has(a.id)?'unlocked':''}">
+            <div class="bl-ach-icon">${a.icon}</div>
+            <div class="bl-ach-name">${a.name}</div>
+            <div class="bl-ach-desc">${a.desc}</div>
+            <div class="bl-ach-coins">🪙 ${a.coins} coins</div>
+            ${unlockedIds.has(a.id) ? '<div class="bl-ach-unlocked-tag">✓ UNLOCKED</div>' : '<div style="color:#222;font-size:0.72rem;margin-top:4px;">Locked</div>'}
+        </div>`).join('')}</div>`;
+}
+
+async function blCheckAchievements() {
+    if (!currentUser || !currentProfile) return;
+    const { data: existing } = await sb.from('user_achievements').select('achievement_id').eq('user_id', currentUser.id);
+    const unlockedIds = new Set((existing||[]).map(a => a.achievement_id));
+    for (const ach of BL_ACHIEVEMENTS) {
+        if (unlockedIds.has(ach.id)) continue;
+        let val = 0;
+        if (ach.type === 'play_count') val = currentProfile.games_played || 0;
+        if (ach.type === 'coins')      val = currentProfile.coins || 0;
+        if (val >= ach.target) {
+            await sb.from('user_achievements').insert({ user_id: currentUser.id, achievement_id: ach.id });
+            await blAwardCoins(ach.coins, 'Achievement: ' + ach.name);
+            blToast('🏆 Achievement unlocked: ' + ach.name + '!');
+        }
+    }
+}
+
+// ─── Coins ────────────────────────────────────────────────────────────────────
+async function blAwardCoins(amount, reason) {
+    if (!currentUser || !currentProfile) return;
+    const newCoins = (currentProfile.coins||0) + amount;
+    await sb.from('profiles').update({ coins: newCoins }).eq('id', currentUser.id);
+    currentProfile.coins = newCoins;
+    const els = ['bl-coins','profile-chip-coins'];
+    els.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = newCoins; });
+}
+
+// ─── Game time tracking ───────────────────────────────────────────────────────
+let blGameStartTime = null;
+
+function blStartGameTimer() { blGameStartTime = Date.now(); }
+
+async function blStopGameTimer() {
+    if (!blGameStartTime || !currentUser) return;
+    const secs = Math.round((Date.now() - blGameStartTime) / 1000);
+    blGameStartTime = null;
+    if (secs < 5) return;
+    // Update games_played
+    const newPlayed = (currentProfile?.games_played||0) + 1;
+    await sb.from('profiles').update({ games_played: newPlayed }).eq('id', currentUser.id);
+    if (currentProfile) currentProfile.games_played = newPlayed;
+    // Progress challenges
+    await blProgressChallenge('play_time', secs);
+    await blProgressChallenge('play_count', 1);
+    // Check achievements
+    blCheckAchievements();
 }
 
 window.onload = boot;
 </script>
 </body>
 </html>
-
-

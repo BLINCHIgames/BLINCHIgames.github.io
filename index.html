@@ -4,47 +4,46 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>BLINCHIGAMES | Elite Game Portal</title>
-
+    <link rel="icon" type="image/png" href="BLINCHI3-Photoroom.png">
+    <link rel="apple-touch-icon" href="BLINCHI3-Photoroom.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Popunder — fires on first click once per day, shows notice overlay -->
+    <!-- Popunder — fires on first click once per day -->
     <script>
         (function () {
-            const KEY     = 'blinchi_last_popunder';
+            const KEY = 'blinchi_last_popunder';
             const ONE_DAY = 24 * 60 * 60 * 1000;
-            const last    = parseInt(localStorage.getItem(KEY) || '0', 10);
+            const last = parseInt(localStorage.getItem(KEY) || '0', 10);
             if (Date.now() - last >= ONE_DAY) {
                 function firePopunder() {
                     document.removeEventListener('click', firePopunder, true);
                     const s = document.createElement('script');
-                    s.src   = 'https://authoritieswoundjoint.com/17/c4/34/17c434ad4a5c24351595e12ab0dcf7fa.js';
+                    s.src = 'https://authoritieswoundjoint.com/17/c4/34/17c434ad4a5c24351595e12ab0dcf7fa.js';
                     s.async = true;
                     document.head.appendChild(s);
                     localStorage.setItem(KEY, String(Date.now()));
-                    // Show the notice overlay
                     const notice = document.getElementById('popunder-notice');
                     if (notice) notice.classList.add('show');
                 }
                 document.addEventListener('click', firePopunder, true);
             }
         })();
-
         function closePopunderNotice() {
             const notice = document.getElementById('popunder-notice');
             if (notice) notice.classList.remove('show');
         }
     </script>
 
-    <!-- Social Ads — fires once per 20 minutes, never more -->
+    <!-- Social Ads — fires once per 20 minutes -->
     <script>
         (function () {
-            const KEY      = 'blinchi_last_social_ad';
+            const KEY = 'blinchi_last_social_ad';
             const COOLDOWN = 20 * 60 * 1000;
             function fireAd() {
                 const script = document.createElement('script');
-                script.src   = 'https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js';
+                script.src = 'https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js';
                 script.async = true;
                 document.head.appendChild(script);
                 localStorage.setItem(KEY, String(Date.now()));
@@ -77,213 +76,132 @@
             --transition: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        * { box-sizing: border-box; }
         body { background: var(--bg-dark); color: var(--text-main); font-family: var(--font-main); margin: 0; overflow-x: hidden; }
         .app-container { display: flex; min-height: 100vh; }
 
-        /* ── Left nav sidebar ── */
-        .sidebar {
-            width: 280px; background: var(--sidebar);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            height: 100vh; position: sticky; top: 0;
-            display: flex; flex-direction: column; z-index: 1000;
-        }
+        .sidebar { width: 280px; background: var(--sidebar); border-right: 1px solid rgba(255,255,255,0.05); height: 100vh; position: sticky; top: 0; display: flex; flex-direction: column; z-index: 100; flex-shrink: 0; }
         .sidebar-header { padding: 30px 25px 15px; }
-        .logo {
-            font-family: var(--font-display); font-size: 1.6rem; font-weight: 800;
-            color: #ffffff; text-decoration: none; display: flex; align-items: center; gap: 10px;
-        }
+        .logo { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--brand); }
         .search-box { padding: 0 20px 20px; }
-        .search-input-wrapper {
-            background: var(--surface); border-radius: var(--radius-md);
-            padding: 12px 16px; display: flex; align-items: center;
-            border: 1px solid transparent; transition: 0.2s;
-        }
+        .search-input-wrapper { background: var(--surface); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: center; border: 1px solid transparent; transition: 0.2s; }
         .search-input-wrapper:focus-within { border-color: var(--brand); }
-        .search-input-wrapper input {
-            background: transparent; border: none; color: white;
-            width: 100%; outline: none; margin-left: 10px; font-size: 0.9rem;
-        }
+        .search-input-wrapper input { background: transparent; border: none; color: white; width: 100%; outline: none; margin-left: 10px; font-size: 0.9rem; }
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 15px; scrollbar-width: none; }
-        .menu-label {
-            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px;
-            color: var(--text-secondary); font-weight: 800; margin: 20px 15px 10px;
-        }
-        .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 18px;
-            color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md);
-            font-weight: 500; transition: all 0.2s; cursor: pointer; border: none;
-            background: transparent; width: 100%; text-align: left; margin-bottom: 4px;
-        }
-        .nav-item:hover { color: #ffffff; background: var(--surface); }
-        .nav-item.active {
-            color: #ffffff; background: var(--brand-soft);
-            border-left: 4px solid var(--brand);
-            border-radius: 4px var(--radius-md) var(--radius-md) 4px;
-        }
+        .menu-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-secondary); font-weight: 800; margin: 20px 15px 10px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 18px; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md); font-weight: 500; transition: all 0.2s; cursor: pointer; border: none; background: transparent; width: 100%; text-align: left; margin-bottom: 4px; }
+        .nav-item:hover { color: #fff; background: var(--surface); }
+        .nav-item.active { color: #fff; background: var(--brand-soft); border-left: 4px solid var(--brand); border-radius: 4px var(--radius-md) var(--radius-md) 4px; }
 
-        /* ── Main content ── */
         .main-content { flex: 1; min-width: 0; padding: 0 40px; }
-        .section-title { font-family: var(--font-display); font-size: 1.75rem; margin-top: 2rem; margin-bottom: 1.5rem; color: #ffffff; }
+        .section-title { font-family: var(--font-display); font-size: 1.75rem; margin-top: 2rem; margin-bottom: 1.5rem; color: #fff; }
         #view-home .section-title:first-child { margin-top: 1rem; }
 
-        /* ── Game grid ── */
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 28px; padding: 10px 0 40px;
-        }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 28px; padding: 10px 0 40px; }
         .elite-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-
-        .game-card {
-            border-radius: var(--radius-md); transition: transform 0.3s var(--transition);
-            cursor: pointer; display: flex; flex-direction: column; position: relative;
-        }
+        .game-card { border-radius: var(--radius-md); transition: transform 0.3s var(--transition); cursor: pointer; display: flex; flex-direction: column; position: relative; }
         .game-card:hover { transform: translateY(-6px); }
-
-        .game-thumb {
-            aspect-ratio: 1/1; overflow: hidden; border-radius: var(--radius-md);
-            background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.05); position: relative;
-        }
-        .game-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: 0.4s; display: block; }
+        .game-thumb { aspect-ratio: 1/1; overflow: hidden; border-radius: var(--radius-md); background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); position: relative; }
+        .game-thumb img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; display: block; }
         .game-card:hover .game-thumb img { transform: scale(1.05); }
-
         .game-info { padding: 10px 5px 4px; }
-        .game-info h6 {
-            margin: 0 0 8px; font-size: 1rem; font-weight: 600;
-            color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .game-info h6 { margin: 0 0 8px; font-size: 1rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .badge-elite { position: absolute; top: 10px; left: 10px; background: var(--brand); color: #000; font-size: 0.7rem; font-weight: 800; padding: 5px 14px; border-radius: 30px; z-index: 10; text-transform: uppercase; box-shadow: 0 4px 15px rgba(50,255,14,0.4); }
 
-        /* ── Like / Dislike ── */
         .like-bar { display: flex; align-items: center; gap: 8px; padding: 0 5px 12px; }
-        .like-btn, .dislike-btn {
-            display: flex; align-items: center; gap: 5px;
-            background: var(--surface); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 30px; padding: 5px 11px; cursor: pointer;
-            color: var(--text-secondary); font-size: 0.78rem; font-weight: 600;
-            transition: all 0.2s; user-select: none; font-family: var(--font-main);
-        }
-        .like-btn:hover    { background: rgba(50,255,14,0.15);  border-color: var(--brand); color: var(--brand); }
-        .dislike-btn:hover { background: rgba(255,60,60,0.15);  border-color: #ff3c3c;     color: #ff3c3c; }
-        .like-btn.active    { background: rgba(50,255,14,0.2);  border-color: var(--brand); color: var(--brand); }
-        .dislike-btn.active { background: rgba(255,60,60,0.2);  border-color: #ff3c3c;     color: #ff3c3c; }
+        .like-btn, .dislike-btn { display: flex; align-items: center; gap: 5px; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 30px; padding: 5px 11px; cursor: pointer; color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; transition: all 0.2s; user-select: none; font-family: var(--font-main); }
+        .like-btn:hover { background: rgba(50,255,14,0.15); border-color: var(--brand); color: var(--brand); }
+        .dislike-btn:hover { background: rgba(255,60,60,0.15); border-color: #ff3c3c; color: #ff3c3c; }
+        .like-btn.active { background: rgba(50,255,14,0.2); border-color: var(--brand); color: var(--brand); }
+        .dislike-btn.active { background: rgba(255,60,60,0.2); border-color: #ff3c3c; color: #ff3c3c; }
 
-        /* ── Single grid ad slot ── */
-        .grid-ad-slot {
-            border-radius: var(--radius-md);
-            background: var(--surface);
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; min-height: 140px;
-        }
+        .grid-ad-slot { border-radius: var(--radius-md); background: var(--surface); border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 140px; }
 
-        .badge-elite {
-            position: absolute; top: 10px; left: 10px;
-            background: var(--brand); color: #000;
-            font-size: 0.7rem; font-weight: 800; padding: 5px 14px; border-radius: 30px;
-            z-index: 10; text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(50, 255, 14, 0.4);
-        }
-
-        #loading-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 3000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        #loading-overlay { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #scroll-sentinel { height: 150px; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 50px; }
 
-        /* ═══════════════ GAME STAGE ═══════════════ */
-        #game-stage {
-            display: none; position: fixed; inset: 0; background: var(--bg-dark);
-            z-index: 2500; overflow-y: auto; flex-direction: column;
-        }
+        #game-stage { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 2500; overflow-y: auto; }
         #game-stage.open { display: block; }
-
-        /* Top banner ad */
-        #stage-banner {
-            background: #0a0a0a;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex; align-items: center; justify-content: center;
-            min-height: 96px; overflow: hidden; position: relative; flex-shrink: 0;
-            transition: min-height 0.3s ease;
-        }
+        #stage-banner { background: #0a0a0a; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; min-height: 96px; overflow: hidden; position: relative; transition: min-height 0.3s ease; }
         #stage-banner.collapsed { min-height: 0 !important; height: 0; overflow: hidden; }
-        #banner-collapse-btn {
-            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-            background: rgba(255,255,255,0.08); border: none; color: #aaa;
-            border-radius: 8px; padding: 4px 10px; font-size: 0.72rem; cursor: pointer;
-            transition: background 0.2s; font-family: var(--font-main);
-        }
+        #banner-collapse-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.08); border: none; color: #aaa; border-radius: 8px; padding: 4px 10px; font-size: 0.72rem; cursor: pointer; font-family: var(--font-main); }
         #banner-collapse-btn:hover { background: rgba(255,255,255,0.18); color: #fff; }
-
-        /* Thin re-expand strip */
-        #banner-expand-strip {
-            display: none; background: #0a0a0a;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            text-align: center; padding: 5px 0; cursor: pointer;
-            color: #444; font-size: 0.72rem; flex-shrink: 0;
-        }
+        #banner-expand-strip { display: none; background: #0a0a0a; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; padding: 5px 0; cursor: pointer; color: #444; font-size: 0.72rem; }
         #banner-expand-strip:hover { color: #888; }
-
-        /* Stage header */
-        .stage-header {
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; background: var(--sidebar);
-            border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
-        }
-
-        /* Middle zone: game-col | right-ad-stack */
-        /* The entire #game-stage is now page-scroll, not inner scroll */
+        .stage-header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--sidebar); border-bottom: 1px solid rgba(255,255,255,0.08); }
         .stage-middle { display: flex; align-items: flex-start; }
-
-        /* Right ad stack: 160px ad + 1mm (≈4px) padding each side = 168px */
-        .stage-ad-right {
-            width: 168px; flex-shrink: 0;
-            background: var(--sidebar);
-            border-left: 1px solid rgba(255,255,255,0.06);
-            padding: 4px; display: flex; flex-direction: column;
-            align-items: center; gap: 8px;
-            /* Sticky so ads stay visible as user scrolls below-game */
-            position: sticky; top: 0; align-self: flex-start;
-        }
-
-        /* Game column: fills all space to the left of ad stack */
-        .game-col {
-            flex: 1; min-width: 0; display: flex; flex-direction: column;
-            background: #000;
-        }
+        .stage-ad-right { width: 168px; flex-shrink: 0; background: var(--sidebar); border-left: 1px solid rgba(255,255,255,0.06); padding: 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: sticky; top: 0; align-self: flex-start; }
+        .game-col { flex: 1; min-width: 0; display: flex; flex-direction: column; background: #000; }
         #stage-iframe { width: 100%; border: none; background: #000; flex-shrink: 0; }
-
-        /* Below-game zone */
         #below-game { background: var(--bg-dark); padding: 22px 28px 60px; }
         #game-like-bar { margin-bottom: 16px; }
-        #stage-banner-below {
-            margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
-            background: #0a0a0a; border-radius: 8px; overflow: hidden; min-height: 96px;
-        }
-        #related-title {
-            font-family: var(--font-display); font-size: 1.2rem;
-            margin-bottom: 14px; color: #fff;
-        }
-        #related-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 18px;
-        }
+        #stage-banner-below { margin-bottom: 20px; display: flex; align-items: center; justify-content: center; background: #0a0a0a; border-radius: 8px; overflow: hidden; min-height: 96px; }
+        #related-title { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 14px; color: #fff; }
+        #related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; }
 
-        /* Fullscreen prompt overlay */
-        #fs-prompt {
-            display: none; position: fixed; inset: 0; z-index: 9000;
-            background: rgba(0,0,0,0.72); align-items: center; justify-content: center;
-        }
-        .fs-prompt-box {
-            background: #111; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 18px; padding: 32px 40px; text-align: center; max-width: 380px;
-        }
+        #fs-prompt { display: none; position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.72); align-items: center; justify-content: center; }
+        .fs-prompt-box { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 32px 40px; text-align: center; max-width: 380px; }
         .fs-prompt-box p:first-child { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
         .fs-prompt-box p:last-of-type { color: #aaa; font-size: 0.9rem; margin-bottom: 24px; }
         .fs-btn-yes { background: var(--brand); color: #000; border: none; border-radius: 30px; padding: 10px 28px; font-weight: 700; cursor: pointer; margin-right: 10px; }
-        .fs-btn-no  { background: #222; color: #fff; border: 1px solid #333; border-radius: 30px; padding: 10px 28px; font-weight: 600; cursor: pointer; }
+        .fs-btn-no { background: #222; color: #fff; border: 1px solid #333; border-radius: 30px; padding: 10px 28px; font-weight: 600; cursor: pointer; }
+
+        #popunder-notice { display: none; position: fixed; inset: 0; z-index: 9500; background: rgba(255,255,255,0.18); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+        #popunder-notice.show { display: flex; }
+        .popunder-box { background: #111; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 36px 40px; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        .popunder-box .pu-icon { font-size: 2.4rem; margin-bottom: 14px; }
+        .popunder-box h3 { font-family: var(--font-display); font-size: 1.3rem; color: #fff; margin-bottom: 10px; }
+        .popunder-box p { color: #aaa; font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
+        .pu-btn { background: var(--brand); color: #000; border: none; border-radius: 30px; padding: 11px 32px; font-weight: 700; font-size: 0.95rem; cursor: pointer; font-family: var(--font-main); }
+
+        #adblock-wall { display: none; position: fixed; inset: 0; z-index: 9999; background: #000; align-items: center; justify-content: center; }
+        #adblock-wall.show { display: flex; }
+        .adblock-box { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px 44px; text-align: center; max-width: 460px; width: 90%; }
+        .adblock-box .ab-icon { font-size: 3rem; margin-bottom: 16px; }
+        .adblock-box h2 { font-family: var(--font-display); font-size: 1.5rem; color: #fff; margin-bottom: 12px; }
+        .adblock-box p { color: #aaa; font-size: 0.92rem; line-height: 1.65; margin-bottom: 28px; }
+        .ab-btn { background: var(--brand); color: #000; border: none; border-radius: 30px; padding: 12px 36px; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: var(--font-main); }
+
+        /* Top right chip */
+        #top-right-chip { position: fixed; top: 16px; right: 20px; z-index: 200; display: flex; align-items: center; gap: 10px; }
+        .online-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brand); display: inline-block; margin-right: 5px; box-shadow: 0 0 6px var(--brand); }
+
+        /* Comments panel */
+        #comments-panel { display: none; position: fixed; right: 0; top: 0; bottom: 0; width: 380px; background: #0d0d0d; border-left: 1px solid rgba(255,255,255,0.08); z-index: 3000; flex-direction: column; }
+        #comments-panel.show { display: flex; }
+        .cpanel-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .cpanel-header h3 { font-family: var(--font-display); font-size: 1.1rem; margin: 0; }
+        .cpanel-close { background: none; border: none; color: #aaa; font-size: 1.4rem; cursor: pointer; }
+        .comments-list { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+        .comment-item { background: #1a1a1a; border-radius: 12px; padding: 12px 14px; }
+        .comment-author { font-size: 0.8rem; font-weight: 700; color: var(--brand); margin-bottom: 4px; }
+        .comment-text { font-size: 0.9rem; color: #ddd; line-height: 1.5; }
+        .comment-time { font-size: 0.75rem; color: #555; margin-top: 5px; }
+        .comment-input-area { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 10px; align-items: flex-end; }
+        .comment-input-area textarea { flex: 1; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 12px; color: #fff; font-size: 0.9rem; resize: none; outline: none; font-family: var(--font-main); min-height: 42px; max-height: 100px; }
+        .comment-input-area textarea:focus { border-color: var(--brand); }
+        .comment-send-btn { background: var(--brand); color: #000; border: none; border-radius: 12px; padding: 10px 16px; cursor: pointer; font-weight: 700; font-size: 0.9rem; }
+        .login-prompt-comment { padding: 20px; text-align: center; color: #aaa; font-size: 0.9rem; }
+        .login-prompt-comment a { color: var(--brand); cursor: pointer; }
+
+        /* Auth modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 9400; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 22px; padding: 36px 40px; width: 90%; max-width: 420px; position: relative; }
+        .modal-box h2 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 6px; }
+        .modal-box p.sub { color: #aaa; font-size: 0.88rem; margin-bottom: 24px; }
+        .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: #aaa; font-size: 1.3rem; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #aaa; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input { width: 100%; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 11px 14px; color: #fff; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus { border-color: var(--brand); }
+        .btn-primary-brand { width: 100%; background: var(--brand); color: #000; border: none; border-radius: 12px; padding: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 4px; }
+        .modal-switch { text-align: center; margin-top: 18px; color: #aaa; font-size: 0.88rem; }
+        .modal-switch a { color: var(--brand); cursor: pointer; text-decoration: none; }
+        .modal-error { color: #ff5555; font-size: 0.85rem; margin-top: 8px; display: none; }
+        .modal-success { color: var(--brand); font-size: 0.85rem; margin-top: 8px; display: none; }
 
         @media (max-width: 992px) {
             .sidebar { width: 80px; }
@@ -291,88 +209,52 @@
             .nav-item { justify-content: center; padding: 15px; }
             .stage-ad-right { display: none; }
         }
-
-        /* ── Popunder notice overlay ── */
-        #popunder-notice {
-            display: none; position: fixed; inset: 0; z-index: 9500;
-            background: rgba(255,255,255,0.18);
-            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-            align-items: center; justify-content: center;
-        }
-        #popunder-notice.show { display: flex; }
-        .popunder-box {
-            background: #111; border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 20px; padding: 36px 40px; text-align: center;
-            max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-        }
-        .popunder-box .pu-icon { font-size: 2.4rem; margin-bottom: 14px; }
-        .popunder-box h3 { font-family: var(--font-display); font-size: 1.3rem; color: #fff; margin-bottom: 10px; }
-        .popunder-box p  { color: #aaa; font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
-        .pu-btn {
-            background: var(--brand); color: #000; border: none;
-            border-radius: 30px; padding: 11px 32px;
-            font-weight: 700; font-size: 0.95rem; cursor: pointer;
-            font-family: var(--font-main); transition: opacity 0.2s;
-        }
-        .pu-btn:hover { opacity: 0.85; }
-
-        /* ── Adblock wall ── */
-        #adblock-wall {
-            display: none; position: fixed; inset: 0; z-index: 9999;
-            background: #000; align-items: center; justify-content: center;
-        }
-        #adblock-wall.show { display: flex; }
-        .adblock-box {
-            background: #111; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 40px 44px; text-align: center;
-            max-width: 460px; width: 90%;
-        }
-        .adblock-box .ab-icon { font-size: 3rem; margin-bottom: 16px; }
-        .adblock-box h2 { font-family: var(--font-display); font-size: 1.5rem; color: #fff; margin-bottom: 12px; }
-        .adblock-box p  { color: #aaa; font-size: 0.92rem; line-height: 1.65; margin-bottom: 28px; }
-        .ab-btn {
-            background: var(--brand); color: #000; border: none;
-            border-radius: 30px; padding: 12px 36px;
-            font-weight: 700; font-size: 1rem; cursor: pointer;
-            font-family: var(--font-main); transition: opacity 0.2s;
-        }
-        .ab-btn:hover { opacity: 0.85; }
     </style>
 </head>
 <body>
 
-<!-- Popunder notice overlay -->
 <div id="popunder-notice">
     <div class="popunder-box">
         <div class="pu-icon">📢</div>
         <h3>Just One Quick Ad</h3>
-        <p>A new tab has opened with an ad. This happens once per day and is how we keep BlinchiGames free for everyone. Thank you for your support!</p>
+        <p>A new tab has opened with an ad. This happens once per day and keeps BlinchiGames free for everyone. Thank you!</p>
         <button class="pu-btn" onclick="closePopunderNotice()">Got it, thanks!</button>
     </div>
 </div>
 
-<!-- Adblock wall -->
 <div id="adblock-wall">
     <div class="adblock-box">
         <div class="ab-icon">🚫</div>
         <h2>Ad Blocker Detected</h2>
-        <p>BlinchiGames is completely free to play. To keep it that way, we rely on ads to cover server and running costs. Please disable your ad blocker and refresh the page to continue.</p>
+        <p>BlinchiGames is free to play. We rely on ads to keep it that way. Please disable your ad blocker and refresh.</p>
         <button class="ab-btn" onclick="window.location.reload()">I've disabled it — Refresh</button>
     </div>
 </div>
 
 <div id="loading-overlay">
-    <h2 class="logo mb-4" style="font-size: 3.5rem;">BLINCHI<span>GAMES</span></h2>
-    <div class="spinner-border" style="color: var(--brand); width: 3.5rem; height: 3.5rem;" role="status"></div>
-    <p class="mt-4 text-white opacity-50 fw-bold letter-spacing-1">LOADING GAMES</p>
+    <h2 class="logo mb-4" style="font-size:3.5rem;">BLINCHI<span>GAMES</span></h2>
+    <div class="spinner-border" style="color:var(--brand);width:3.5rem;height:3.5rem;" role="status"></div>
+    <p class="mt-4 text-white opacity-50 fw-bold">LOADING GAMES</p>
 </div>
 
-<!-- ═══ MAIN PORTAL ═══ -->
+<!-- Top right chip -->
+<div id="top-right-chip">
+    <div id="signin-nudge" style="display:flex;align-items:center;gap:8px;background:#1a1a1a;border:1px solid rgba(50,255,14,0.3);border-radius:20px;padding:6px 14px;cursor:pointer;" onclick="openAuthModal()">
+        <i class="bi bi-person-circle" style="color:var(--brand);font-size:1rem;"></i>
+        <span style="font-size:0.82rem;font-weight:600;color:#ccc;">Sign in / Register</span>
+    </div>
+    <div id="profile-chip" style="display:none;align-items:center;gap:8px;background:#1a1a1a;border:1px solid rgba(50,255,14,0.3);border-radius:20px;padding:5px 14px;cursor:pointer;" onclick="goToLive()">
+        <div class="online-dot"></div>
+        <span id="profile-chip-name" style="font-size:0.85rem;font-weight:700;color:#fff;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <span style="font-size:0.78rem;color:var(--brand);font-weight:700;">🪙 <span id="profile-chip-coins">0</span></span>
+    </div>
+</div>
+
 <div class="app-container">
     <aside class="sidebar">
         <div class="sidebar-header">
             <a href="#" class="logo" onclick="location.reload()">
-                <i class="bi bi-controller" style="color: var(--brand);"></i> BLINCHI<span>GAMES</span>
+                <i class="bi bi-controller" style="color:var(--brand);"></i> BLINCHI<span>GAMES</span>
             </a>
         </div>
         <div class="search-box">
@@ -386,8 +268,12 @@
             <button class="nav-item active" id="btn-home" onclick="showSection('home', this)">
                 <i class="bi bi-grid-1x2-fill"></i> <span>Home</span>
             </button>
-            <div class="menu-label">Elite Categories</div>
+            <div class="menu-label">Categories</div>
             <div id="cat-nav-container"></div>
+            <div class="menu-label">BlinchiLive</div>
+            <button class="nav-item" onclick="goToLive()">
+                <i class="bi bi-broadcast" style="color:var(--brand);"></i> <span>BlinchiLive</span>
+            </button>
             <div class="menu-label">Social</div>
             <a href="https://www.tiktok.com/@blinchigames3" target="_blank" class="nav-item">
                 <i class="bi bi-tiktok"></i> <span>TikTok</span>
@@ -400,7 +286,6 @@
             <h2 class="section-title">Elite Collection</h2>
             <div id="elite-grid" class="game-grid elite-grid"></div>
             <h2 class="section-title" id="main-lib-title">Global Library</h2>
-            <!-- Static 300×250 library ad — always visible at top of grid -->
             <div class="game-grid" style="padding-bottom:0;">
                 <div class="grid-ad-slot">
                     <script>atOptions={'key':'70cf6dd8abb266eb5a0f8dee6db632cf','format':'iframe','height':250,'width':300,'params':{}};</script>
@@ -409,27 +294,22 @@
             </div>
             <div id="home-grid" class="game-grid"></div>
         </div>
-
         <div id="view-cat" style="display:none">
             <h2 id="cat-display-title" class="section-title"></h2>
             <div id="cat-grid" class="game-grid"></div>
         </div>
-
         <div id="view-search" style="display:none">
             <h2 id="search-display-title" class="section-title"></h2>
             <div id="search-grid" class="game-grid"></div>
         </div>
-
         <div id="scroll-sentinel">
-            <div class="spinner-border" style="color: var(--brand);" role="status"></div>
+            <div class="spinner-border" style="color:var(--brand);" role="status"></div>
         </div>
     </main>
 </div>
 
-<!-- ═══ GAME STAGE ═══ -->
+<!-- Game Stage -->
 <div id="game-stage">
-
-    <!-- Top banner ad (728×90) -->
     <div id="stage-banner">
         <div id="ad-banner-top">
             <script>atOptions={'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':90,'width':728,'params':{}};</script>
@@ -438,8 +318,6 @@
         <button id="banner-collapse-btn" onclick="collapseBanner()">▲ Hide Ad</button>
     </div>
     <div id="banner-expand-strip" onclick="expandBanner()">▼ Show Ad</div>
-
-    <!-- Header bar -->
     <div class="stage-header">
         <div class="d-flex align-items-center">
             <button class="btn btn-dark rounded-pill px-4 fw-bold border-secondary" onclick="closeGame()">
@@ -447,20 +325,14 @@
             </button>
             <span id="stage-title" class="ms-4 text-white fw-bold small text-uppercase"></span>
         </div>
-        <button class="btn rounded-pill px-4 fw-bold" style="background: var(--brand); color: #000; border: none;" onclick="handleFullscreen()">
+        <button class="btn rounded-pill px-4 fw-bold" style="background:var(--brand);color:#000;border:none;" onclick="handleFullscreen()">
             <i class="bi bi-arrows-fullscreen me-2"></i> FULLSCREEN
         </button>
     </div>
-
-    <!-- Middle: game | right-ad-stack -->
     <div class="stage-middle">
-
-        <!-- Game column (iframe + below-game) -->
         <div class="game-col" id="game-col">
             <iframe id="stage-iframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
-
             <div id="below-game">
-                <!-- Like / dislike for current game -->
                 <div id="game-like-bar" class="like-bar">
                     <button class="like-btn" id="stage-like-btn" onclick="voteGame('like')">
                         <i class="bi bi-hand-thumbs-up-fill"></i> <span id="stage-like-count">0</span>
@@ -468,29 +340,24 @@
                     <button class="dislike-btn" id="stage-dislike-btn" onclick="voteGame('dislike')">
                         <i class="bi bi-hand-thumbs-down-fill"></i> <span id="stage-dislike-count">0</span>
                     </button>
+                    <button class="like-btn" onclick="openComments()" style="margin-left:auto;">
+                        <i class="bi bi-chat-dots-fill"></i> <span id="stage-comment-count">0</span>
+                    </button>
                 </div>
-
-                <!-- Banner ad below like buttons, above related games -->
                 <div id="stage-banner-below">
-                    <div id="ad-below-game">
-                        <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
-                        <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
-                    </div>
+                    <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
+                    <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
                 </div>
-
-                <!-- Related games -->
                 <div id="related-title">Related Games</div>
                 <div id="related-grid"></div>
             </div>
         </div>
-
-        <!-- Right ad stack: 160×600 on top, 160×300 below -->
         <div class="stage-ad-right">
-            <div id="ad-right-top">
+            <div>
                 <script>atOptions={'key':'0d1d9860b64193bffb24174fa1adda1d','format':'iframe','height':600,'width':160,'params':{}};</script>
                 <script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script>
             </div>
-            <div id="ad-right-bottom">
+            <div>
                 <script>atOptions={'key':'6e1109cad98d336d18e23b0a2087bbc8','format':'iframe','height':300,'width':160,'params':{}};</script>
                 <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
             </div>
@@ -498,52 +365,212 @@
     </div>
 </div>
 
-<!-- Fullscreen / collapse prompt -->
 <div id="fs-prompt">
     <div class="fs-prompt-box">
         <p>Collapse the ad banner?</p>
         <p>Hiding the top ad gives you more room while in fullscreen.</p>
         <button class="fs-btn-yes" onclick="fsPromptYes()">Yes, hide it</button>
-        <button class="fs-btn-no"  onclick="fsPromptNo()">No thanks</button>
+        <button class="fs-btn-no" onclick="fsPromptNo()">No thanks</button>
     </div>
 </div>
 
+<!-- Auth Modal -->
+<div class="modal-overlay" id="auth-modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeAuthModal()">×</button>
+        <div id="auth-signin-view">
+            <h2>Welcome back</h2>
+            <p class="sub">Sign in to your BlinchiUser account</p>
+            <div class="form-group"><label>Email</label><input type="email" id="signin-email" placeholder="Enter email"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="signin-pass" placeholder="Enter password"></div>
+            <p class="modal-error" id="signin-error"></p>
+            <button class="btn-primary-brand" onclick="doSignIn()">Sign In</button>
+            <div class="modal-switch">Don't have an account? <a onclick="switchAuth('signup')">Create one</a></div>
+        </div>
+        <div id="auth-signup-view" style="display:none">
+            <h2>Join BlinchiGames</h2>
+            <p class="sub">Create your free BlinchiUser account</p>
+            <div class="form-group"><label>Username</label><input type="text" id="signup-username" placeholder="Choose a username"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="signup-email" placeholder="Enter email"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="signup-pass" placeholder="Min 6 characters"></div>
+            <p class="modal-error" id="signup-error"></p>
+            <p class="modal-success" id="signup-success"></p>
+            <button class="btn-primary-brand" onclick="doSignUp()">Create Account</button>
+            <div class="modal-switch">Already have an account? <a onclick="switchAuth('signin')">Sign in</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- Comments Panel -->
+<div id="comments-panel">
+    <div class="cpanel-header">
+        <h3><i class="bi bi-chat-dots-fill me-2" style="color:var(--brand);"></i>Comments</h3>
+        <button class="cpanel-close" onclick="closeComments()">×</button>
+    </div>
+    <div class="comments-list" id="comments-list"></div>
+    <div class="comment-input-area" id="comment-input-area" style="display:none;">
+        <textarea id="comment-text" placeholder="Write a comment..." rows="1"></textarea>
+        <button class="comment-send-btn" onclick="submitComment()"><i class="bi bi-send-fill"></i></button>
+    </div>
+    <div class="login-prompt-comment" id="comment-login-prompt" style="display:none;">
+        <a onclick="openAuthModal()">Sign in</a> to leave a comment
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// ─── Elite hand-picked games ─────────────────────────────────────────────────
+// ─── Supabase ─────────────────────────────────────────────────────────────────
+const SUPA_URL = 'https://ezdiptkyfwttxjuxkusg.supabase.co';
+const SUPA_KEY = 'sb_publishable_ORNNniNlw9b8a9I6VAh9Tw_w4QZPDBU';
+let sb = null;
+try { sb = supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) { console.warn('Supabase unavailable'); }
+let currentUser = null, currentProfile = null;
+
+async function initAuth() {
+    if (!sb) return;
+    try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) await onSignedIn(session.user);
+        sb.auth.onAuthStateChange(async (event, session) => {
+            if (session) await onSignedIn(session.user);
+            else onSignedOut();
+        });
+    } catch(e) { console.warn('Auth error', e); }
+}
+
+async function onSignedIn(user) {
+    currentUser = user;
+    let { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    if (!prof) {
+        const username = user.user_metadata?.username || 'Player' + Math.floor(Math.random()*9999);
+        const { data: np } = await sb.from('profiles').insert({ id: user.id, username, email: user.email, coins: 0, games_played: 0 }).select().single();
+        prof = np;
+    }
+    currentProfile = prof;
+    updateAuthUI();
+}
+
+function onSignedOut() { currentUser = null; currentProfile = null; updateAuthUI(); }
+
+function updateAuthUI() {
+    const nudge = document.getElementById('signin-nudge');
+    const chip = document.getElementById('profile-chip');
+    if (currentProfile) {
+        if (nudge) nudge.style.display = 'none';
+        if (chip) chip.style.display = 'flex';
+        document.getElementById('profile-chip-name').textContent = currentProfile.username;
+        document.getElementById('profile-chip-coins').textContent = currentProfile.coins || 0;
+    } else {
+        if (nudge) nudge.style.display = 'flex';
+        if (chip) chip.style.display = 'none';
+    }
+}
+
+function goToLive() { window.location.href = 'blinchilive.html'; }
+function openAuthModal() { document.getElementById('auth-modal').classList.add('show'); }
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
+function switchAuth(v) {
+    document.getElementById('auth-signin-view').style.display = v === 'signin' ? '' : 'none';
+    document.getElementById('auth-signup-view').style.display = v === 'signup' ? '' : 'none';
+}
+
+async function doSignIn() {
+    if (!sb) return;
+    const email = document.getElementById('signin-email').value.trim();
+    const pass = document.getElementById('signin-pass').value;
+    const errEl = document.getElementById('signin-error');
+    errEl.style.display = 'none';
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; }
+    else closeAuthModal();
+}
+
+async function doSignUp() {
+    if (!sb) return;
+    const username = document.getElementById('signup-username').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const pass = document.getElementById('signup-pass').value;
+    const errEl = document.getElementById('signup-error');
+    const okEl = document.getElementById('signup-success');
+    errEl.style.display = 'none'; okEl.style.display = 'none';
+    if (!username || !email || !pass) { errEl.textContent = 'All fields required'; errEl.style.display = 'block'; return; }
+    if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.style.display = 'block'; return; }
+    const { data: existing } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+    if (existing) { errEl.textContent = 'Username already taken'; errEl.style.display = 'block'; return; }
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { username } } });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+    if (data.user) await sb.from('profiles').upsert({ id: data.user.id, username, email, coins: 0, games_played: 0 });
+    okEl.textContent = 'Account created! Check your email to verify, then sign in.';
+    okEl.style.display = 'block';
+}
+
+// ─── Comments ─────────────────────────────────────────────────────────────────
+let currentGame = null;
+
+function openComments() {
+    document.getElementById('comments-panel').classList.add('show');
+    document.getElementById('comment-input-area').style.display = currentUser ? 'flex' : 'none';
+    document.getElementById('comment-login-prompt').style.display = currentUser ? 'none' : 'block';
+    loadComments();
+}
+function closeComments() { document.getElementById('comments-panel').classList.remove('show'); }
+
+async function loadComments() {
+    if (!currentGame || !sb) return;
+    const list = document.getElementById('comments-list');
+    list.innerHTML = '<div style="text-align:center;color:#444;padding:30px;">Loading...</div>';
+    try {
+        const { data } = await sb.from('comments').select('body, created_at, profiles(username)').eq('game_title', currentGame.title).order('created_at', { ascending: false }).limit(50);
+        if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;color:#444;padding:40px 0;">No comments yet. Be the first!</div>'; document.getElementById('stage-comment-count').textContent = '0'; return; }
+        document.getElementById('stage-comment-count').textContent = data.length;
+        list.innerHTML = data.map(c => `<div class="comment-item"><div class="comment-author">@${escHtml(c.profiles?.username||'BlinchiUser')}</div><div class="comment-text">${escHtml(c.body)}</div><div class="comment-time">${timeAgo(c.created_at)}</div></div>`).join('');
+    } catch(e) { list.innerHTML = '<div style="color:#555;text-align:center;padding:20px;">Could not load comments.</div>'; }
+}
+
+async function submitComment() {
+    if (!currentUser || !currentGame || !sb) return;
+    const ta = document.getElementById('comment-text');
+    const body = ta.value.trim();
+    if (!body) return;
+    ta.value = '';
+    await sb.from('comments').insert({ user_id: currentUser.id, game_title: currentGame.title, body });
+    loadComments();
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function timeAgo(ts) {
+    if (!ts) return '';
+    const d = Math.round((Date.now() - new Date(ts)) / 1000);
+    if (d < 60) return 'just now';
+    if (d < 3600) return Math.floor(d/60) + 'm ago';
+    if (d < 86400) return Math.floor(d/3600) + 'h ago';
+    return Math.floor(d/86400) + 'd ago';
+}
+
+// ─── Game portal ──────────────────────────────────────────────────────────────
 const ELITE_LIST = [
-    { title: 'Majestic Games', category: 'Elite',        url: 'https://majesticwafr.github.io',      thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
-    { title: 'Poxel.io',       category: 'Elite IO',     url: 'https://poxel.io/',                    thumb: '' },
-    { title: 'Speed Stars 2',  category: 'Elite Racing', url: 'https://speedstars2.io/',              thumb: '' },
-    { title: 'Basket Random',  category: 'Elite Sports', url: 'https://basketrandom.github.io/',      thumb: '' },
+    { title: 'Majestic Games', category: 'Elite', url: 'https://majesticwafr.github.io', thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
+    { title: 'Poxel.io', category: 'Elite IO', url: 'https://poxel.io/', thumb: '' },
+    { title: 'Speed Stars 2', category: 'Elite Racing', url: 'https://speedstars2.io/', thumb: '' },
+    { title: 'Basket Random', category: 'Elite Sports', url: 'https://basketrandom.github.io/', thumb: '' },
 ];
+const GENRES = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
+const PAGE_INIT = 100, PAGE_STEP = 20;
+let masterCatalog = [], activeList = [], itemsLoaded = 0, viewMode = 'home', observer = null;
 
-const GENRES     = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
-const PAGE_INIT  = 100;
-const PAGE_STEP  = 20;
-
-let masterCatalog = [];
-let activeList    = [];
-let itemsLoaded   = 0;
-let viewMode      = 'home';
-let observer      = null;
-let currentGame   = null;
-
-// ─── Vote storage (localStorage per browser) ─────────────────────────────────
-function getLikes(t)    { return parseInt(localStorage.getItem('vl_' + t) || '0', 10); }
+function getLikes(t) { return parseInt(localStorage.getItem('vl_' + t) || '0', 10); }
 function getDislikes(t) { return parseInt(localStorage.getItem('vd_' + t) || '0', 10); }
-function getMyVote(t)   { return localStorage.getItem('vm_' + t) || ''; }
-
+function getMyVote(t) { return localStorage.getItem('vm_' + t) || ''; }
 function setVote(title, type) {
     const prev = getMyVote(title);
     if (prev === type) return;
-    if (prev === 'like')    localStorage.setItem('vl_' + title, Math.max(0, getLikes(title)    - 1));
+    if (prev === 'like') localStorage.setItem('vl_' + title, Math.max(0, getLikes(title) - 1));
     if (prev === 'dislike') localStorage.setItem('vd_' + title, Math.max(0, getDislikes(title) - 1));
-    if (type === 'like')    localStorage.setItem('vl_' + title, getLikes(title)    + 1);
+    if (type === 'like') localStorage.setItem('vl_' + title, getLikes(title) + 1);
     if (type === 'dislike') localStorage.setItem('vd_' + title, getDislikes(title) + 1);
     localStorage.setItem('vm_' + title, type);
 }
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
     const eg = document.getElementById('elite-grid');
     ELITE_LIST.forEach(g => eg.innerHTML += generateCard(g, true));
@@ -560,15 +587,11 @@ async function boot() {
         'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=5',
     ];
 
-    const results = await Promise.all(
-        feedUrls.map(url => fetch(url).then(r => r.json()).catch(() => []))
-    );
-
+    const results = await Promise.all(feedUrls.map(url => fetch(url).then(r => r.json()).catch(() => [])));
     masterCatalog = [...ELITE_LIST];
 
     results.forEach((data, idx) => {
         const url = feedUrls[idx];
-
         if (url.includes('g_min.json')) {
             if (!Array.isArray(data)) return;
             data.forEach(g => {
@@ -578,7 +601,6 @@ async function boot() {
             });
             return;
         }
-
         if (url.includes('gamepix.com') || url.includes('Gamepix.json')) {
             const items = Array.isArray(data) ? data : (data.data || data.items || []);
             items.forEach(g => {
@@ -589,7 +611,6 @@ async function boot() {
             });
             return;
         }
-
         if (!Array.isArray(data)) return;
         data.forEach(g => {
             let gameUrl = g.embed || g.url || g.link || '';
@@ -600,38 +621,31 @@ async function boot() {
     });
 
     const seen = new Set();
-    masterCatalog = masterCatalog.filter(g => {
-        const key = (g.title || '').toLowerCase();
-        return seen.has(key) ? false : seen.add(key);
-    });
+    masterCatalog = masterCatalog.filter(g => { const key = (g.title || '').toLowerCase(); return seen.has(key) ? false : seen.add(key); });
 
     initNav();
     showHome();
     setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
-
     detectAdblock();
     sizeIframe();
     window.addEventListener('resize', sizeIframe);
+    initAuth().catch(() => {});
 }
 
 function sizeIframe() {
-    const ifr    = document.getElementById('stage-iframe');
+    const ifr = document.getElementById('stage-iframe');
     const banner = document.getElementById('stage-banner');
     if (!ifr) return;
-    const bannerH  = banner.classList.contains('collapsed') ? 0 : (banner.offsetHeight || 96);
-    const available = window.innerHeight - bannerH - 60; // 60 = header
-    // Use 85% of available height — much bigger game screen
-    ifr.style.height = Math.max(400, Math.round(available * 0.85)) + 'px';
+    const bannerH = banner.classList.contains('collapsed') ? 0 : (banner.offsetHeight || 96);
+    ifr.style.height = Math.max(400, Math.round((window.innerHeight - bannerH - 60) * 0.85)) + 'px';
 }
 
-// ─── Nav ──────────────────────────────────────────────────────────────────────
 function initNav() {
     const container = document.getElementById('cat-nav-container');
     container.innerHTML = '';
     GENRES.forEach(cat => {
         const b = document.createElement('button');
         b.className = 'nav-item';
-        b.dataset.genre = cat;
         b.innerHTML = `<i class="bi bi-caret-right-fill"></i> <span>${cat}</span>`;
         b.onclick = () => filterByGenre(cat, b);
         container.appendChild(b);
@@ -639,20 +653,19 @@ function initNav() {
 }
 
 function hideAllViews() {
-    document.getElementById('view-home').style.display   = 'none';
-    document.getElementById('view-cat').style.display    = 'none';
-    document.getElementById('view-search').style.display = 'none';
+    ['view-home','view-cat','view-search'].forEach(id => document.getElementById(id).style.display = 'none');
 }
 function setActiveNav(btn) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     if (btn) btn.classList.add('active');
 }
 
+let singleAdInjected = false;
 function showHome() {
     viewMode = 'home'; itemsLoaded = 0; singleAdInjected = false;
     hideAllViews();
-    document.getElementById('view-home').style.display  = 'block';
-    document.getElementById('home-grid').innerHTML      = '';
+    document.getElementById('view-home').style.display = 'block';
+    document.getElementById('home-grid').innerHTML = '';
     document.getElementById('main-lib-title').innerText = 'Global Library';
     setActiveNav(document.getElementById('btn-home'));
     activeList = [...masterCatalog];
@@ -665,59 +678,44 @@ function showSection(type, btn) {
     showHome();
     setActiveNav(btn || document.getElementById('btn-home'));
 }
-
 function filterByGenre(genre, btn) {
     viewMode = 'cat'; itemsLoaded = 0;
     hideAllViews();
-    document.getElementById('view-cat').style.display      = 'block';
+    document.getElementById('view-cat').style.display = 'block';
     document.getElementById('cat-display-title').innerText = genre + ' Collection';
-    document.getElementById('cat-grid').innerHTML          = '';
+    document.getElementById('cat-grid').innerHTML = '';
     setActiveNav(btn);
     const q = genre.toLowerCase().replace(' games', '').trim();
-    activeList = masterCatalog.filter(g => (g.category || '').toLowerCase().includes(q) || (g.title || '').toLowerCase().includes(q));
+    activeList = masterCatalog.filter(g => (g.category||'').toLowerCase().includes(q) || (g.title||'').toLowerCase().includes(q));
     renderBatch(PAGE_INIT);
     resetObserver();
     window.scrollTo(0, 0);
 }
-
 function handleSearch() {
     const query = document.getElementById('game-search').value.toLowerCase().trim();
     if (!query) { showHome(); return; }
     viewMode = 'search'; itemsLoaded = 0;
     hideAllViews();
-    document.getElementById('view-search').style.display      = 'block';
+    document.getElementById('view-search').style.display = 'block';
     document.getElementById('search-display-title').innerText = `Search Results: "${query}"`;
-    document.getElementById('search-grid').innerHTML          = '';
+    document.getElementById('search-grid').innerHTML = '';
     setActiveNav(null);
-    activeList = masterCatalog.filter(g => (g.title || '').toLowerCase().includes(query) || (g.category || '').toLowerCase().includes(query));
+    activeList = masterCatalog.filter(g => (g.title||'').toLowerCase().includes(query) || (g.category||'').toLowerCase().includes(query));
     renderBatch(PAGE_INIT);
     resetObserver();
 }
-
-// ─── Render ───────────────────────────────────────────────────────────────────
 function getActiveGrid() {
-    if (viewMode === 'home')   return document.getElementById('home-grid');
-    if (viewMode === 'cat')    return document.getElementById('cat-grid');
+    if (viewMode === 'home') return document.getElementById('home-grid');
+    if (viewMode === 'cat') return document.getElementById('cat-grid');
     if (viewMode === 'search') return document.getElementById('search-grid');
 }
-
-let singleAdInjected = false;
-
 function renderBatch(count) {
-    const grid  = getActiveGrid();
+    const grid = getActiveGrid();
     const batch = activeList.slice(itemsLoaded, itemsLoaded + count);
-
-    batch.forEach(g => {
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = generateCard(g);
-        grid.appendChild(wrapper.firstElementChild);
-    });
-
+    batch.forEach(g => { const w = document.createElement('div'); w.innerHTML = generateCard(g); grid.appendChild(w.firstElementChild); });
     itemsLoaded += batch.length;
-    document.getElementById('scroll-sentinel').style.visibility =
-        itemsLoaded < activeList.length ? 'visible' : 'hidden';
+    document.getElementById('scroll-sentinel').style.visibility = itemsLoaded < activeList.length ? 'visible' : 'hidden';
 }
-
 function resetObserver() {
     if (observer) observer.disconnect();
     observer = new IntersectionObserver(entries => {
@@ -725,190 +723,95 @@ function resetObserver() {
     }, { rootMargin: '400px' });
     observer.observe(document.getElementById('scroll-sentinel'));
 }
-
-// ─── Card (library — no like/dislike) ────────────────────────────────────────
 function generateCard(g, isElite = false) {
-    const img       = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Elite+Game';
-    const safeTitle = (g.title    || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    const safeUrl   = (g.url      || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    const safeCat   = (g.category || '').replace(/'/g, "\\'");
-    return `
-        <div class="game-card" onclick="launchGame('${safeUrl}','${safeTitle}','${safeCat}')">
-            <div class="game-thumb">
-                ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
-                <img src="${img}" alt="${g.title || ''}" loading="lazy">
-            </div>
-            <div class="game-info">
-                <h6>${g.title || ''}</h6>
-            </div>
-        </div>`;
+    const img = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Game';
+    const safeTitle = (g.title || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const safeUrl = (g.url || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const safeCat = (g.category || '').replace(/'/g, "\\'");
+    return `<div class="game-card" onclick="launchGame('${safeUrl}','${safeTitle}','${safeCat}')">
+        <div class="game-thumb">${isElite ? '<div class="badge-elite">Elite</div>' : ''}<img src="${img}" alt="${g.title||''}" loading="lazy"></div>
+        <div class="game-info"><h6>${g.title||''}</h6></div>
+    </div>`;
 }
 
-// ─── Voting on library cards ──────────────────────────────────────────────────
-function voteCard(btn, type, title) {
-    setVote(title, type);
-    const bar = btn.closest('.like-bar');
-    const lb  = bar.querySelector('.like-btn');
-    const db  = bar.querySelector('.dislike-btn');
-    const mv  = getMyVote(title);
-    lb.classList.toggle('active', mv === 'like');
-    db.classList.toggle('active', mv === 'dislike');
-    lb.querySelector('span').textContent = getLikes(title);
-    db.querySelector('span').textContent = getDislikes(title);
-    if (currentGame && currentGame.title === title) updateStageLikeBar();
-}
-
-// ─── Voting inside the stage ─────────────────────────────────────────────────
-function voteGame(type) {
-    if (!currentGame) return;
-    setVote(currentGame.title, type);
-    updateStageLikeBar();
-}
+function voteGame(type) { if (!currentGame) return; setVote(currentGame.title, type); updateStageLikeBar(); }
 function updateStageLikeBar() {
     if (!currentGame) return;
-    const t  = currentGame.title;
-    const mv = getMyVote(t);
-    document.getElementById('stage-like-btn').classList.toggle('active',    mv === 'like');
+    const t = currentGame.title, mv = getMyVote(t);
+    document.getElementById('stage-like-btn').classList.toggle('active', mv === 'like');
     document.getElementById('stage-dislike-btn').classList.toggle('active', mv === 'dislike');
-    document.getElementById('stage-like-count').textContent    = getLikes(t);
+    document.getElementById('stage-like-count').textContent = getLikes(t);
     document.getElementById('stage-dislike-count').textContent = getDislikes(t);
 }
 
-// ─── Launch game ──────────────────────────────────────────────────────────────
 let gamesPlayedCount = 0;
-
 function launchGame(url, title, category) {
     currentGame = { url, title, category };
-    gamesPlayedCount++;
-
-    // Every 17 games, clear accumulated DOM/memory without touching localStorage
-    if (gamesPlayedCount % 17 === 0) {
-        cleanPortalCache();
-    }
-
+    if (++gamesPlayedCount % 17 === 0) cleanPortalCache();
     document.getElementById('game-stage').classList.add('open');
-    document.getElementById('stage-iframe').src      = url;
+    document.getElementById('stage-iframe').src = url;
     document.getElementById('stage-title').innerText = 'PLAYING: ' + title;
     document.body.style.overflow = 'hidden';
     updateStageLikeBar();
     renderRelated(title, category);
     sizeIframe();
-    // Scroll the stage overlay to top
     document.getElementById('game-stage').scrollTop = 0;
 }
-
 function closeGame() {
     document.getElementById('game-stage').classList.remove('open');
-    // Fully unload the game iframe to free memory
     const ifr = document.getElementById('stage-iframe');
     ifr.src = 'about:blank';
     setTimeout(() => { ifr.src = ''; }, 100);
     document.body.style.overflow = '';
     currentGame = null;
-    // Clear related grid DOM to free memory
     document.getElementById('related-grid').innerHTML = '';
-    // Purge any blob/object URLs the browser may have cached for this session
     cleanPortalCache();
 }
-
-// ─── Portal cache cleaner — clears rendering/script cache without touching game saves ──
 function cleanPortalCache() {
-    // Remove stale script tags injected by ad refreshes (keep only the live ones)
     document.querySelectorAll('script[data-ad-injected]').forEach(s => s.remove());
-    // Force GC hint by briefly toggling a style
-    const body = document.body;
-    body.style.display = 'none';
-    // eslint-disable-next-line no-unused-expressions
-    body.offsetHeight; // reflow
-    body.style.display = '';
+    const body = document.body; body.style.display = 'none'; body.offsetHeight; body.style.display = '';
 }
-
-// ─── Related games ────────────────────────────────────────────────────────────
 function renderRelated(title, category) {
     const grid = document.getElementById('related-grid');
     grid.innerHTML = '';
     const cat = (category || '').toLowerCase();
-    const related = masterCatalog
-        .filter(g => g.title !== title &&
-            ((g.category || '').toLowerCase() === cat ||
-             (g.category || '').toLowerCase().includes(cat) ||
-             cat.includes((g.category || '').toLowerCase())))
-        .slice(0, 18);
-
-    if (!related.length) {
-        grid.innerHTML = '<p style="color:#555;font-size:0.9rem;">No related games found.</p>';
-        return;
-    }
+    const related = masterCatalog.filter(g => g.title !== title && ((g.category||'').toLowerCase() === cat || (g.category||'').toLowerCase().includes(cat) || cat.includes((g.category||'').toLowerCase()))).slice(0, 18);
+    if (!related.length) { grid.innerHTML = '<p style="color:#555;font-size:0.9rem;">No related games found.</p>'; return; }
     related.forEach(g => {
-        const img     = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Game';
-        const st      = (g.title    || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        const su      = (g.url      || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        const sc      = (g.category || '').replace(/'/g, "\\'");
-        const el      = document.createElement('div');
-        el.className  = 'game-card';
-        el.innerHTML  = `
-            <div class="game-thumb" onclick="launchGame('${su}','${st}','${sc}')">
-                <img src="${img}" alt="${g.title||''}" loading="lazy">
-            </div>
-            <div class="game-info">
-                <h6 onclick="launchGame('${su}','${st}','${sc}')">${g.title||''}</h6>
-            </div>`;
+        const img = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Game';
+        const st = (g.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const su = (g.url||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const sc = (g.category||'').replace(/'/g,"\\'");
+        const el = document.createElement('div');
+        el.className = 'game-card';
+        el.innerHTML = `<div class="game-thumb" onclick="launchGame('${su}','${st}','${sc}')"><img src="${img}" alt="${g.title||''}" loading="lazy"></div><div class="game-info"><h6 onclick="launchGame('${su}','${st}','${sc}')">${g.title||''}</h6></div>`;
         grid.appendChild(el);
     });
 }
 
-// ─── Fullscreen with banner-collapse prompt ───────────────────────────────────
 function handleFullscreen() {
-    const banner = document.getElementById('stage-banner');
-    if (!banner.classList.contains('collapsed')) {
-        document.getElementById('fs-prompt').style.display = 'flex';
-    } else {
-        doFullscreen();
-    }
+    if (!document.getElementById('stage-banner').classList.contains('collapsed')) document.getElementById('fs-prompt').style.display = 'flex';
+    else doFullscreen();
 }
-function fsPromptYes() {
-    document.getElementById('fs-prompt').style.display = 'none';
-    collapseBanner();
-    doFullscreen();
-}
-function fsPromptNo() {
-    document.getElementById('fs-prompt').style.display = 'none';
-    doFullscreen();
-}
+function fsPromptYes() { document.getElementById('fs-prompt').style.display = 'none'; collapseBanner(); doFullscreen(); }
+function fsPromptNo() { document.getElementById('fs-prompt').style.display = 'none'; doFullscreen(); }
 function doFullscreen() {
     const ifr = document.getElementById('stage-iframe');
-    if      (ifr.requestFullscreen)       ifr.requestFullscreen();
+    if (ifr.requestFullscreen) ifr.requestFullscreen();
     else if (ifr.webkitRequestFullscreen) ifr.webkitRequestFullscreen();
-    else if (ifr.msRequestFullscreen)     ifr.msRequestFullscreen();
 }
+function collapseBanner() { document.getElementById('stage-banner').classList.add('collapsed'); document.getElementById('banner-expand-strip').style.display = 'block'; sizeIframe(); }
+function expandBanner() { document.getElementById('stage-banner').classList.remove('collapsed'); document.getElementById('banner-expand-strip').style.display = 'none'; sizeIframe(); }
 
-function collapseBanner() {
-    document.getElementById('stage-banner').classList.add('collapsed');
-    document.getElementById('banner-expand-strip').style.display = 'block';
-    sizeIframe();
-}
-function expandBanner() {
-    document.getElementById('stage-banner').classList.remove('collapsed');
-    document.getElementById('banner-expand-strip').style.display = 'none';
-    sizeIframe();
-}
-
-// ─── Adblock detection ────────────────────────────────────────────────────────
 function detectAdblock() {
-    // Create a bait element that adblocks typically hide/remove
     const bait = document.createElement('div');
     bait.setAttribute('class', 'ad-banner ad adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links');
     bait.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;';
     document.body.appendChild(bait);
-
     setTimeout(() => {
-        const blocked = !bait || bait.offsetHeight === 0 || bait.offsetParent === null ||
-            window.getComputedStyle(bait).display === 'none' ||
-            window.getComputedStyle(bait).visibility === 'hidden';
+        const blocked = !bait || bait.offsetHeight === 0 || bait.offsetParent === null || window.getComputedStyle(bait).display === 'none' || window.getComputedStyle(bait).visibility === 'hidden';
         bait.remove();
-        if (blocked) {
-            document.getElementById('adblock-wall').classList.add('show');
-        }
+        if (blocked) document.getElementById('adblock-wall').classList.add('show');
     }, 200);
 }
 
@@ -916,5 +819,3 @@ window.onload = boot;
 </script>
 </body>
 </html>
-
-

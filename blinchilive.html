@@ -36,17 +36,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .live-logo-icon svg{width:15px;height:15px}
 .live-logo-wordmark{font-family:var(--display);font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.2px;white-space:nowrap}
 /* "Live" is the curved-box part */
-.live-logo-live{
+.live-logo-live,.live-logo-pill{
   display:inline-flex;align-items:center;
   background:var(--brand);
   color:#000;
   font-family:var(--display);
-  font-size:.9rem;
+  font-size:.82rem;
   font-weight:900;
-  letter-spacing:.5px;
-  padding:2px 10px;
+  letter-spacing:.6px;
+  padding:2px 9px;
   border-radius:20px;
-  margin-left:2px;
+  margin-left:3px;
   vertical-align:middle;
   line-height:1.5;
   position:relative;
@@ -254,13 +254,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #toast.show{display:block;animation:fup .22s ease}
 @keyframes fup{from{opacity:0;transform:translateX(-50%) translateY(7px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
+/* ── Chat sidebar tabs ── */
+.chat-wrap{display:flex;height:calc(100vh - 218px);min-height:400px}
+.chat-sidebar{width:210px;flex-shrink:0;background:#080808;border-radius:12px 0 0 12px;border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.chat-sidebar-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.csb-tab{flex:1;padding:9px 0;text-align:center;font-size:.76rem;font-weight:700;color:#333;cursor:pointer;border:none;background:transparent;font-family:var(--font);transition:color .14s;border-bottom:2px solid transparent}
+.csb-tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+.chat-sidebar-list{flex:1;overflow-y:auto}
+/* Ephemeral warning bar */
+.ephemeral-bar{background:rgba(249,115,22,.08);border-top:1px solid rgba(249,115,22,.18);padding:7px 14px;font-size:.72rem;color:#f97316;text-align:center;flex-shrink:0}
+/* Clickable friend row */
+.fr-row-click{cursor:pointer;border-radius:var(--r);transition:background .13s}
+.fr-row-click:hover{background:rgba(50,255,14,.04)}
+/* Group panel tab style */
+.grp-ptab{padding:10px 14px;font-size:.82rem;font-weight:700;color:#333;cursor:pointer;border-bottom:2px solid transparent;transition:all .14s}
+.grp-ptab.active{color:var(--brand);border-bottom-color:var(--brand)}
 @media(max-width:900px){.ad-sidebar{display:none}}
 @media(max-width:600px){
   .nav{width:52px}
   .nav .nav-sec,.nav .nav-btn span{display:none}
   .nav-btn{justify-content:center;padding:11px 6px}
   .tab{padding:13px 11px 40px}
-  .chat-layout{height:400px}
+  .chat-wrap{height:calc(100vh - 200px)}
+  .chat-sidebar{width:54px}
+  .csb-tab span{display:none}
+  .convo-name,.convo-sub{display:none}
 }
 </style>
 </head>
@@ -282,14 +300,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <div class="topbar">
     <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Back</a>
 
-    <!-- BlinchiLive logo: "Blinchi" plain, "Live" in green curved box -->
+    <!-- BlinchiLive logo: signal icon + Blinchi + Live-pill -->
     <div class="live-logo">
       <div class="live-logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="7" width="20" height="11" rx="3"/>
-          <path d="M8 11v4M6 13h4"/>
-          <circle cx="16" cy="12" r=".9" fill="#000"/>
-          <circle cx="18" cy="14" r=".9" fill="#000"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="2" fill="#000" stroke="none"/>
+          <path d="M8.5 8.5a5 5 0 0 0 0 7"/>
+          <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path d="M5 5a10 10 0 0 0 0 14"/>
+          <path d="M19 5a10 10 0 0 1 0 14"/>
         </svg>
       </div>
       <span class="live-logo-wordmark">Blinchi<span class="live-logo-live">Live</span></span>
@@ -399,7 +418,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <!-- FRIENDS -->
       <div class="tab" id="tab-friends">
         <div class="pg-title">Friends</div>
-        <div class="pg-sub">Your accepted friends list</div>
+        <div class="pg-sub">Click any friend to message them instantly</div>
         <div id="friends-locked" class="locked"><i class="bi bi-people"></i><p>Sign in to see your friends</p><button class="btn" onclick="openAuth()">Sign In</button></div>
         <div id="friends-content" style="display:none"><div id="friends-list"></div></div>
         <div class="ad-mid">
@@ -410,18 +429,38 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
       <!-- MESSAGES -->
       <div class="tab" id="tab-messages">
-        <div class="pg-title">Messages</div>
-        <div class="pg-sub">Ephemeral — snaps after 24h unless saved ⚡</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:3px">
+          <div class="pg-title" style="margin:0">Messages</div>
+          <span id="unread-count-badge" style="display:none;font-size:.76rem;font-weight:700;color:#ff3c3c;background:rgba(255,60,60,.1);border:1px solid rgba(255,60,60,.25);border-radius:20px;padding:1px 9px"></span>
+        </div>
+        <div class="pg-sub">Unsaved messages are automatically removed after 24 hours</div>
         <div id="msg-locked" class="locked"><i class="bi bi-chat"></i><p>Sign in to message friends</p><button class="btn" onclick="openAuth()">Sign In</button></div>
         <div id="msg-content" style="display:none">
-          <div class="chat-layout">
-            <div class="convo-list" id="convo-list"><div style="padding:13px;color:#1a1a1a;font-size:.81rem">No conversations yet</div></div>
+          <div class="chat-wrap">
+            <!-- Left: tabbed Friends + Groups sidebar -->
+            <div class="chat-sidebar">
+              <div class="chat-sidebar-tabs">
+                <button class="csb-tab active" id="csb-friends-tab" onclick="switchChatSidebar('friends')">Friends</button>
+                <button class="csb-tab" id="csb-groups-tab" onclick="switchChatSidebar('groups')">Groups</button>
+              </div>
+              <div class="chat-sidebar-list" id="convo-list">
+                <div style="padding:13px;color:#1a1a1a;font-size:.81rem">Loading…</div>
+              </div>
+            </div>
+            <!-- Right: chat window -->
             <div class="chat-win">
-              <div class="chat-hdr" id="chat-hdr"><div style="color:#1a1a1a;font-size:.84rem">Pick a conversation</div></div>
-              <div class="msgs" id="chat-msgs"><div style="margin:auto;color:#111;font-size:.82rem">👆 Select a friend to chat</div></div>
+              <div class="chat-hdr" id="chat-hdr">
+                <div style="color:#1a1a1a;font-size:.84rem">← Select a friend or group to chat</div>
+              </div>
+              <div class="msgs" id="chat-msgs">
+                <div style="margin:auto;color:#111;font-size:.82rem">Pick a conversation from the list</div>
+              </div>
+              <div class="ephemeral-bar" id="ephemeral-bar" style="display:none">
+                ⏳ Unsaved messages will be removed after 24 hours — tap 💾 on any message to keep it forever
+              </div>
               <div class="chat-input-row" id="chat-input-row" style="display:none">
                 <button class="media-btn" onclick="document.getElementById('media-input').click()" title="Send photo/video"><i class="bi bi-image"></i></button>
-                <input id="chat-input" placeholder="Message… (snaps in 24h ⚡)" onkeydown="if(event.key==='Enter')sendMsg()">
+                <input id="chat-input" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMsg()">
                 <button class="send-btn" onclick="sendMsg()"><i class="bi bi-send-fill"></i></button>
               </div>
             </div>
@@ -433,10 +472,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <!-- GROUPS -->
       <div class="tab" id="tab-groups">
         <div class="pg-title">Groups</div>
-        <div class="pg-sub">Create and join gaming groups</div>
+        <div class="pg-sub">Create gaming groups — click any group to chat, manage members, and more</div>
         <div id="groups-locked" class="locked"><i class="bi bi-collection"></i><p>Sign in to create or join groups</p><button class="btn" onclick="openAuth()">Sign In</button></div>
         <div id="groups-content" style="display:none">
-          <div class="rowf"><input class="inp" id="grp-name" placeholder="New group name…"><button class="btn" onclick="createGroup()">Create</button></div>
+          <div class="rowf">
+            <input class="inp" id="grp-name" placeholder="New group name…" autocomplete="off" autocorrect="off">
+            <button class="btn" onclick="createGroup()">+ Create</button>
+          </div>
           <div id="groups-list"></div>
         </div>
       </div>
@@ -480,6 +522,23 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   </div>
 </div>
 
+<!-- GROUP MANAGEMENT PANEL -->
+<div id="grp-panel" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.82);align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="background:#0d0d0d;border:1px solid var(--border2);border-radius:18px;width:90%;max-width:700px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div class="av grp" id="grp-panel-emoji" style="width:38px;height:38px;font-size:1.1rem">🎮</div>
+      <div style="font-family:var(--display);font-size:1.15rem;font-weight:800;flex:1" id="grp-panel-name">Group</div>
+      <button style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1" onclick="closeGrpPanel()">×</button>
+    </div>
+    <div style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0;padding:0 16px" id="grp-panel-tabs">
+      <div class="grp-ptab active" onclick="grpPanelTab('chat')">💬 Chat</div>
+      <div class="grp-ptab" onclick="grpPanelTab('members')">👥 Members</div>
+      <div class="grp-ptab" onclick="grpPanelTab('add')">➕ Add Friends</div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:18px 20px" id="grp-panel-body"></div>
+  </div>
+</div>
+
 <!-- AUTH MODAL -->
 <div class="modal-ov" id="auth-modal">
   <div class="modal-box">
@@ -519,109 +578,83 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 'use strict';
-// ══════════════════════════════════════════════════
-// SUPABASE
-// ══════════════════════════════════════════════════
 const SB_URL='https://ezdiptkyfwttxjuxkusg.supabase.co';
 const SB_KEY='sb_publishable_ORNNniNlw9b8a9I6VAh9Tw_w4QZPDBU';
 let db=null;
-try{db=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});}
-catch(e){console.error('DB init failed',e);}
+try{db=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});}catch(e){console.error('DB',e);}
 
-let U=null,P=null;  // currentUser, currentProfile
-let frSub=null;     // friend_requests realtime subscription
-let msgSub=null;    // messages realtime
-let presSub=null;   // presence
-let presInt=null;   // presence heartbeat interval
+let U=null,P=null;
+let frSub=null,msgSub=null,rtPres=null,presTimer=null;
+let activeFid=null,activeFname=null,activeChatType='dm';
+let activeGid=null,activeGname=null;
+let chatSidebarMode='friends';
+let grpPanelId=null,grpPanelName=null,grpPanelEmoji_=null,grpCurrentTab='chat';
 
-// ══════════════════════════════════════════════════
-// AUTH
-// ══════════════════════════════════════════════════
+// ─── HELPERS ────────────────────────────────────────────────────
+function toast(msg,dur=3200){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function ago(ts){if(!ts)return'';const d=Math.round((Date.now()-new Date(ts))/1000);if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
+function nameOf(p){return(p&&(p.displayname||p.username))||'BlinchiUser';}
+
+// ─── AUTH ────────────────────────────────────────────────────────
 async function initAuth(){
   if(!db)return;
   const{data:{session}}=await db.auth.getSession();
   if(session)await onIn(session.user);
   db.auth.onAuthStateChange(async(_,s)=>{if(s)await onIn(s.user);else onOut();});
 }
-
 async function onIn(user){
   U=user;
   let{data:p}=await db.from('profiles').select('*').eq('id',user.id).maybeSingle();
   if(!p){
     const un='player_'+Math.floor(Math.random()*999999);
     const dn=user.user_metadata?.displayname||un;
-    ({data:p}=await db.from('profiles')
-      .insert({id:user.id,username:un,displayname:dn,email:user.email,coins:0,games_played:0})
-      .select().single());
+    ({data:p}=await db.from('profiles').insert({id:user.id,username:un,displayname:dn,email:user.email,coins:0,games_played:0}).select().single());
   }
   P=p;
   updateUI();
-  subscribeToFriendRequests();
+  subscribeRealtime();
   checkPendingBadge();
+  countUnread();
   refreshTab(activeTab);
-
-  // Broadcast if came from a game
-  try{
-    const ag=localStorage.getItem('bl_active_game');
-    if(ag){const g=JSON.parse(ag);broadcastActivity(g.title,g.url);}
-  }catch(e){}
-
-  // Start incoming call listener
+  try{const ag=localStorage.getItem('bl_active_game');if(ag&&U){const g=JSON.parse(ag);broadcastActivity(g.title,g.url);}}catch(e){}
   setTimeout(listenCalls,1000);
 }
-
-function onOut(){
-  U=null;P=null;
-  if(frSub){frSub.unsubscribe();frSub=null;}
-  updateUI();
-}
+function onOut(){U=null;P=null;if(frSub){frSub.unsubscribe();frSub=null;}updateUI();}
 
 function updateUI(){
   const loggedIn=!!P;
-  // Locked/unlocked sections
-  [
-    ['addfr-locked','addfr-content'],
-    ['friends-locked','friends-content'],
-    ['msg-locked','msg-content'],
-    ['groups-locked','groups-content'],
-    ['ch-locked','ch-list'],
-    ['ach-locked','ach-list'],
+  [['addfr-locked','addfr-content'],['friends-locked','friends-content'],
+   ['msg-locked','msg-content'],['groups-locked','groups-content'],
+   ['ch-locked','ch-list'],['ach-locked','ach-list']
   ].forEach(([l,c])=>{
     const le=document.getElementById(l),ce=document.getElementById(c);
     if(le)le.style.display=loggedIn?'none':'';
     if(ce)ce.style.display=loggedIn?'block':'none';
   });
   const up=document.getElementById('bl-user-pill'),sb_=document.getElementById('bl-signin-btn');
-  const un=document.getElementById('bl-username'),co=document.getElementById('bl-coins');
   if(loggedIn){
     up.style.display='flex';sb_.style.display='none';
-    un.textContent=P.displayname||P.username;
-    co.textContent=P.coins||0;
-    // Reset placeholders that had the locked state
-    const fc=document.getElementById('feed-content');
-    if(fc&&fc.querySelector('.locked'))fc.innerHTML='';
-    const pc=document.getElementById('profile-content');
-    if(pc&&pc.querySelector('.locked'))pc.innerHTML='';
+    document.getElementById('bl-username').textContent=nameOf(P);
+    document.getElementById('bl-coins').textContent=P.coins||0;
+    const fc=document.getElementById('feed-content');if(fc&&fc.querySelector('.locked'))fc.innerHTML='';
+    const pc=document.getElementById('profile-content');if(pc&&pc.querySelector('.locked'))pc.innerHTML='';
   }else{
     up.style.display='none';sb_.style.display='';
-    co.textContent=0;
+    document.getElementById('bl-coins').textContent=0;
   }
 }
 
 function openAuth(){document.getElementById('auth-modal').classList.add('show');}
 function closeAuth(){document.getElementById('auth-modal').classList.remove('show');}
-function swAuth(v){
-  document.getElementById('signin-view').style.display=v==='signin'?'':'none';
-  document.getElementById('signup-view').style.display=v==='signup'?'':'none';
-}
+function swAuth(v){document.getElementById('signin-view').style.display=v==='signin'?'':'none';document.getElementById('signup-view').style.display=v==='signup'?'':'none';}
+
 async function doSignIn(){
   if(!db)return;
-  const email=document.getElementById('si-em').value.trim();
-  const pass=document.getElementById('si-pw').value;
+  const email=document.getElementById('si-em').value.trim(),pass=document.getElementById('si-pw').value;
   const err=document.getElementById('si-err');err.style.display='none';
   const{error}=await db.auth.signInWithPassword({email,password:pass});
-  if(error){err.textContent=error.message;err.style.display='block';}
-  else closeAuth();
+  if(error){err.textContent=error.message;err.style.display='block';}else closeAuth();
 }
 async function doSignUp(){
   if(!db)return;
@@ -632,20 +665,17 @@ async function doSignUp(){
   const err=document.getElementById('su-err'),ok=document.getElementById('su-ok');
   err.style.display='none';ok.style.display='none';
   if(!dn||!un||!email||!pass){err.textContent='All fields required';err.style.display='block';return;}
-  if(!/^[a-z0-9_]{3,20}$/.test(un)){err.textContent='Username: 3–20 chars, a-z / 0-9 / _ only';err.style.display='block';return;}
+  if(!/^[a-z0-9_]{3,20}$/.test(un)){err.textContent='Username: 3-20 chars, a-z/0-9/_ only';err.style.display='block';return;}
   if(pass.length<6){err.textContent='Password min 6 characters';err.style.display='block';return;}
   const{data:ex}=await db.from('profiles').select('id').eq('username',un).maybeSingle();
-  if(ex){err.textContent='That username is taken — please choose another';err.style.display='block';return;}
+  if(ex){err.textContent='That username is taken';err.style.display='block';return;}
   const{data,error}=await db.auth.signUp({email,password:pass,options:{data:{username:un,displayname:dn}}});
   if(error){err.textContent=error.message;err.style.display='block';return;}
   if(data.user)await db.from('profiles').upsert({id:data.user.id,username:un,displayname:dn,email,coins:0,games_played:0});
-  ok.textContent='Account created! Check your email to verify, then sign in.';
-  ok.style.display='block';
+  ok.textContent='Account created! Check your email to verify, then sign in.';ok.style.display='block';
 }
 
-// ══════════════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════════════
+// ─── TABS ────────────────────────────────────────────────────────
 let activeTab='feed';
 function blTab(tab){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -660,137 +690,94 @@ function refreshTab(tab){
   else if(tab==='profile')renderProfile();
   else if(tab==='addfriends'){showAddFriends();loadPendingRequests();}
   else if(tab==='friends')loadFriends();
-  else if(tab==='messages')loadConvos();
+  else if(tab==='messages'){loadChatSidebar();countUnread();}
   else if(tab==='groups')loadGroups();
   else if(tab==='challenges')loadChallenges();
   else if(tab==='achievements')loadAchievements();
 }
 
-// ══════════════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════════════
-function toast(msg,dur=3000){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),dur);
-}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function ago(ts){
-  if(!ts)return'';
-  const d=Math.round((Date.now()-new Date(ts))/1000);
-  if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';
-  if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';
-}
-function nameOf(p){return p?.displayname||p?.username||'BlinchiUser';}
-
-// ══════════════════════════════════════════════════
-// REALTIME: FRIENDSHIPS (uses actual friendships table)
-// The friendships table has: user_id, friend_id, status ('pending'|'accepted'), created_at
-// A "pending" row means user_id sent a request to friend_id
-// ══════════════════════════════════════════════════
-function subscribeToFriendRequests(){
+// ─── REALTIME ────────────────────────────────────────────────────
+function subscribeRealtime(){
   if(!U||!db)return;
   if(frSub)frSub.unsubscribe();
-  // Watch for incoming requests where WE are friend_id and status=pending (someone added us)
-  frSub=db.channel('friendships_'+U.id)
-    .on('postgres_changes',{
-      event:'INSERT',schema:'public',table:'friendships',
-      filter:`friend_id=eq.${U.id}`
-    },payload=>{
-      // Someone sent us a friend request
+  frSub=db.channel('bl_social_'+U.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'friendships',filter:`friend_id=eq.${U.id}`},()=>{
       checkPendingBadge();
       if(activeTab==='addfriends')loadPendingRequests();
-      toast('🤝 Someone sent you a friend request!');
+      toast('\uD83E\uDD1D Someone sent you a friend request!');
     })
-    .on('postgres_changes',{
-      event:'UPDATE',schema:'public',table:'friendships'
-    },payload=>{
-      // A request was accepted
-      if(payload.new.status==='accepted'){
-        checkPendingBadge();
-        if(activeTab==='friends')loadFriends();
-        if(activeTab==='addfriends')loadPendingRequests();
-        // If we were the sender (user_id), notify us
-        if(payload.new.user_id===U.id){
-          toast('🎮 Your friend request was accepted!');
-        }
-      }
-    })
-    .on('postgres_changes',{
-      event:'DELETE',schema:'public',table:'friendships'
-    },()=>{
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'friendships'},payload=>{
+      checkPendingBadge();
       if(activeTab==='friends')loadFriends();
+      if(activeTab==='addfriends')loadPendingRequests();
+      if(activeTab==='messages')loadChatSidebar();
+      if(payload.new&&payload.new.status==='accepted'&&payload.new.user_id===U.id)toast('\uD83C\uDFAE Your friend request was accepted!');
+    })
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'friendships'},()=>{
+      if(activeTab==='friends')loadFriends();
+      if(activeTab==='messages')loadChatSidebar();
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver_id=eq.${U.id}`},()=>{
+      countUnread();
+      if(activeTab==='messages'&&activeChatType==='dm')loadMsgs();
+      else toast('\uD83D\uDCAC New message!');
     })
     .subscribe();
 }
 
 async function checkPendingBadge(){
   if(!U||!db)return;
-  const{count}=await db.from('friendships')
-    .select('user_id',{count:'exact',head:true})
-    .eq('friend_id',U.id).eq('status','pending');
+  const{count}=await db.from('friendships').select('user_id',{count:'exact',head:true}).eq('friend_id',U.id).eq('status','pending');
   const badge=document.getElementById('req-badge');
-  if(count&&count>0){badge.textContent=count;badge.style.display='block';}
-  else badge.style.display='none';
+  if(count&&count>0){badge.textContent=count;badge.style.display='block';}else badge.style.display='none';
 }
 
-// ══════════════════════════════════════════════════
-// FEED
-// ══════════════════════════════════════════════════
+async function countUnread(){
+  if(!U||!db)return;
+  const{count}=await db.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',U.id).eq('saved',false).gt('created_at',new Date(Date.now()-86400000).toISOString());
+  const badge=document.getElementById('msg-badge');
+  const top=document.getElementById('unread-count-badge');
+  if(count&&count>0){badge.textContent=count;badge.style.display='block';if(top){top.textContent=count+' unread';top.style.display='inline-block';}}
+  else{badge.style.display='none';if(top)top.style.display='none';}
+}
+
+// ─── FEED ────────────────────────────────────────────────────────
 async function loadFeed(){
   if(!U||!db)return;
   const el=document.getElementById('feed-content');
   el.innerHTML='<div style="color:#111;padding:14px;font-size:.83rem">Loading…</div>';
   try{
-    // Get accepted friends from BOTH directions
-    const{data:sent}=await db.from('friendships')
-      .select('friend_id').eq('user_id',U.id).eq('status','accepted');
-    const{data:recv}=await db.from('friendships')
-      .select('user_id').eq('friend_id',U.id).eq('status','accepted');
-    const ids=new Set([
-      ...(sent||[]).map(r=>r.friend_id),
-      ...(recv||[]).map(r=>r.user_id)
-    ]);
+    const{data:sent}=await db.from('friendships').select('friend_id').eq('user_id',U.id).eq('status','accepted');
+    const{data:recv}=await db.from('friendships').select('user_id').eq('friend_id',U.id).eq('status','accepted');
+    const ids=new Set([...(sent||[]).map(r=>r.friend_id),...(recv||[]).map(r=>r.user_id)]);
     if(!ids.size){
       el.innerHTML=`<div class="card-s" style="text-align:center;padding:28px 16px">
         <div style="font-weight:700;color:#2a2a2a;margin-bottom:5px">No friends yet</div>
         <div style="color:#1a1a1a;font-size:.82rem;margin-bottom:13px">Add friends to see what they're playing</div>
         <button class="btn" onclick="blTab('addfriends')">Find Friends</button>
-      </div>`;
-      return;
+      </div>`;return;
     }
-    const{data:acts}=await db.from('activity')
-      .select('*,profiles(username,displayname)')
-      .in('user_id',[...ids])
-      .order('updated_at',{ascending:false});
-    if(!acts||!acts.length){
-      el.innerHTML='<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are playing right now.</div>';
-      return;
-    }
+    const{data:acts}=await db.from('activity').select('*,profiles(username,displayname)').in('user_id',[...ids]).order('updated_at',{ascending:false});
+    if(!acts||!acts.length){el.innerHTML='<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are playing right now.</div>';return;}
     el.innerHTML=acts.map(a=>{
       const mins=Math.max(0,Math.round((Date.now()-new Date(a.updated_at))/60000));
       const when=mins<1?'just now':mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
       const init=nameOf(a.profiles)[0].toUpperCase();
-      const su=(a.game_url||'').replace(/'/g,"\\'");
+      const safeUrl=encodeURIComponent(a.game_url||'');
       return`<div class="fi">
         <div class="av">${init}</div>
         <div class="fi-text">
-          <div class="fi-name"><span class="online-dot" style="width:6px;height:6px;margin-right:3px"></span>${esc(nameOf(a.profiles))}</div>
+          <div class="fi-name"><span class="online-dot" style="width:6px;height:6px;margin-right:3px;flex-shrink:0"></span>${esc(nameOf(a.profiles))}</div>
           <div class="fi-desc">Playing <strong style="color:#ccc">${esc(a.game_title||'')}</strong> · ${when}</div>
         </div>
-        <a href="index.html" class="join-btn" onclick="localStorage.setItem('bl_join_game','${su}')">▶ Play</a>
+        <a href="index.html" class="fi-join-btn" onclick="localStorage.setItem('bl_join_game',decodeURIComponent('${safeUrl}'))" style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">&#9654; Play</a>
       </div>`;
     }).join('');
-  }catch(e){el.innerHTML='<div style="color:#222;padding:14px;font-size:.83rem">Could not load feed.</div>';}
+  }catch(e){el.innerHTML='<div style="color:#222;padding:14px;font-size:.83rem">Could not load feed — check RLS policies.</div>';console.error('feed',e);}
 }
+async function broadcastActivity(title,url){if(!U||!db)return;await db.from('activity').upsert({user_id:U.id,game_title:title,game_url:url,updated_at:new Date().toISOString()},{onConflict:'user_id'});}
 
-async function broadcastActivity(title,url){
-  if(!U||!db)return;
-  await db.from('activity').upsert({user_id:U.id,game_title:title,game_url:url,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-}
-
-// ══════════════════════════════════════════════════
-// PROFILE
-// ══════════════════════════════════════════════════
+// ─── PROFILE ─────────────────────────────────────────────────────
 function renderProfile(){
   if(!P)return;
   const el=document.getElementById('profile-content');
@@ -809,193 +796,124 @@ function renderProfile(){
       <button class="btn-ghost" onclick="db.auth.signOut()">Sign Out</button>
     </div>
     <div class="cb">
-      <div style="font-size:1.7rem">🪙</div>
+      <div style="font-size:1.7rem">\uD83E\uDE99</div>
       <div>
         <div style="font-family:var(--display);font-size:1.35rem;font-weight:800;color:var(--brand)">${P.coins||0}</div>
         <div style="color:#2a2a2a;font-size:.77rem">BlinchiCoins · spend in future custom games</div>
       </div>
     </div>
     <div class="card-s" style="display:flex;align-items:center;gap:11px">
-      <div style="font-size:1.35rem">🎨</div>
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:.88rem;margin-bottom:1px">Character Creator</div>
-        <div style="font-size:.75rem;color:#2a2a2a">Customise your avatar — coming in a future update!</div>
-      </div>
-      <span style="font-size:.68rem;background:#111;color:#444;border:1px solid #1a1a1a;border-radius:20px;padding:3px 9px">Soon™</span>
+      <div style="font-size:1.35rem">\uD83C\uDFA8</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:.88rem;margin-bottom:1px">Character Creator</div>
+      <div style="font-size:.75rem;color:#2a2a2a">Customise your avatar — coming in a future update!</div></div>
+      <span style="font-size:.68rem;background:#111;color:#444;border:1px solid #1a1a1a;border-radius:20px;padding:3px 9px">Soon\u2122</span>
     </div>`;
 }
 
-// ══════════════════════════════════════════════════
-// ADD FRIENDS — uses actual 'friendships' table
-// Schema: user_id (sender), friend_id (recipient), status ('pending'|'accepted')
-// ══════════════════════════════════════════════════
+// ─── ADD FRIENDS ──────────────────────────────────────────────────
+async function getFriendIds(){
+  const{data:sent}=await db.from('friendships').select('friend_id').eq('user_id',U.id);
+  const{data:recv}=await db.from('friendships').select('user_id').eq('friend_id',U.id);
+  return new Set([U.id,...(sent||[]).map(r=>r.friend_id),...(recv||[]).map(r=>r.user_id)]);
+}
 async function showAddFriends(){
   if(!U||!db)return;
   try{
-    // Get IDs of everyone already in any relationship with us
-    const{data:sent}=await db.from('friendships').select('friend_id').eq('user_id',U.id);
-    const{data:recv}=await db.from('friendships').select('user_id').eq('friend_id',U.id);
-    const related=new Set([
-      U.id,
-      ...(sent||[]).map(r=>r.friend_id),
-      ...(recv||[]).map(r=>r.user_id)
-    ]);
+    const related=await getFriendIds();
     const{data:users}=await db.from('profiles').select('id,username,displayname').limit(50);
     const sug=(users||[]).filter(u=>!related.has(u.id)).slice(0,10);
     const el=document.getElementById('fr-suggested');if(!el)return;
-    if(!sug.length){el.innerHTML='<div style="color:#1a1a1a;font-size:.82rem">No suggestions right now.</div>';return;}
-    el.innerHTML=sug.map(u=>userResultRow(u)).join('');
+    el.innerHTML=sug.length?sug.map(userResultRow).join(''):'<div style="color:#1a1a1a;font-size:.82rem">No suggestions right now.</div>';
   }catch(e){console.error('showAddFriends',e);}
 }
-
 async function loadPendingRequests(){
   if(!U||!db)return;
-  // Pending requests where WE are the recipient (friend_id = our ID)
-  const{data}=await db.from('friendships')
-    .select('user_id,created_at,profiles!friendships_user_id_fkey(id,username,displayname)')
-    .eq('friend_id',U.id)
-    .eq('status','pending')
-    .order('created_at',{ascending:false});
-
-  const sec=document.getElementById('pending-section');
-  const list=document.getElementById('pending-list');
+  const{data}=await db.from('friendships').select('user_id,created_at,profiles!friendships_user_id_fkey(id,username,displayname)').eq('friend_id',U.id).eq('status','pending').order('created_at',{ascending:false});
+  const sec=document.getElementById('pending-section'),list=document.getElementById('pending-list');
   if(!data||!data.length){if(sec)sec.style.display='none';return;}
-  if(sec)sec.style.display='block';
+  sec.style.display='block';
   list.innerHTML=data.map(r=>{
-    const prof=r.profiles;
-    const name=esc(nameOf(prof));
-    const senderId=r.user_id;
+    const name=esc(nameOf(r.profiles));const sid=r.user_id;
     return`<div class="req-card">
-      <div class="av">${nameOf(prof)[0].toUpperCase()}</div>
+      <div class="av">${nameOf(r.profiles)[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:.9rem">${name} wants to be friends</div>
-        <div class="req-warning">⚠️ Only accept people you actually know. Don't add strangers.</div>
-        <div style="font-size:.72rem;color:#2a2a2a;margin-top:2px">@${esc(prof?.username||'')} · ${ago(r.created_at)}</div>
+        <div style="font-size:.72rem;color:#f97316;margin-top:3px;line-height:1.4">\u26A0\uFE0F Only accept people you actually know. Don\u2019t accept strangers.</div>
+        <div style="font-size:.72rem;color:#2a2a2a;margin-top:3px">@${esc(r.profiles?.username||'')} \u00B7 ${ago(r.created_at)}</div>
       </div>
       <div style="display:flex;gap:7px;flex-shrink:0">
-        <button class="btn-accept" onclick="respondRequest('${senderId}','accepted','${name}')">✓ Accept</button>
-        <button class="btn-decline" onclick="respondRequest('${senderId}','declined','${name}')">✕ Decline</button>
+        <button class="btn-accept" onclick="respondRequest('${sid}','accepted','${name}')">\u2713 Accept</button>
+        <button class="btn-decline" onclick="respondRequest('${sid}','declined','${name}')">\u2715 Decline</button>
       </div>
     </div>`;
   }).join('');
 }
-
 async function respondRequest(senderId,status,name){
   if(!db||!U)return;
   if(status==='accepted'){
-    // Update the pending row to accepted
-    await db.from('friendships')
-      .update({status:'accepted'})
-      .eq('user_id',senderId)
-      .eq('friend_id',U.id);
-    // Also insert the reverse row so both sides can query easily
-    await db.from('friendships')
-      .upsert({user_id:U.id,friend_id:senderId,status:'accepted'},{onConflict:'user_id,friend_id'});
-    toast('🎮 You and '+name+' are now friends!');
-    awardCoins(5,'Made a new friend');
-    loadFriends();
+    await db.from('friendships').update({status:'accepted'}).eq('user_id',senderId).eq('friend_id',U.id);
+    await db.from('friendships').upsert({user_id:U.id,friend_id:senderId,status:'accepted'},{onConflict:'user_id,friend_id'});
+    toast('\uD83C\uDFAE You and '+name+' are now friends!');
+    awardCoins(5);
+    // Instantly update friends list and chat sidebar
+    if(activeTab==='friends')loadFriends();
+    if(activeTab==='messages')loadChatSidebar();
   }else{
-    // Decline: delete the pending row
-    await db.from('friendships')
-      .delete()
-      .eq('user_id',senderId)
-      .eq('friend_id',U.id);
+    await db.from('friendships').delete().eq('user_id',senderId).eq('friend_id',U.id);
     toast('Request from '+name+' declined.');
   }
-  loadPendingRequests();
-  checkPendingBadge();
+  loadPendingRequests();checkPendingBadge();
 }
-
+let _frTimer=null;
+function frSearchLive(){clearTimeout(_frTimer);_frTimer=setTimeout(searchUsers,200);}
 async function searchUsers(){
   if(!U||!db)return;
-  const q=document.getElementById('fr-search').value.trim();
-  if(!q)return;
+  const q=document.getElementById('fr-search').value.trim();if(!q)return;
   const res=document.getElementById('fr-results');
   res.innerHTML='<div style="color:#222;font-size:.82rem">Searching…</div>';
-  // Fast search — profiles table, username or displayname
-  const{data}=await db.from('profiles')
-    .select('id,username,displayname')
-    .or(`username.ilike.%${q}%,displayname.ilike.%${q}%`)
-    .neq('id',U.id)
-    .limit(15);
+  const{data}=await db.from('profiles').select('id,username,displayname').or(`username.ilike.%${q}%,displayname.ilike.%${q}%`).neq('id',U.id).limit(15);
   if(!data||!data.length){res.innerHTML='<div style="color:#2a2a2a;font-size:.82rem;padding:8px 0">No users found.</div>';return;}
-  res.innerHTML=data.map(u=>userResultRow(u)).join('');
+  res.innerHTML=data.map(userResultRow).join('');
 }
-
-// Debounced live search as user types
-let _frSearchTimer=null;
-function frSearchLive(){
-  clearTimeout(_frSearchTimer);
-  _frSearchTimer=setTimeout(searchUsers,200);
-}
-
 function userResultRow(u){
-  const init=nameOf(u)[0].toUpperCase();
   return`<div class="fr-row">
-    <div class="av">${init}</div>
-    <div class="fr-info">
-      <div class="fr-name">${esc(nameOf(u))}</div>
-      <div class="fr-status">@${esc(u.username)}</div>
-    </div>
-    <button class="btn" style="padding:6px 12px;font-size:.78rem" id="addbtn_${u.id}"
-      onclick="sendFriendRequest('${u.id}','${esc(nameOf(u))}')">Add Friend</button>
+    <div class="av">${nameOf(u)[0].toUpperCase()}</div>
+    <div class="fr-info"><div class="fr-name">${esc(nameOf(u))}</div><div class="fr-status">@${esc(u.username)}</div></div>
+    <button class="btn" style="padding:6px 12px;font-size:.78rem" id="addbtn_${u.id}" onclick="sendFriendRequest('${u.id}','${esc(nameOf(u))}')">Add</button>
   </div>`;
 }
-
 async function sendFriendRequest(toId,toName){
   if(!U||!db)return;
-  const btn=document.getElementById('addbtn_'+toId);
-  // Check existing relationship in either direction
-  const{data:ex1}=await db.from('friendships')
-    .select('status').eq('user_id',U.id).eq('friend_id',toId).maybeSingle();
-  const{data:ex2}=await db.from('friendships')
-    .select('status').eq('user_id',toId).eq('friend_id',U.id).maybeSingle();
-  if(ex1||ex2){
-    const s=(ex1||ex2).status;
-    if(s==='accepted'){toast('Already friends with '+toName+'!');return;}
-    if(s==='pending'){toast('Request already sent to '+toName+'!');return;}
-  }
-  // Insert pending row: user_id=sender, friend_id=recipient
+  const{data:ex1}=await db.from('friendships').select('status').eq('user_id',U.id).eq('friend_id',toId).maybeSingle();
+  const{data:ex2}=await db.from('friendships').select('status').eq('user_id',toId).eq('friend_id',U.id).maybeSingle();
+  if(ex1||ex2){const s=(ex1||ex2).status;if(s==='accepted'){toast('Already friends!');return;}if(s==='pending'){toast('Request already sent!');return;}}
   const{error}=await db.from('friendships').insert({user_id:U.id,friend_id:toId,status:'pending'});
   if(error){toast('Error: '+error.message);return;}
-  if(btn){btn.textContent='Sent ✓';btn.disabled=true;btn.style.opacity='.5';}
-  toast('🤝 Friend request sent to '+toName+'!');
-  // The recipient will see it via realtime subscription
+  const btn=document.getElementById('addbtn_'+toId);
+  if(btn){btn.textContent='Sent \u2713';btn.disabled=true;btn.style.opacity='.5';}
+  toast('\uD83E\uDD1D Request sent to '+toName+'!');
+  showAddFriends();// refresh suggestions instantly
 }
 
-// ══════════════════════════════════════════════════
-// FRIENDS LIST
-// ══════════════════════════════════════════════════
+// ─── FRIENDS LIST ─────────────────────────────────────────────────
 async function loadFriends(){
   if(!U||!db)return;
-  // Get accepted friends from both directions
-  const{data:sent}=await db.from('friendships')
-    .select('friend_id,profiles!friendships_friend_id_fkey(id,username,displayname)')
-    .eq('user_id',U.id).eq('status','accepted');
-  const{data:recv}=await db.from('friendships')
-    .select('user_id,profiles!friendships_user_id_fkey(id,username,displayname)')
-    .eq('friend_id',U.id).eq('status','accepted');
-
+  const{data:sent}=await db.from('friendships').select('friend_id,profiles!friendships_friend_id_fkey(id,username,displayname)').eq('user_id',U.id).eq('status','accepted');
+  const{data:recv}=await db.from('friendships').select('user_id,profiles!friendships_user_id_fkey(id,username,displayname)').eq('friend_id',U.id).eq('status','accepted');
   const el=document.getElementById('friends-list');
-  // Combine and deduplicate by friend ID
-  const friendMap=new Map();
-  (sent||[]).forEach(r=>{if(r.profiles)friendMap.set(r.friend_id,r.profiles);});
-  (recv||[]).forEach(r=>{if(r.profiles)friendMap.set(r.user_id,r.profiles);});
-
-  if(!friendMap.size){
-    el.innerHTML=`<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No friends yet — <a style="color:var(--brand);cursor:pointer" onclick="blTab('addfriends')">find some!</a></div>`;
-    return;
-  }
-  el.innerHTML=[...friendMap.entries()].map(([fid,fp])=>{
-    const fn=esc(nameOf(fp));
-    const init=fn[0].toUpperCase();
-    return`<div class="fr-row">
+  const fmap=new Map();
+  (sent||[]).forEach(r=>{if(r.profiles)fmap.set(r.friend_id,r.profiles);});
+  (recv||[]).forEach(r=>{if(r.profiles)fmap.set(r.user_id,r.profiles);});
+  if(!fmap.size){el.innerHTML=`<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No friends yet \u2014 <a style="color:var(--brand);cursor:pointer" onclick="blTab('addfriends')">find some!</a></div>`;return;}
+  el.innerHTML=[...fmap.entries()].map(([fid,fp])=>{
+    const fn=esc(nameOf(fp)),init=fn[0].toUpperCase();
+    return`<div class="fr-row" style="cursor:pointer" onclick="openDM('${fid}','${fn}')">
       <div class="av">${init}</div>
       <div class="fr-info">
         <div class="fr-name">${fn}</div>
-        <div class="fr-status online">● Friend · @${esc(fp.username)}</div>
+        <div class="fr-status online">\u25CF Friend \u00B7 @${esc(fp.username)}</div>
       </div>
-      <div class="fr-acts">
+      <div class="fr-acts" onclick="event.stopPropagation()">
         <button class="ibt" title="Message" onclick="openDM('${fid}','${fn}')"><i class="bi bi-chat-fill"></i></button>
         <button class="ibt g" title="Voice call" onclick="startCall('${fid}','${fn}','voice')"><i class="bi bi-telephone-fill"></i></button>
         <button class="ibt b" title="Video call" onclick="startCall('${fid}','${fn}','video')"><i class="bi bi-camera-video-fill"></i></button>
@@ -1004,387 +922,357 @@ async function loadFriends(){
     </div>`;
   }).join('');
 }
-
-async function unfriend(friendId){
+async function unfriend(fid){
   if(!U||!db)return;
-  // Remove both directions
-  await db.from('friendships').delete().eq('user_id',U.id).eq('friend_id',friendId);
-  await db.from('friendships').delete().eq('user_id',friendId).eq('friend_id',U.id);
-  loadFriends();
+  await db.from('friendships').delete().eq('user_id',U.id).eq('friend_id',fid);
+  await db.from('friendships').delete().eq('user_id',fid).eq('friend_id',U.id);
+  loadFriends();if(activeTab==='messages')loadChatSidebar();
   toast('Removed from friends.');
 }
 
-// ══════════════════════════════════════════════════
-// MESSAGES — ephemeral multimedia with presence
-// ══════════════════════════════════════════════════
-let activeFid=null,activeFname=null,rtMsg=null,rtPres=null,presTimer=null;
+// ─── MESSAGES SIDEBAR ─────────────────────────────────────────────
+function switchChatSidebar(mode){
+  chatSidebarMode=mode;
+  document.getElementById('csb-friends-tab').classList.toggle('active',mode==='friends');
+  document.getElementById('csb-groups-tab').classList.toggle('active',mode==='groups');
+  loadChatSidebar();
+}
+async function loadChatSidebar(){if(!U||!db)return;if(chatSidebarMode==='friends')await loadConvos();else await loadGroupConvos();}
 
 async function loadConvos(){
   if(!U||!db)return;
-  // Get accepted friends from both directions
-  const{data:sent}=await db.from('friendships')
-    .select('friend_id,profiles!friendships_friend_id_fkey(id,username,displayname)')
-    .eq('user_id',U.id).eq('status','accepted');
-  const{data:recv}=await db.from('friendships')
-    .select('user_id,profiles!friendships_user_id_fkey(id,username,displayname)')
-    .eq('friend_id',U.id).eq('status','accepted');
-
+  const{data:sent}=await db.from('friendships').select('friend_id,profiles!friendships_friend_id_fkey(id,username,displayname)').eq('user_id',U.id).eq('status','accepted');
+  const{data:recv}=await db.from('friendships').select('user_id,profiles!friendships_user_id_fkey(id,username,displayname)').eq('friend_id',U.id).eq('status','accepted');
   const el=document.getElementById('convo-list');
-  const friendMap=new Map();
-  (sent||[]).forEach(r=>{if(r.profiles)friendMap.set(r.friend_id,r.profiles);});
-  (recv||[]).forEach(r=>{if(r.profiles)friendMap.set(r.user_id,r.profiles);});
-
-  if(!friendMap.size){el.innerHTML='<div style="padding:13px;color:#111;font-size:.81rem">Add friends to chat</div>';return;}
-  el.innerHTML=[...friendMap.entries()].map(([fid,fp])=>{
+  const fmap=new Map();
+  (sent||[]).forEach(r=>{if(r.profiles)fmap.set(r.friend_id,r.profiles);});
+  (recv||[]).forEach(r=>{if(r.profiles)fmap.set(r.user_id,r.profiles);});
+  if(!fmap.size){el.innerHTML='<div style="padding:13px;color:#1a1a1a;font-size:.81rem">Add friends to chat</div>';return;}
+  el.innerHTML=[...fmap.entries()].map(([fid,fp])=>{
     const fn=esc(nameOf(fp));
-    return`<div class="convo-item ${activeFid===fid?'active':''}" onclick="openDM('${fid}','${fn}')">
+    return`<div class="convo-item ${activeFid===fid&&activeChatType==='dm'?'active':''}" onclick="openDM('${fid}','${fn}')">
       <div class="av" style="width:30px;height:30px;font-size:.76rem">${fn[0].toUpperCase()}</div>
-      <div style="min-width:0">
-        <div class="convo-name">${fn}</div>
-        <div class="convo-sub" id="convo-sub-${fid}">⚡ 24h snap</div>
-      </div>
+      <div style="min-width:0"><div class="convo-name">${fn}</div><div class="convo-sub">DM</div></div>
+    </div>`;
+  }).join('');
+}
+async function loadGroupConvos(){
+  if(!U||!db)return;
+  const{data}=await db.from('group_members').select('group_id,groups(id,name,emoji)').eq('user_id',U.id);
+  const el=document.getElementById('convo-list');
+  if(!data||!data.length){el.innerHTML='<div style="padding:13px;color:#1a1a1a;font-size:.81rem">No groups yet</div>';return;}
+  el.innerHTML=data.map(gm=>{
+    const g=gm.groups;if(!g)return'';
+    const gn=esc(g.name);
+    return`<div class="convo-item ${activeGid===g.id&&activeChatType==='group'?'active':''}" onclick="openGroupChat('${g.id}','${gn}','${g.emoji||'\uD83C\uDFAE'}')">
+      <div class="av grp" style="width:30px;height:30px;font-size:.82rem">${g.emoji||'\uD83C\uDFAE'}</div>
+      <div style="min-width:0"><div class="convo-name">${gn}</div><div class="convo-sub">Group</div></div>
     </div>`;
   }).join('');
 }
 
+// ─── OPEN DM ──────────────────────────────────────────────────────
 async function openDM(fid,fname){
-  activeFid=fid;activeFname=fname;
-  blTab('messages');
+  activeFid=fid;activeFname=fname;activeChatType='dm';
+  if(activeTab!=='messages'){blTab('messages');return;}
   document.getElementById('chat-hdr').innerHTML=`
     <div class="av" style="width:28px;height:28px;font-size:.74rem">${fname[0].toUpperCase()}</div>
     <div class="chat-hdr-info">
       <div class="chat-hdr-name">${fname}</div>
-      <div class="chat-hdr-sub" id="peer-pres">● Offline</div>
+      <div class="chat-hdr-sub" id="peer-pres">\u25CF Offline</div>
     </div>
     <div class="call-btns">
       <button class="cbtn v" title="Voice call" onclick="startCall('${fid}','${fname}','voice')"><i class="bi bi-telephone-fill"></i></button>
       <button class="cbtn c" title="Video call" onclick="startCall('${fid}','${fname}','video')"><i class="bi bi-camera-video-fill"></i></button>
     </div>`;
   document.getElementById('chat-input-row').style.display='flex';
+  document.getElementById('ephemeral-bar').style.display='block';
+  document.getElementById('chat-input').placeholder='Message '+fname+'\u2026';
   await loadMsgs();
-  // Realtime new messages
-  if(rtMsg)rtMsg.unsubscribe();
+  if(msgSub)msgSub.unsubscribe();
   const ch=[U.id,fid].sort().join('_');
-  rtMsg=db.channel('msgs_'+ch)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>loadMsgs())
-    .subscribe();
-  // Presence
+  msgSub=db.channel('dm_'+ch).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},()=>loadMsgs()).subscribe();
   startPresence(fid);
   loadConvos();
 }
 
-// Presence heartbeat
+// ─── PRESENCE ────────────────────────────────────────────────────
 async function startPresence(fid){
-  if(presTimer)clearInterval(presTimer);
-  if(rtPres)rtPres.unsubscribe();
-  // Write own presence
-  await pingPresence(fid);
-  presTimer=setInterval(()=>pingPresence(fid),20000);
-  // Watch peer's presence
-  rtPres=db.channel('pres_'+[U.id,fid].sort().join('_'))
-    .on('postgres_changes',{event:'*',schema:'public',table:'dm_presence'},
-      ()=>checkPeerPres(fid))
-    .subscribe();
+  if(presTimer)clearInterval(presTimer);if(rtPres)rtPres.unsubscribe();
+  await pingPres(fid);presTimer=setInterval(()=>pingPres(fid),20000);
+  rtPres=db.channel('pres_'+[U.id,fid].sort().join('_')).on('postgres_changes',{event:'*',schema:'public',table:'dm_presence'},()=>checkPeerPres(fid)).subscribe();
   checkPeerPres(fid);
 }
-
-async function pingPresence(fid){
-  if(!U||!db)return;
-  try{await db.from('dm_presence').upsert({user_id:U.id,friend_id:fid,last_seen:new Date().toISOString()},{onConflict:'user_id,friend_id'});}
-  catch(e){}
-}
-
+async function pingPres(fid){try{await db.from('dm_presence').upsert({user_id:U.id,friend_id:fid,last_seen:new Date().toISOString()},{onConflict:'user_id,friend_id'});}catch(e){}}
 async function checkPeerPres(fid){
-  if(!db)return;
   try{
     const{data}=await db.from('dm_presence').select('last_seen').eq('user_id',fid).eq('friend_id',U.id).maybeSingle();
     const el=document.getElementById('peer-pres');if(!el)return;
-    if(data&&(Date.now()-new Date(data.last_seen))/1000<35){
-      el.textContent='● In chat now';el.className='chat-hdr-sub in';
-    }else{
-      el.textContent='● Offline';el.className='chat-hdr-sub';
-    }
+    if(data&&(Date.now()-new Date(data.last_seen))/1000<35){el.textContent='\u25CF In chat now';el.className='chat-hdr-sub in';}
+    else{el.textContent='\u25CF Offline';el.className='chat-hdr-sub';}
   }catch(e){}
 }
 
+// ─── LOAD / SEND MESSAGES ─────────────────────────────────────────
 async function loadMsgs(){
-  if(!U||!activeFid||!db)return;
-  // Delete own expired unsaved messages first
-  try{
-    await db.from('messages')
-      .delete()
-      .lt('expires_at',new Date().toISOString())
-      .eq('saved',false)
-      .or(`sender_id.eq.${U.id},receiver_id.eq.${U.id}`);
-  }catch(e){}
-  const{data}=await db.from('messages')
-    .select('*')
-    .or(`and(sender_id.eq.${U.id},receiver_id.eq.${activeFid}),and(sender_id.eq.${activeFid},receiver_id.eq.${U.id})`)
-    .order('created_at',{ascending:true})
-    .limit(120);
-  const el=document.getElementById('chat-msgs');
-  if(!data||!data.length){el.innerHTML='<div style="margin:auto;color:#0f0f0f;font-size:.82rem">Say something! Snaps after 24h ⚡</div>';return;}
+  if(!U||!activeFid||activeChatType!=='dm'||!db)return;
+  try{await db.from('messages').delete().lt('expires_at',new Date().toISOString()).eq('saved',false).or(`sender_id.eq.${U.id},receiver_id.eq.${U.id}`);}catch(e){}
+  const{data}=await db.from('messages').select('*').or(`and(sender_id.eq.${U.id},receiver_id.eq.${activeFid}),and(sender_id.eq.${activeFid},receiver_id.eq.${U.id})`).order('created_at',{ascending:true}).limit(120);
+  renderMsgList(data,document.getElementById('chat-msgs'));
+}
+function renderMsgList(data,el){
+  if(!el)return;
+  if(!data||!data.length){el.innerHTML='<div style="margin:auto;color:#111;font-size:.82rem">No messages yet \u2014 say hi! \uD83D\uDC4B</div>';return;}
   el.innerHTML=data.map(m=>{
     const isMe=m.sender_id===U.id;
-    const exp=m.expires_at?Math.max(0,Math.round((new Date(m.expires_at)-Date.now())/3600000)):null;
-    const snapInfo=!m.saved&&exp!==null
-      ?`<span class="snap-tag">⚡ ${exp}h</span>`
-      :(m.saved?'<span style="color:var(--brand)">💾</span>':'');
-    const saveBtn=!m.saved&&m.body?`<button class="save-msg-btn" onclick="saveMsg('${m.id}')" title="Save">💾</button>`:'';
+    const hrs=m.expires_at?Math.max(0,Math.round((new Date(m.expires_at)-Date.now())/3600000)):null;
+    const ephTag=!m.saved&&hrs!==null?`<span style="color:#888;font-size:.67rem" title="Removed in ${hrs}h unless saved">\u23F3 ${hrs}h</span>`:(m.saved?'<span style="color:var(--brand)">\uD83D\uDCBE</span>':'');
+    const saveBtn=!m.saved&&m.body?`<button class="save-msg-btn" onclick="saveMsg('${m.id}')" title="Save forever">\uD83D\uDCBE</button>`:'';
     let media='';
-    if(m.media_url){
-      if(m.media_type&&m.media_type.startsWith('video/')){
-        media=`<div class="msg-media"><video src="${esc(m.media_url)}" controls></video></div>`;
-      }else{
-        media=`<div class="msg-media"><img src="${esc(m.media_url)}" loading="lazy" onclick="window.open('${esc(m.media_url)}','_blank')" style="cursor:zoom-in"></div>`;
-      }
-    }
+    if(m.media_url){media=m.media_type?.startsWith('video/')?`<div class="msg-media"><video src="${esc(m.media_url)}" controls></video></div>`:`<div class="msg-media"><img src="${esc(m.media_url)}" loading="lazy" onclick="window.open('${esc(m.media_url)}','_blank')" style="cursor:zoom-in"></div>`;}
     const body=m.body?`<div class="bubble${m.saved?' saved':''}">${esc(m.body)}</div>`:'';
-    return`<div class="msg ${isMe?'me':'them'}">${media}${body}
-      <div class="msg-meta">${ago(m.created_at)} ${snapInfo} ${saveBtn}</div>
-    </div>`;
+    return`<div class="msg ${isMe?'me':'them'}">${media}${body}<div class="msg-meta">${ago(m.created_at)} ${ephTag} ${saveBtn}</div></div>`;
   }).join('');
   el.scrollTop=el.scrollHeight;
 }
-
 async function sendMsg(){
-  if(!U||!activeFid||!db)return;
-  const inp=document.getElementById('chat-input');
-  const body=inp.value.trim();if(!body)return;
-  inp.value='';
-  await db.from('messages').insert({
-    sender_id:U.id,receiver_id:activeFid,body,
-    expires_at:new Date(Date.now()+86400000).toISOString(),saved:false,
-    media_url:null,media_type:null
-  });
+  if(!U||!db)return;
+  const inp=document.getElementById('chat-input');const body=inp.value.trim();if(!body)return;inp.value='';
+  if(activeChatType==='dm'&&activeFid){
+    await db.from('messages').insert({sender_id:U.id,receiver_id:activeFid,body,expires_at:new Date(Date.now()+86400000).toISOString(),saved:false,media_url:null,media_type:null});
+  }else if(activeChatType==='group'&&activeGid){
+    await db.from('messages').insert({sender_id:U.id,receiver_id:activeGid,body,expires_at:null,saved:true,media_url:null,media_type:null});
+    loadGroupMessages();
+  }
 }
-
 async function sendMedia(input){
   if(!input.files||!input.files[0]||!U||!activeFid||!db)return;
   const file=input.files[0];input.value='';
   if(file.size>10*1024*1024){toast('Max file size is 10MB');return;}
-  toast('Uploading…');
+  toast('Uploading\u2026');
   try{
     const path=`${U.id}/${Date.now()}_${file.name.replace(/[^a-z0-9._-]/gi,'_')}`;
     const{error}=await db.storage.from('chat_media').upload(path,file,{upsert:true});
     if(error)throw error;
     const{data:ud}=db.storage.from('chat_media').getPublicUrl(path);
-    await db.from('messages').insert({
-      sender_id:U.id,receiver_id:activeFid,body:null,
-      media_url:ud.publicUrl,media_type:file.type,
-      expires_at:new Date(Date.now()+86400000).toISOString(),saved:false
-    });
-    toast('📷 Media sent!');
-  }catch(e){toast('Upload failed — check Supabase Storage setup');}
+    await db.from('messages').insert({sender_id:U.id,receiver_id:activeFid,body:null,media_url:ud.publicUrl,media_type:file.type,expires_at:new Date(Date.now()+86400000).toISOString(),saved:false});
+    toast('\uD83D\uDCF7 Media sent!');
+  }catch(e){toast('Upload failed \u2014 check Supabase Storage setup');}
 }
-
 async function saveMsg(id){
-  if(!db)return;
   await db.from('messages').update({saved:true,expires_at:null}).eq('id',id);
-  toast('💾 Message saved permanently!');
-  loadMsgs();
+  toast('\uD83D\uDCBE Message saved forever!');
+  if(activeChatType==='dm')loadMsgs();else loadGroupMessages();
 }
 
-// ══════════════════════════════════════════════════
-// CALLING — WebRTC via Supabase broadcast
-// ══════════════════════════════════════════════════
-const ICE_CFG={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
-let localStream=null,pc=null,callTimer=null,callSecs=0;
-let isMuted=false,isCamOff=false,callType='voice',callPid=null,callPname=null;
-let callSigCh=null;
-
-async function startCall(fid,fname,type){
-  if(!U||!db)return;
-  callType=type;callPid=fid;callPname=fname;
-  try{
-    localStream=await navigator.mediaDevices.getUserMedia(
-      type==='video'?{audio:true,video:true}:{audio:true,video:false}
-    );
-  }catch(e){toast('Could not access '+(type==='video'?'camera/':'')+'microphone');return;}
-  showCallUI(fname,'Calling…',type);
-  pc=new RTCPeerConnection(ICE_CFG);
-  localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
-  pc.ontrack=e=>{const rv=document.getElementById('remote-vid');if(rv)rv.srcObject=e.streams[0];};
-  // Set up signalling channel
-  callSigCh=db.channel('call_'+[U.id,fid].sort().join('_'));
-  pc.onicecandidate=e=>{
-    if(e.candidate&&callSigCh)
-      callSigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
-  };
-  callSigCh.on('broadcast',{event:'answer'},async e=>{
-    if(e.payload.from!==fid)return;
-    await pc.setRemoteDescription(new RTCSessionDescription(e.payload.sdp));
-    startCallTimer();
-  })
-  .on('broadcast',{event:'ice'},async e=>{
-    if(e.payload.from!==fid||!pc)return;
-    try{await pc.addIceCandidate(new RTCIceCandidate(e.payload.c));}catch(_){}
-  })
-  .on('broadcast',{event:'end'},e=>{if(e.payload.from===fid)endCall();})
-  .subscribe();
-  // Insert offer into DB (for incoming call notification)
-  const offer=await pc.createOffer();
-  await pc.setLocalDescription(offer);
-  await db.from('call_signals').insert({
-    caller_id:U.id,callee_id:fid,signal_type:'offer',
-    payload:JSON.stringify(offer),call_type:type,
-    caller_name:nameOf(P)
-  });
-  // Also broadcast for fast pickup
-  callSigCh.send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
-  if(type==='video'){const lv=document.getElementById('local-vid');if(lv)lv.srcObject=localStream;}
-}
-
-function showCallUI(name,status,type){
-  document.getElementById('call-nm').textContent=name;
-  document.getElementById('call-st').textContent=status;
-  document.getElementById('call-tm').textContent='';
-  document.getElementById('call-overlay').classList.add('show');
-  const vg=document.getElementById('vid-grid'),cb=document.getElementById('btn-cam');
-  if(type==='video'){vg.style.display='grid';if(cb)cb.style.display='flex';}
-  else{vg.style.display='none';if(cb)cb.style.display='none';}
-}
-
-function startCallTimer(){
-  document.getElementById('call-st').textContent='Connected';
-  callSecs=0;
-  callTimer=setInterval(()=>{
-    callSecs++;
-    const m=Math.floor(callSecs/60),s=callSecs%60;
-    document.getElementById('call-tm').textContent=m+':'+(s<10?'0':'')+s;
-  },1000);
-}
-
-function endCall(){
-  if(callTimer)clearInterval(callTimer);
-  if(localStream)localStream.getTracks().forEach(t=>t.stop());
-  if(pc)pc.close();
-  if(callSigCh){
-    callSigCh.send({type:'broadcast',event:'end',payload:{from:U?.id}});
-    callSigCh.unsubscribe();
-  }
-  localStream=null;pc=null;callTimer=null;callSigCh=null;
-  document.getElementById('call-overlay').classList.remove('show');
-  callPid=null;callPname=null;isMuted=false;isCamOff=false;
-}
-
-function toggleMute(){
-  isMuted=!isMuted;
-  if(localStream)localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);
-  const b=document.getElementById('btn-mute');
-  b.classList.toggle('on',isMuted);
-  b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i>':'<i class="bi bi-mic-fill"></i>';
-}
-
-function toggleCam(){
-  isCamOff=!isCamOff;
-  if(localStream)localStream.getVideoTracks().forEach(t=>t.enabled=!isCamOff);
-  const b=document.getElementById('btn-cam');
-  b.classList.toggle('on',isCamOff);
-  b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i>':'<i class="bi bi-camera-video-fill"></i>';
-}
-
-// Listen for incoming calls via DB realtime
-function listenCalls(){
-  if(!U||!db)return;
-  db.channel('inc_calls_'+U.id)
-    .on('postgres_changes',{
-      event:'INSERT',schema:'public',table:'call_signals',
-      filter:`callee_id=eq.${U.id}`
-    },async e=>{
-      const row=e.new;
-      if(row.signal_type!=='offer')return;
-      // Don't show if already on a call
-      if(pc)return;
-      callPid=row.caller_id;callPname=row.caller_name||'Someone';callType=row.call_type||'voice';
-      window._pendingOffer=JSON.parse(row.payload);
-      document.getElementById('inc-nm').textContent=callPname+' is calling…';
-      document.getElementById('inc-type').textContent=callType==='video'?'📹 Video call':'📞 Voice call';
-      document.getElementById('inc-call').classList.add('show');
-    })
-    .subscribe();
-}
-
-async function acceptCall(){
-  document.getElementById('inc-call').classList.remove('show');
-  const offer=window._pendingOffer;if(!offer||!callPid)return;
-  try{
-    localStream=await navigator.mediaDevices.getUserMedia(
-      callType==='video'?{audio:true,video:true}:{audio:true,video:false}
-    );
-  }catch(e){toast('Could not access microphone');return;}
-  showCallUI(callPname,'Connected',callType);
-  startCallTimer();
-  pc=new RTCPeerConnection(ICE_CFG);
-  localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
-  pc.ontrack=e=>{const rv=document.getElementById('remote-vid');if(rv)rv.srcObject=e.streams[0];};
-  callSigCh=db.channel('call_'+[U.id,callPid].sort().join('_'));
-  pc.onicecandidate=e=>{
-    if(e.candidate&&callSigCh)
-      callSigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
-  };
-  callSigCh.on('broadcast',{event:'ice'},async e=>{
-    if(e.payload.from!==callPid||!pc)return;
-    try{await pc.addIceCandidate(new RTCIceCandidate(e.payload.c));}catch(_){}
-  })
-  .on('broadcast',{event:'end'},()=>endCall())
-  .subscribe();
-  await pc.setRemoteDescription(new RTCSessionDescription(offer));
-  const answer=await pc.createAnswer();
-  await pc.setLocalDescription(answer);
-  callSigCh.send({type:'broadcast',event:'answer',payload:{from:U.id,sdp:answer}});
-  if(callType==='video'){const lv=document.getElementById('local-vid');if(lv)lv.srcObject=localStream;}
-}
-
-function declineCall(){
-  document.getElementById('inc-call').classList.remove('show');
-  window._pendingOffer=null;
-}
-
-// ══════════════════════════════════════════════════
-// GROUPS
-// ══════════════════════════════════════════════════
+// ─── GROUPS ───────────────────────────────────────────────────────
 async function loadGroups(){
   if(!U||!db)return;
-  const{data}=await db.from('group_members').select('groups(id,name,emoji,member_count)').eq('user_id',U.id);
+  const{data}=await db.from('group_members').select('group_id,groups(id,name,emoji,member_count,created_by)').eq('user_id',U.id);
   const el=document.getElementById('groups-list');
-  if(!data||!data.length){el.innerHTML='<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No groups yet — create one above!</div>';return;}
-  el.innerHTML=data.map(g=>`
-    <div class="gr-card">
-      <div class="av grp" style="width:40px;height:40px">${g.groups?.emoji||'🎮'}</div>
+  if(!data||!data.length){el.innerHTML='<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No groups yet \u2014 create one above!</div>';return;}
+  el.innerHTML=data.map(gm=>{
+    const g=gm.groups;if(!g)return'';
+    const isOwner=g.created_by===U.id;
+    const gn=esc(g.name),ge=g.emoji||'\uD83C\uDFAE';
+    return`<div class="gr-card" onclick="openGrpPanel('${g.id}','${gn}','${ge}')">
+      <div class="av grp" style="width:40px;height:40px">${ge}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:.88rem">${esc(g.groups?.name||'')}</div>
-        <div style="font-size:.74rem;color:var(--muted)">${g.groups?.member_count||1} member${(g.groups?.member_count||1)!==1?'s':''}</div>
+        <div style="font-weight:700;font-size:.88rem">${gn}</div>
+        <div style="font-size:.74rem;color:var(--muted)">${g.member_count||1} member${(g.member_count||1)!==1?'s':''}${isOwner?' \u00B7 Owner':''}</div>
       </div>
-      <i class="bi bi-chevron-right" style="color:#1a1a1a"></i>
-    </div>`).join('');
+      <i class="bi bi-chevron-right" style="color:#1a1a1a;flex-shrink:0"></i>
+    </div>`;
+  }).join('');
 }
-
 async function createGroup(){
   if(!U||!db)return;
   const name=document.getElementById('grp-name').value.trim();if(!name)return;
-  const emojis=['🎮','🕹️','🏆','⚡','🔥','💥','🌟','🚀','👾','🎯'];
+  const emojis=['\uD83C\uDFAE','\uD83D\uDD79\uFE0F','\uD83C\uDFC6','\u26A1','\uD83D\uDD25','\uD83D\uDCA5','\uD83C\uDF1F','\uD83D\uDE80','\uD83D\uDC7E','\uD83C\uDFAF'];
   const emoji=emojis[Math.floor(Math.random()*emojis.length)];
   const{data:g}=await db.from('groups').insert({name,emoji,created_by:U.id,member_count:1}).select().single();
   if(g){
     await db.from('group_members').insert({group_id:g.id,user_id:U.id});
     document.getElementById('grp-name').value='';
-    loadGroups();awardCoins(10,'Created a group');toast('🎮 Group created!');
+    loadGroups();awardCoins(10);toast('\uD83C\uDFAE Group "'+name+'" created!');
+    openGrpPanel(g.id,name,emoji);
   }
 }
 
-// ══════════════════════════════════════════════════
-// CHALLENGES
-// ══════════════════════════════════════════════════
+// ─── GROUP MANAGEMENT PANEL ───────────────────────────────────────
+function openGrpPanel(gid,gname,gemoji){
+  grpPanelId=gid;grpPanelName=gname;grpPanelEmoji_=gemoji;grpCurrentTab='chat';
+  document.getElementById('grp-panel-name').textContent=gname;
+  document.getElementById('grp-panel-emoji').textContent=gemoji;
+  // Reset tab highlights
+  document.querySelectorAll('.grp-ptab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.getElementById('grp-panel').style.display='flex';
+  grpPanelTab('chat');
+}
+function closeGrpPanel(){document.getElementById('grp-panel').style.display='none';}
+function grpPanelTab(tab){
+  grpCurrentTab=tab;
+  document.querySelectorAll('.grp-ptab').forEach(t=>{
+    const txt=t.textContent.toLowerCase();
+    t.classList.toggle('active',txt.includes(tab==='chat'?'chat':tab==='members'?'member':'add'));
+  });
+  if(tab==='chat'){
+    activeGid=grpPanelId;activeGname=grpPanelName;activeChatType='group';
+    const body=document.getElementById('grp-panel-body');
+    body.innerHTML=`<div style="display:flex;flex-direction:column;height:400px">
+      <div id="grp-chat-msgs" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px">
+        <div style="margin:auto;color:#111;font-size:.82rem">Loading messages\u2026</div>
+      </div>
+      <div style="padding:8px 0 0;display:flex;gap:7px;align-items:center;flex-shrink:0;border-top:1px solid var(--border)">
+        <input id="chat-input" class="inp" style="border-radius:20px" placeholder="Message group\u2026" onkeydown="if(event.key===\'Enter\')sendMsg()">
+        <button class="send-btn" onclick="sendMsg()"><i class="bi bi-send-fill"></i></button>
+      </div>
+    </div>`;
+    loadGroupMessages();
+    if(msgSub)msgSub.unsubscribe();
+    msgSub=db.channel('grp_'+grpPanelId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver_id=eq.${grpPanelId}`},()=>loadGroupMessages()).subscribe();
+  }else if(tab==='members'){loadGroupMembers();}
+  else if(tab==='add'){loadAddToGroup();}
+}
+async function loadGroupMessages(){
+  if(!grpPanelId||!db)return;
+  const{data}=await db.from('messages').select('*,profiles!messages_sender_id_fkey(username,displayname)').eq('receiver_id',grpPanelId).order('created_at',{ascending:true}).limit(100);
+  const el=document.getElementById('grp-chat-msgs');if(!el)return;
+  if(!data||!data.length){el.innerHTML='<div style="margin:auto;color:#111;font-size:.82rem">No messages yet \u2014 say something! \uD83D\uDC4B</div>';return;}
+  el.innerHTML=data.map(m=>{
+    const isMe=m.sender_id===U.id;
+    const sn=isMe?'You':esc(nameOf(m.profiles));
+    const body=m.body?`<div style="background:${isMe?'var(--brand)':'var(--surf2)'};color:${isMe?'#000':'#fff'};border-radius:13px;padding:8px 12px;font-size:.84rem;max-width:70%">${esc(m.body)}</div>`:'';
+    return`<div style="display:flex;flex-direction:column;align-self:${isMe?'flex-end':'flex-start'};max-width:72%">
+      ${!isMe?`<div style="font-size:.7rem;color:var(--brand);font-weight:700;margin-bottom:2px">${sn}</div>`:''}
+      ${body}
+      <div style="font-size:.67rem;color:#1a1a1a;margin-top:2px;${isMe?'text-align:right':''}">${ago(m.created_at)}</div>
+    </div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+async function loadGroupMembers(){
+  const body=document.getElementById('grp-panel-body');
+  const{data}=await db.from('group_members').select('user_id,profiles!group_members_user_id_fkey(id,username,displayname)').eq('group_id',grpPanelId);
+  if(!data||!data.length){body.innerHTML='<div style="color:#333">No members found.</div>';return;}
+  body.innerHTML=`<div style="margin-bottom:12px;font-size:.82rem;color:var(--muted)">${data.length} member${data.length!==1?'s':''}</div>`+
+    data.map(m=>`<div class="fr-row">
+      <div class="av">${nameOf(m.profiles)[0].toUpperCase()}</div>
+      <div class="fr-info">
+        <div class="fr-name">${esc(nameOf(m.profiles))}${m.user_id===U.id?' <span style="font-size:.7rem;color:var(--brand)">(you)</span>':''}</div>
+        <div class="fr-status">@${esc(m.profiles?.username||'')}</div>
+      </div>
+    </div>`).join('');
+}
+async function loadAddToGroup(){
+  const body=document.getElementById('grp-panel-body');
+  body.innerHTML='<div style="color:#222;font-size:.83rem">Loading friends\u2026</div>';
+  const{data:members}=await db.from('group_members').select('user_id').eq('group_id',grpPanelId);
+  const mids=new Set((members||[]).map(m=>m.user_id));
+  const{data:sent}=await db.from('friendships').select('friend_id,profiles!friendships_friend_id_fkey(id,username,displayname)').eq('user_id',U.id).eq('status','accepted');
+  const{data:recv}=await db.from('friendships').select('user_id,profiles!friendships_user_id_fkey(id,username,displayname)').eq('friend_id',U.id).eq('status','accepted');
+  const fmap=new Map();
+  (sent||[]).forEach(r=>{if(r.profiles&&!mids.has(r.friend_id))fmap.set(r.friend_id,r.profiles);});
+  (recv||[]).forEach(r=>{if(r.profiles&&!mids.has(r.user_id))fmap.set(r.user_id,r.profiles);});
+  if(!fmap.size){body.innerHTML='<div style="color:#333;font-size:.84rem">All your friends are already in this group, or you have no friends to add.</div>';return;}
+  body.innerHTML='<div style="margin-bottom:12px;font-size:.82rem;color:var(--muted)">Select friends to add:</div>'+
+    [...fmap.entries()].map(([fid,fp])=>`<div class="fr-row">
+      <div class="av">${nameOf(fp)[0].toUpperCase()}</div>
+      <div class="fr-info"><div class="fr-name">${esc(nameOf(fp))}</div><div class="fr-status">@${esc(fp.username)}</div></div>
+      <button class="btn" style="padding:5px 11px;font-size:.78rem" id="gaddBtn_${fid}" onclick="addToGroup('${fid}','${esc(nameOf(fp))}')">&plus; Add</button>
+    </div>`).join('');
+}
+async function addToGroup(userId,userName){
+  if(!grpPanelId||!db)return;
+  const{error}=await db.from('group_members').insert({group_id:grpPanelId,user_id:userId});
+  if(error&&!error.message.includes('duplicate')){toast('Could not add: '+error.message);return;}
+  const btn=document.getElementById('gaddBtn_'+userId);
+  if(btn){btn.textContent='Added \u2713';btn.disabled=true;btn.style.opacity='.5';}
+  toast('\u2795 '+userName+' added to group!');
+  loadGroups();
+}
+async function openGroupChat(gid,gname,gemoji){
+  activeGid=gid;activeGname=gname;activeChatType='group';
+  openGrpPanel(gid,gname,gemoji);
+}
+
+// ─── CALLS ────────────────────────────────────────────────────────
+const ICE_CFG={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
+let localStream=null,pc=null,callTimer=null,callSecs=0,isMuted=false,isCamOff=false,callType='voice',callPid=null,callPname=null,callSigCh=null;
+async function startCall(fid,fname,type){
+  if(!U||!db)return;callType=type;callPid=fid;callPname=fname;
+  try{localStream=await navigator.mediaDevices.getUserMedia(type==='video'?{audio:true,video:true}:{audio:true,video:false});}
+  catch(e){toast('Could not access '+(type==='video'?'camera/':'')+'microphone');return;}
+  showCallUI(fname,'Calling\u2026',type);
+  pc=new RTCPeerConnection(ICE_CFG);
+  localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+  pc.ontrack=e=>{const rv=document.getElementById('remote-vid');if(rv)rv.srcObject=e.streams[0];};
+  callSigCh=db.channel('call_'+[U.id,fid].sort().join('_'));
+  pc.onicecandidate=e=>{if(e.candidate&&callSigCh)callSigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});};
+  callSigCh.on('broadcast',{event:'answer'},async e=>{if(e.payload.from!==fid)return;await pc.setRemoteDescription(new RTCSessionDescription(e.payload.sdp));startCallTimer();})
+    .on('broadcast',{event:'ice'},async e=>{if(e.payload.from!==fid||!pc)return;try{await pc.addIceCandidate(new RTCIceCandidate(e.payload.c));}catch(_){}})
+    .on('broadcast',{event:'end'},e=>{if(e.payload.from===fid)endCall();}).subscribe();
+  const offer=await pc.createOffer();await pc.setLocalDescription(offer);
+  await db.from('call_signals').insert({caller_id:U.id,callee_id:fid,type:'offer',payload:JSON.stringify(offer),call_type:type,caller_name:nameOf(P)});
+  callSigCh.send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
+  if(type==='video'){const lv=document.getElementById('local-vid');if(lv)lv.srcObject=localStream;}
+}
+function showCallUI(name,status,type){
+  document.getElementById('call-nm').textContent=name;document.getElementById('call-st').textContent=status;document.getElementById('call-tm').textContent='';
+  document.getElementById('call-overlay').classList.add('show');
+  const vg=document.getElementById('vid-grid'),cb=document.getElementById('btn-cam');
+  if(type==='video'){vg.style.display='grid';if(cb)cb.style.display='flex';}else{vg.style.display='none';if(cb)cb.style.display='none';}
+}
+function startCallTimer(){document.getElementById('call-st').textContent='Connected';callSecs=0;callTimer=setInterval(()=>{callSecs++;const m=Math.floor(callSecs/60),s=callSecs%60;document.getElementById('call-tm').textContent=m+':'+(s<10?'0':'')+s;},1000);}
+function endCall(){
+  if(callTimer)clearInterval(callTimer);if(localStream)localStream.getTracks().forEach(t=>t.stop());if(pc)pc.close();
+  if(callSigCh){callSigCh.send({type:'broadcast',event:'end',payload:{from:U?.id}});callSigCh.unsubscribe();}
+  localStream=null;pc=null;callTimer=null;callSigCh=null;
+  document.getElementById('call-overlay').classList.remove('show');
+  callPid=null;callPname=null;isMuted=false;isCamOff=false;
+}
+function toggleMute(){isMuted=!isMuted;if(localStream)localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);const b=document.getElementById('btn-mute');b.classList.toggle('on',isMuted);b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i>':'<i class="bi bi-mic-fill"></i>';}
+function toggleCam(){isCamOff=!isCamOff;if(localStream)localStream.getVideoTracks().forEach(t=>t.enabled=!isCamOff);const b=document.getElementById('btn-cam');b.classList.toggle('on',isCamOff);b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i>':'<i class="bi bi-camera-video-fill"></i>';}
+function listenCalls(){
+  if(!U||!db)return;
+  db.channel('inc_calls_'+U.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'call_signals',filter:`callee_id=eq.${U.id}`},e=>{
+    const row=e.new;if(row.type!=='offer'||pc)return;
+    callPid=row.caller_id;callPname=row.caller_name||'Someone';callType=row.call_type||'voice';
+    window._pendingOffer=JSON.parse(row.payload);
+    document.getElementById('inc-nm').textContent=callPname+' is calling\u2026';
+    document.getElementById('inc-type').textContent=callType==='video'?'\uD83D\uDCF9 Video call':'\uD83D\uDCDE Voice call';
+    document.getElementById('inc-call').classList.add('show');
+  }).subscribe();
+}
+async function acceptCall(){
+  document.getElementById('inc-call').classList.remove('show');
+  const offer=window._pendingOffer;if(!offer||!callPid)return;
+  try{localStream=await navigator.mediaDevices.getUserMedia(callType==='video'?{audio:true,video:true}:{audio:true,video:false});}
+  catch(e){toast('Could not access microphone');return;}
+  showCallUI(callPname,'Connected',callType);startCallTimer();
+  pc=new RTCPeerConnection(ICE_CFG);localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+  pc.ontrack=e=>{const rv=document.getElementById('remote-vid');if(rv)rv.srcObject=e.streams[0];};
+  callSigCh=db.channel('call_'+[U.id,callPid].sort().join('_'));
+  pc.onicecandidate=e=>{if(e.candidate&&callSigCh)callSigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});};
+  callSigCh.on('broadcast',{event:'ice'},async e=>{if(e.payload.from!==callPid||!pc)return;try{await pc.addIceCandidate(new RTCIceCandidate(e.payload.c));}catch(_){}})
+    .on('broadcast',{event:'end'},()=>endCall()).subscribe();
+  await pc.setRemoteDescription(new RTCSessionDescription(offer));
+  const answer=await pc.createAnswer();await pc.setLocalDescription(answer);
+  callSigCh.send({type:'broadcast',event:'answer',payload:{from:U.id,sdp:answer}});
+  if(callType==='video'){const lv=document.getElementById('local-vid');if(lv)lv.srcObject=localStream;}
+}
+function declineCall(){document.getElementById('inc-call').classList.remove('show');window._pendingOffer=null;}
+
+// ─── CHALLENGES ───────────────────────────────────────────────────
 const CTMPLS=[
-  {icon:'🎮',name:'Play 3 games',desc:'Play any 3 games today',coins:15,type:'play_count',target:3},
-  {icon:'⏰',name:'10 min session',desc:'Stay in any game for 10+ min',coins:20,type:'play_time',target:600},
-  {icon:'💬',name:'Leave 2 comments',desc:'Comment on any 2 games',coins:10,type:'comment_count',target:2},
-  {icon:'👍',name:'Like 5 games',desc:'Like any 5 games',coins:10,type:'like_count',target:5},
-  {icon:'🤝',name:'Add a friend',desc:'Send or accept a friend request',coins:25,type:'friend_count',target:1},
-  {icon:'🏆',name:'Play 5 games',desc:'Explore 5 different games',coins:30,type:'play_count',target:5},
-  {icon:'💾',name:'Save a message',desc:'Save a message before it snaps',coins:15,type:'save_msg',target:1},
-  {icon:'👥',name:'Create a group',desc:'Start a BlinchiLive group',coins:20,type:'group_count',target:1},
+  {icon:'\uD83C\uDFAE',name:'Play 3 games',desc:'Play any 3 games today',coins:15,type:'play_count',target:3},
+  {icon:'\u23F0',name:'10 min session',desc:'Stay in any game for 10+ min',coins:20,type:'play_time',target:600},
+  {icon:'\uD83D\uDCAC',name:'Leave 2 comments',desc:'Comment on any 2 games',coins:10,type:'comment_count',target:2},
+  {icon:'\uD83D\uDC4D',name:'Like 5 games',desc:'Like any 5 games',coins:10,type:'like_count',target:5},
+  {icon:'\uD83E\uDD1D',name:'Add a friend',desc:'Send or accept a friend request',coins:25,type:'friend_count',target:1},
+  {icon:'\uD83C\uDFC6',name:'Play 5 games',desc:'Explore 5 different games',coins:30,type:'play_count',target:5},
+  {icon:'\uD83D\uDCBE',name:'Save a message',desc:'Save a message before it expires',coins:15,type:'save_msg',target:1},
+  {icon:'\uD83D\uDC65',name:'Create a group',desc:'Start a BlinchiLive group',coins:20,type:'group_count',target:1},
 ];
 async function loadChallenges(){
   if(!U||!db)return;
@@ -1392,74 +1280,54 @@ async function loadChallenges(){
   let{data:ch}=await db.from('daily_challenges').select('*').eq('user_id',U.id).eq('date',today);
   if(!ch||!ch.length){
     const picked=[...CTMPLS].sort(()=>Math.random()-.5).slice(0,3);
-    const{data:ins}=await db.from('daily_challenges')
-      .insert(picked.map(c=>({user_id:U.id,date:today,type:c.type,target:c.target,coins:c.coins,progress:0,completed:false})))
-      .select();
+    const{data:ins}=await db.from('daily_challenges').insert(picked.map(c=>({user_id:U.id,date:today,type:c.type,target:c.target,coins:c.coins,progress:0,completed:false}))).select();
     ch=ins||[];
   }
   const el=document.getElementById('ch-list');if(!el)return;
   el.innerHTML=ch.map(c=>{
     const t=CTMPLS.find(x=>x.type===c.type)||CTMPLS[0];
     const pct=Math.min(100,Math.round(((c.progress||0)/c.target)*100));
-    return`<div class="ch-card">
-      <div class="ch-icon">${t.icon}</div>
-      <div class="ch-info">
-        <div class="ch-name">${t.name}</div>
-        <div class="ch-desc">${t.desc}</div>
-        <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
-        <div style="font-size:.68rem;color:#1a1a1a;margin-top:2px">${c.progress||0}/${c.target}</div>
-        <div class="ch-coins">🪙 ${c.coins}</div>
-      </div>
-      ${c.completed?'<div style="color:var(--brand);font-size:1.2rem;flex-shrink:0">✅</div>':''}
-    </div>`;
+    return`<div class="ch-card"><div class="ch-icon">${t.icon}</div><div class="ch-info">
+      <div class="ch-name">${t.name}</div><div class="ch-desc">${t.desc}</div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:.68rem;color:#1a1a1a;margin-top:2px">${c.progress||0}/${c.target}</div>
+      <div class="ch-coins">\uD83E\uDE99 ${c.coins}</div>
+    </div>${c.completed?'<div style="color:var(--brand);font-size:1.2rem;flex-shrink:0">\u2705</div>':''}</div>`;
   }).join('');
 }
 
-// ══════════════════════════════════════════════════
-// ACHIEVEMENTS
-// ══════════════════════════════════════════════════
+// ─── ACHIEVEMENTS ─────────────────────────────────────────────────
 const ACHS=[
-  {id:'first_game',icon:'🎮',name:'First Play',desc:'Play your first game',coins:5},
-  {id:'ten_games',icon:'🕹️',name:'Gamer',desc:'Play 10 games',coins:20},
-  {id:'fifty_games',icon:'🏆',name:'Elite Gamer',desc:'Play 50 games',coins:100},
-  {id:'first_comment',icon:'💬',name:'Commentator',desc:'Leave your first comment',coins:5},
-  {id:'first_friend',icon:'🤝',name:'Social Butterfly',desc:'Add your first friend',coins:15},
-  {id:'coin_100',icon:'🪙',name:'Coin Collector',desc:'Earn 100 BlinchiCoins',coins:25},
-  {id:'first_group',icon:'👥',name:'Group Founder',desc:'Create your first group',coins:20},
-  {id:'play_hour',icon:'⏰',name:'Marathon',desc:'Play for 1 hour total',coins:30},
-  {id:'saved_msg',icon:'💾',name:'Memory Keeper',desc:'Save your first message',coins:10},
+  {id:'first_game',icon:'\uD83C\uDFAE',name:'First Play',desc:'Play your first game',coins:5},
+  {id:'ten_games',icon:'\uD83D\uDD79\uFE0F',name:'Gamer',desc:'Play 10 games',coins:20},
+  {id:'fifty_games',icon:'\uD83C\uDFC6',name:'Elite Gamer',desc:'Play 50 games',coins:100},
+  {id:'first_comment',icon:'\uD83D\uDCAC',name:'Commentator',desc:'Leave your first comment',coins:5},
+  {id:'first_friend',icon:'\uD83E\uDD1D',name:'Social Butterfly',desc:'Add your first friend',coins:15},
+  {id:'coin_100',icon:'\uD83E\uDE99',name:'Coin Collector',desc:'Earn 100 BlinchiCoins',coins:25},
+  {id:'first_group',icon:'\uD83D\uDC65',name:'Group Founder',desc:'Create your first group',coins:20},
+  {id:'play_hour',icon:'\u23F0',name:'Marathon',desc:'Play for 1 hour total',coins:30},
+  {id:'saved_msg',icon:'\uD83D\uDCBE',name:'Memory Keeper',desc:'Save your first message',coins:10},
 ];
 async function loadAchievements(){
   if(!U||!db)return;
   const{data:ul}=await db.from('user_achievements').select('achievement_id').eq('user_id',U.id);
   const uids=new Set((ul||[]).map(a=>a.achievement_id));
   const el=document.getElementById('ach-list');if(!el)return;
-  el.innerHTML=`<div class="ach-grid">${ACHS.map(a=>`
-    <div class="ach-card ${uids.has(a.id)?'unlocked':''}">
-      <div class="ach-icon">${a.icon}</div>
-      <div class="ach-name">${a.name}</div>
-      <div class="ach-desc">${a.desc}</div>
-      <div class="ach-coins">🪙 ${a.coins}</div>
-      ${uids.has(a.id)
-        ?'<div class="ach-tag">✓ UNLOCKED</div>'
-        :'<div style="color:#111;font-size:.67rem;margin-top:2px">Locked</div>'}
-    </div>`).join('')}</div>`;
+  el.innerHTML=`<div class="ach-grid">${ACHS.map(a=>`<div class="ach-card ${uids.has(a.id)?'unlocked':''}">
+    <div class="ach-icon">${a.icon}</div><div class="ach-name">${a.name}</div>
+    <div class="ach-desc">${a.desc}</div><div class="ach-coins">\uD83E\uDE99 ${a.coins}</div>
+    ${uids.has(a.id)?'<div class="ach-tag">\u2713 UNLOCKED</div>':'<div style="color:#111;font-size:.67rem;margin-top:2px">Locked</div>'}
+  </div>`).join('')}</div>`;
 }
 
-// ══════════════════════════════════════════════════
-// COINS
-// ══════════════════════════════════════════════════
+// ─── COINS ────────────────────────────────────────────────────────
 async function awardCoins(amount){
-  if(!U||!P||!db)return;
-  const nc=(P.coins||0)+amount;
+  if(!U||!P||!db)return;const nc=(P.coins||0)+amount;
   await db.from('profiles').update({coins:nc}).eq('id',U.id);
-  P.coins=nc;
-  const el=document.getElementById('bl-coins');if(el)el.textContent=nc;
+  P.coins=nc;const el=document.getElementById('bl-coins');if(el)el.textContent=nc;
 }
 
-// ══════════════════════════════════════════════════
-// BOOT
-// ══════════════════════════════════════════════════
+// ─── BOOT ─────────────────────────────────────────────────────────
 window.onload=()=>initAuth().catch(console.error);
 </script>
 </body>

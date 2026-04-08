@@ -30,13 +30,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 /* ── Topbar ── */
 .topbar{height:54px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;z-index:10}
-/* BlinchiLive logo pill */
-.live-logo{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#0a2200,#001800);border:1px solid rgba(50,255,14,.35);border-radius:22px;padding:5px 14px 5px 10px;cursor:default}
-.live-logo-icon{width:26px;height:26px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.live-logo-icon svg{width:14px;height:14px}
-.live-logo-text{font-family:var(--display);font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-.2px}
-.live-logo-text em{color:var(--brand);font-style:normal}
-.live-logo-badge{background:var(--brand);color:#000;font-size:.62rem;font-weight:900;padding:2px 7px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+/* BlinchiLive logo */
+.live-logo{display:inline-flex;align-items:center;gap:8px;cursor:default}
+.live-logo-icon{width:28px;height:28px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.live-logo-icon svg{width:15px;height:15px}
+.live-logo-wordmark{font-family:var(--display);font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.2px;white-space:nowrap}
+/* "Live" is the curved-box part */
+.live-logo-live{
+  display:inline-flex;align-items:center;
+  background:var(--brand);
+  color:#000;
+  font-family:var(--display);
+  font-size:.9rem;
+  font-weight:900;
+  letter-spacing:.5px;
+  padding:2px 10px;
+  border-radius:20px;
+  margin-left:2px;
+  vertical-align:middle;
+  line-height:1.5;
+  position:relative;
+  top:-1px
+}
 .topbar-r{margin-left:auto;display:flex;align-items:center;gap:9px}
 .coins-pill{display:flex;align-items:center;gap:5px;background:var(--surf);border:1px solid rgba(50,255,14,.22);border-radius:20px;padding:5px 12px;font-size:.8rem}
 .coins-pill b{color:var(--brand)}
@@ -267,19 +282,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <div class="topbar">
     <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Back</a>
 
-    <!-- BlinchiLive logo with controller icon -->
+    <!-- BlinchiLive logo: "Blinchi" plain, "Live" in green curved box -->
     <div class="live-logo">
       <div class="live-logo-icon">
-        <!-- Controller SVG matching BlinchiGames style -->
         <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="7" width="20" height="11" rx="3"/>
           <path d="M8 11v4M6 13h4"/>
-          <circle cx="16" cy="12" r=".8" fill="#000"/>
-          <circle cx="18" cy="14" r=".8" fill="#000"/>
+          <circle cx="16" cy="12" r=".9" fill="#000"/>
+          <circle cx="18" cy="14" r=".9" fill="#000"/>
         </svg>
       </div>
-      <span class="live-logo-text">Blinchi<em>Live</em></span>
-      <span class="live-logo-badge">LIVE</span>
+      <span class="live-logo-wordmark">Blinchi<span class="live-logo-live">Live</span></span>
     </div>
 
     <div class="topbar-r">
@@ -365,7 +378,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
             <input class="inp" id="fr-search" type="text"
               name="bl_fr_srch_xk77"
               placeholder="Search by username or display name…"
-              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              oninput="frSearchLive()" onkeydown="if(event.key==='Enter')searchUsers()">
             <button class="btn" onclick="searchUsers()">Search</button>
           </div>
           <div id="fr-results" style="margin-bottom:18px"></div>
@@ -669,43 +683,51 @@ function ago(ts){
 function nameOf(p){return p?.displayname||p?.username||'BlinchiUser';}
 
 // ══════════════════════════════════════════════════
-// REALTIME: FRIEND REQUESTS
-// — fires whenever any friend_request row changes
+// REALTIME: FRIENDSHIPS (uses actual friendships table)
+// The friendships table has: user_id, friend_id, status ('pending'|'accepted'), created_at
+// A "pending" row means user_id sent a request to friend_id
 // ══════════════════════════════════════════════════
 function subscribeToFriendRequests(){
   if(!U||!db)return;
   if(frSub)frSub.unsubscribe();
-  frSub=db.channel('fr-'+U.id)
+  // Watch for incoming requests where WE are friend_id and status=pending (someone added us)
+  frSub=db.channel('friendships_'+U.id)
     .on('postgres_changes',{
-      event:'*',schema:'public',table:'friend_requests',
-      filter:`to_id=eq.${U.id}`
+      event:'INSERT',schema:'public',table:'friendships',
+      filter:`friend_id=eq.${U.id}`
     },payload=>{
-      // New incoming request or status update
+      // Someone sent us a friend request
       checkPendingBadge();
       if(activeTab==='addfriends')loadPendingRequests();
-      if(activeTab==='friends')loadFriends();
-      if(payload.eventType==='INSERT'){
-        toast('🤝 New friend request received!');
+      toast('🤝 Someone sent you a friend request!');
+    })
+    .on('postgres_changes',{
+      event:'UPDATE',schema:'public',table:'friendships'
+    },payload=>{
+      // A request was accepted
+      if(payload.new.status==='accepted'){
+        checkPendingBadge();
+        if(activeTab==='friends')loadFriends();
+        if(activeTab==='addfriends')loadPendingRequests();
+        // If we were the sender (user_id), notify us
+        if(payload.new.user_id===U.id){
+          toast('🎮 Your friend request was accepted!');
+        }
       }
     })
     .on('postgres_changes',{
-      event:'UPDATE',schema:'public',table:'friend_requests',
-      filter:`from_id=eq.${U.id}`
-    },payload=>{
-      // Someone accepted/declined our request
-      if(payload.new.status==='accepted'){
-        toast('🎮 '+( payload.new.to_displayname||'Someone')+' accepted your friend request!');
-        if(activeTab==='friends')loadFriends();
-      }
+      event:'DELETE',schema:'public',table:'friendships'
+    },()=>{
+      if(activeTab==='friends')loadFriends();
     })
     .subscribe();
 }
 
 async function checkPendingBadge(){
   if(!U||!db)return;
-  const{data,count}=await db.from('friend_requests')
-    .select('id',{count:'exact',head:true})
-    .eq('to_id',U.id).eq('status','pending');
+  const{count}=await db.from('friendships')
+    .select('user_id',{count:'exact',head:true})
+    .eq('friend_id',U.id).eq('status','pending');
   const badge=document.getElementById('req-badge');
   if(count&&count>0){badge.textContent=count;badge.style.display='block';}
   else badge.style.display='none';
@@ -719,12 +741,16 @@ async function loadFeed(){
   const el=document.getElementById('feed-content');
   el.innerHTML='<div style="color:#111;padding:14px;font-size:.83rem">Loading…</div>';
   try{
-    // Get accepted friends via view
-    const{data:fr}=await db.from('friend_requests')
-      .select('from_id,to_id')
-      .or(`from_id.eq.${U.id},to_id.eq.${U.id}`)
-      .eq('status','accepted');
-    if(!fr||!fr.length){
+    // Get accepted friends from BOTH directions
+    const{data:sent}=await db.from('friendships')
+      .select('friend_id').eq('user_id',U.id).eq('status','accepted');
+    const{data:recv}=await db.from('friendships')
+      .select('user_id').eq('friend_id',U.id).eq('status','accepted');
+    const ids=new Set([
+      ...(sent||[]).map(r=>r.friend_id),
+      ...(recv||[]).map(r=>r.user_id)
+    ]);
+    if(!ids.size){
       el.innerHTML=`<div class="card-s" style="text-align:center;padding:28px 16px">
         <div style="font-weight:700;color:#2a2a2a;margin-bottom:5px">No friends yet</div>
         <div style="color:#1a1a1a;font-size:.82rem;margin-bottom:13px">Add friends to see what they're playing</div>
@@ -732,10 +758,9 @@ async function loadFeed(){
       </div>`;
       return;
     }
-    const ids=fr.map(f=>f.from_id===U.id?f.to_id:f.from_id);
     const{data:acts}=await db.from('activity')
       .select('*,profiles(username,displayname)')
-      .in('user_id',ids)
+      .in('user_id',[...ids])
       .order('updated_at',{ascending:false});
     if(!acts||!acts.length){
       el.innerHTML='<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are playing right now.</div>';
@@ -801,61 +826,80 @@ function renderProfile(){
 }
 
 // ══════════════════════════════════════════════════
-// ADD FRIENDS — SEARCH + PENDING REQUESTS
+// ADD FRIENDS — uses actual 'friendships' table
+// Schema: user_id (sender), friend_id (recipient), status ('pending'|'accepted')
 // ══════════════════════════════════════════════════
 async function showAddFriends(){
   if(!U||!db)return;
-  // Suggested users: random sample excluding already-related
   try{
-    const{data:mine}=await db.from('friend_requests')
-      .select('from_id,to_id')
-      .or(`from_id.eq.${U.id},to_id.eq.${U.id}`);
-    const related=new Set((mine||[]).flatMap(r=>[r.from_id,r.to_id]));
-    related.add(U.id);
-    const{data:users}=await db.from('profiles').select('id,username,displayname').limit(40);
+    // Get IDs of everyone already in any relationship with us
+    const{data:sent}=await db.from('friendships').select('friend_id').eq('user_id',U.id);
+    const{data:recv}=await db.from('friendships').select('user_id').eq('friend_id',U.id);
+    const related=new Set([
+      U.id,
+      ...(sent||[]).map(r=>r.friend_id),
+      ...(recv||[]).map(r=>r.user_id)
+    ]);
+    const{data:users}=await db.from('profiles').select('id,username,displayname').limit(50);
     const sug=(users||[]).filter(u=>!related.has(u.id)).slice(0,10);
     const el=document.getElementById('fr-suggested');if(!el)return;
     if(!sug.length){el.innerHTML='<div style="color:#1a1a1a;font-size:.82rem">No suggestions right now.</div>';return;}
-    el.innerHTML=sug.map(u=>userResultRow(u,'suggest')).join('');
-  }catch(e){}
+    el.innerHTML=sug.map(u=>userResultRow(u)).join('');
+  }catch(e){console.error('showAddFriends',e);}
 }
 
 async function loadPendingRequests(){
   if(!U||!db)return;
-  const{data}=await db.from('friend_requests')
-    .select('id,from_id,created_at,profiles!friend_requests_from_id_fkey(username,displayname)')
-    .eq('to_id',U.id).eq('status','pending')
+  // Pending requests where WE are the recipient (friend_id = our ID)
+  const{data}=await db.from('friendships')
+    .select('user_id,created_at,profiles!friendships_user_id_fkey(id,username,displayname)')
+    .eq('friend_id',U.id)
+    .eq('status','pending')
     .order('created_at',{ascending:false});
 
   const sec=document.getElementById('pending-section');
   const list=document.getElementById('pending-list');
-  if(!data||!data.length){sec.style.display='none';return;}
-  sec.style.display='block';
+  if(!data||!data.length){if(sec)sec.style.display='none';return;}
+  if(sec)sec.style.display='block';
   list.innerHTML=data.map(r=>{
-    const name=esc(nameOf(r.profiles));
+    const prof=r.profiles;
+    const name=esc(nameOf(prof));
+    const senderId=r.user_id;
     return`<div class="req-card">
-      <div class="av">${nameOf(r.profiles)[0].toUpperCase()}</div>
+      <div class="av">${nameOf(prof)[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:.9rem">${name} wants to be friends</div>
-        <div class="req-warning">⚠️ Only accept people you actually know. Do not add strangers.</div>
-        <div style="font-size:.72rem;color:#2a2a2a;margin-top:2px">${ago(r.created_at)}</div>
+        <div class="req-warning">⚠️ Only accept people you actually know. Don't add strangers.</div>
+        <div style="font-size:.72rem;color:#2a2a2a;margin-top:2px">@${esc(prof?.username||'')} · ${ago(r.created_at)}</div>
       </div>
       <div style="display:flex;gap:7px;flex-shrink:0">
-        <button class="btn-accept" onclick="respondRequest('${r.id}','accepted','${name}')">Accept</button>
-        <button class="btn-decline" onclick="respondRequest('${r.id}','declined','${name}')">Decline</button>
+        <button class="btn-accept" onclick="respondRequest('${senderId}','accepted','${name}')">✓ Accept</button>
+        <button class="btn-decline" onclick="respondRequest('${senderId}','declined','${name}')">✕ Decline</button>
       </div>
     </div>`;
   }).join('');
 }
 
-async function respondRequest(rid,status,name){
-  if(!db)return;
-  await db.from('friend_requests').update({status,updated_at:new Date().toISOString()}).eq('id',rid);
+async function respondRequest(senderId,status,name){
+  if(!db||!U)return;
   if(status==='accepted'){
+    // Update the pending row to accepted
+    await db.from('friendships')
+      .update({status:'accepted'})
+      .eq('user_id',senderId)
+      .eq('friend_id',U.id);
+    // Also insert the reverse row so both sides can query easily
+    await db.from('friendships')
+      .upsert({user_id:U.id,friend_id:senderId,status:'accepted'},{onConflict:'user_id,friend_id'});
     toast('🎮 You and '+name+' are now friends!');
-    loadFriends();
     awardCoins(5,'Made a new friend');
+    loadFriends();
   }else{
+    // Decline: delete the pending row
+    await db.from('friendships')
+      .delete()
+      .eq('user_id',senderId)
+      .eq('friend_id',U.id);
     toast('Request from '+name+' declined.');
   }
   loadPendingRequests();
@@ -868,16 +912,24 @@ async function searchUsers(){
   if(!q)return;
   const res=document.getElementById('fr-results');
   res.innerHTML='<div style="color:#222;font-size:.82rem">Searching…</div>';
+  // Fast search — profiles table, username or displayname
   const{data}=await db.from('profiles')
     .select('id,username,displayname')
     .or(`username.ilike.%${q}%,displayname.ilike.%${q}%`)
     .neq('id',U.id)
-    .limit(12);
+    .limit(15);
   if(!data||!data.length){res.innerHTML='<div style="color:#2a2a2a;font-size:.82rem;padding:8px 0">No users found.</div>';return;}
-  res.innerHTML=data.map(u=>userResultRow(u,'search')).join('');
+  res.innerHTML=data.map(u=>userResultRow(u)).join('');
 }
 
-function userResultRow(u,ctx='search'){
+// Debounced live search as user types
+let _frSearchTimer=null;
+function frSearchLive(){
+  clearTimeout(_frSearchTimer);
+  _frSearchTimer=setTimeout(searchUsers,200);
+}
+
+function userResultRow(u){
   const init=nameOf(u)[0].toUpperCase();
   return`<div class="fr-row">
     <div class="av">${init}</div>
@@ -885,25 +937,30 @@ function userResultRow(u,ctx='search'){
       <div class="fr-name">${esc(nameOf(u))}</div>
       <div class="fr-status">@${esc(u.username)}</div>
     </div>
-    <button class="btn" style="padding:6px 12px;font-size:.78rem" onclick="sendFriendRequest('${u.id}','${esc(nameOf(u))}',this)">Add Friend</button>
+    <button class="btn" style="padding:6px 12px;font-size:.78rem" id="addbtn_${u.id}"
+      onclick="sendFriendRequest('${u.id}','${esc(nameOf(u))}')">Add Friend</button>
   </div>`;
 }
 
-async function sendFriendRequest(toId,toName,btn){
+async function sendFriendRequest(toId,toName){
   if(!U||!db)return;
-  // Check for existing relationship
-  const{data:ex}=await db.from('friend_requests')
-    .select('id,status')
-    .or(`and(from_id.eq.${U.id},to_id.eq.${toId}),and(from_id.eq.${toId},to_id.eq.${U.id})`)
-    .maybeSingle();
-  if(ex){
-    if(ex.status==='pending'){toast('Request already sent!');return;}
-    if(ex.status==='accepted'){toast('Already friends!');return;}
+  const btn=document.getElementById('addbtn_'+toId);
+  // Check existing relationship in either direction
+  const{data:ex1}=await db.from('friendships')
+    .select('status').eq('user_id',U.id).eq('friend_id',toId).maybeSingle();
+  const{data:ex2}=await db.from('friendships')
+    .select('status').eq('user_id',toId).eq('friend_id',U.id).maybeSingle();
+  if(ex1||ex2){
+    const s=(ex1||ex2).status;
+    if(s==='accepted'){toast('Already friends with '+toName+'!');return;}
+    if(s==='pending'){toast('Request already sent to '+toName+'!');return;}
   }
-  const{error}=await db.from('friend_requests').insert({from_id:U.id,to_id:toId,status:'pending'});
-  if(error){toast('Could not send request — '+error.message);return;}
+  // Insert pending row: user_id=sender, friend_id=recipient
+  const{error}=await db.from('friendships').insert({user_id:U.id,friend_id:toId,status:'pending'});
+  if(error){toast('Error: '+error.message);return;}
   if(btn){btn.textContent='Sent ✓';btn.disabled=true;btn.style.opacity='.5';}
   toast('🤝 Friend request sent to '+toName+'!');
+  // The recipient will see it via realtime subscription
 }
 
 // ══════════════════════════════════════════════════
@@ -911,45 +968,48 @@ async function sendFriendRequest(toId,toName,btn){
 // ══════════════════════════════════════════════════
 async function loadFriends(){
   if(!U||!db)return;
-  // Query accepted requests (both directions)
-  const{data}=await db.from('friend_requests')
-    .select(`
-      id,from_id,to_id,
-      from_profile:profiles!friend_requests_from_id_fkey(id,username,displayname),
-      to_profile:profiles!friend_requests_to_id_fkey(id,username,displayname)
-    `)
-    .or(`from_id.eq.${U.id},to_id.eq.${U.id}`)
-    .eq('status','accepted');
+  // Get accepted friends from both directions
+  const{data:sent}=await db.from('friendships')
+    .select('friend_id,profiles!friendships_friend_id_fkey(id,username,displayname)')
+    .eq('user_id',U.id).eq('status','accepted');
+  const{data:recv}=await db.from('friendships')
+    .select('user_id,profiles!friendships_user_id_fkey(id,username,displayname)')
+    .eq('friend_id',U.id).eq('status','accepted');
 
   const el=document.getElementById('friends-list');
-  if(!data||!data.length){
+  // Combine and deduplicate by friend ID
+  const friendMap=new Map();
+  (sent||[]).forEach(r=>{if(r.profiles)friendMap.set(r.friend_id,r.profiles);});
+  (recv||[]).forEach(r=>{if(r.profiles)friendMap.set(r.user_id,r.profiles);});
+
+  if(!friendMap.size){
     el.innerHTML=`<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No friends yet — <a style="color:var(--brand);cursor:pointer" onclick="blTab('addfriends')">find some!</a></div>`;
     return;
   }
-  // Resolve the "other" person in each row
-  el.innerHTML=data.map(row=>{
-    const friend=row.from_id===U.id?row.to_profile:row.from_profile;
-    const fid=friend.id,fn=esc(nameOf(friend));
-    const init=nameOf(friend)[0].toUpperCase();
+  el.innerHTML=[...friendMap.entries()].map(([fid,fp])=>{
+    const fn=esc(nameOf(fp));
+    const init=fn[0].toUpperCase();
     return`<div class="fr-row">
       <div class="av">${init}</div>
       <div class="fr-info">
         <div class="fr-name">${fn}</div>
-        <div class="fr-status online">● Friend</div>
+        <div class="fr-status online">● Friend · @${esc(fp.username)}</div>
       </div>
       <div class="fr-acts">
         <button class="ibt" title="Message" onclick="openDM('${fid}','${fn}')"><i class="bi bi-chat-fill"></i></button>
         <button class="ibt g" title="Voice call" onclick="startCall('${fid}','${fn}','voice')"><i class="bi bi-telephone-fill"></i></button>
         <button class="ibt b" title="Video call" onclick="startCall('${fid}','${fn}','video')"><i class="bi bi-camera-video-fill"></i></button>
-        <button class="ibt r" title="Unfriend" onclick="unfriend('${row.id}')"><i class="bi bi-person-x-fill"></i></button>
+        <button class="ibt r" title="Unfriend" onclick="unfriend('${fid}')"><i class="bi bi-person-x-fill"></i></button>
       </div>
     </div>`;
   }).join('');
 }
 
-async function unfriend(reqId){
-  if(!db)return;
-  await db.from('friend_requests').delete().eq('id',reqId);
+async function unfriend(friendId){
+  if(!U||!db)return;
+  // Remove both directions
+  await db.from('friendships').delete().eq('user_id',U.id).eq('friend_id',friendId);
+  await db.from('friendships').delete().eq('user_id',friendId).eq('friend_id',U.id);
   loadFriends();
   toast('Removed from friends.');
 }
@@ -961,24 +1021,27 @@ let activeFid=null,activeFname=null,rtMsg=null,rtPres=null,presTimer=null;
 
 async function loadConvos(){
   if(!U||!db)return;
-  const{data}=await db.from('friend_requests')
-    .select(`
-      from_id,to_id,
-      fp:profiles!friend_requests_from_id_fkey(id,username,displayname),
-      tp:profiles!friend_requests_to_id_fkey(id,username,displayname)
-    `)
-    .or(`from_id.eq.${U.id},to_id.eq.${U.id}`)
-    .eq('status','accepted');
+  // Get accepted friends from both directions
+  const{data:sent}=await db.from('friendships')
+    .select('friend_id,profiles!friendships_friend_id_fkey(id,username,displayname)')
+    .eq('user_id',U.id).eq('status','accepted');
+  const{data:recv}=await db.from('friendships')
+    .select('user_id,profiles!friendships_user_id_fkey(id,username,displayname)')
+    .eq('friend_id',U.id).eq('status','accepted');
+
   const el=document.getElementById('convo-list');
-  if(!data||!data.length){el.innerHTML='<div style="padding:13px;color:#111;font-size:.81rem">Add friends to chat</div>';return;}
-  el.innerHTML=data.map(row=>{
-    const f=row.from_id===U.id?row.tp:row.fp;
-    const fn=esc(nameOf(f));
-    return`<div class="convo-item ${activeFid===f.id?'active':''}" onclick="openDM('${f.id}','${fn}')">
+  const friendMap=new Map();
+  (sent||[]).forEach(r=>{if(r.profiles)friendMap.set(r.friend_id,r.profiles);});
+  (recv||[]).forEach(r=>{if(r.profiles)friendMap.set(r.user_id,r.profiles);});
+
+  if(!friendMap.size){el.innerHTML='<div style="padding:13px;color:#111;font-size:.81rem">Add friends to chat</div>';return;}
+  el.innerHTML=[...friendMap.entries()].map(([fid,fp])=>{
+    const fn=esc(nameOf(fp));
+    return`<div class="convo-item ${activeFid===fid?'active':''}" onclick="openDM('${fid}','${fn}')">
       <div class="av" style="width:30px;height:30px;font-size:.76rem">${fn[0].toUpperCase()}</div>
       <div style="min-width:0">
         <div class="convo-name">${fn}</div>
-        <div class="convo-sub" id="convo-sub-${f.id}">⚡ 24h snap</div>
+        <div class="convo-sub" id="convo-sub-${fid}">⚡ 24h snap</div>
       </div>
     </div>`;
   }).join('');

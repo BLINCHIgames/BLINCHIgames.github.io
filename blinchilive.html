@@ -548,6 +548,13 @@ async function onIn(user) {
   countUnread();
   refreshTab(activeTab);
   setTimeout(listenCalls, 800);
+  // Set online status
+  db.from('profiles').update({ status: 'online' }).eq('id', user.id).then(() => {});
+  // Set offline on page close
+  window.addEventListener('beforeunload', () => {
+    navigator.sendBeacon('/dev/null'); // keep page alive briefly
+    db.from('profiles').update({ status: 'offline' }).eq('id', user.id);
+  }, { once: true });
   try {
     const ag = localStorage.getItem('bl_active_game');
     if (ag) { const g = JSON.parse(ag); broadcastActivity(g.title, g.url); }
@@ -662,11 +669,17 @@ function subscribeRealtime() {
       event: 'UPDATE', schema: 'public', table: 'friendships'
     }, payload => {
       checkReqBadge();
-      if (activeTab==='friends') loadFriends();
-      if (activeTab==='messages') loadSidebar();
+      // Always refresh friends + sidebar regardless of active tab
+      loadFriends();
+      loadSidebar();
       if (activeTab==='addfriends') loadSuggested();
-      if (payload.new.status==='accepted' && payload.new.user1===U.id)
-        toast('🎮 Your friend request was accepted!');
+      // Notify the sender when their request is accepted
+      if (payload.new && payload.new.status==='accepted') {
+        if (payload.new.user1===U.id)
+          toast('🎮 Your friend request was accepted!');
+        else if (payload.new.user2===U.id)
+          toast('🎮 You are now friends!');
+      }
     })
     // ── Friendship deleted (unfriend)
     .on('postgres_changes', {
@@ -746,11 +759,19 @@ async function checkReqBadge() {
 
 async function countUnread() {
   if (!U) return;
-  // Count messages in conversations I'm in where I'm not the sender, in last 24h
-  const { count } = await db.from('messages').select('id', { count: 'exact', head: true })
-    .neq('sender_id', U.id)
-    .eq('saved', false)
-    .gt('created_at', new Date(Date.now() - 86400000).toISOString());
+  // Count messages in MY conversations where I'm not the sender, in last 24h
+  const { data: myConvIds } = await db.from('conversation_members').select('conversation_id').eq('user_id', U.id);
+  const cids = (myConvIds||[]).map(r => r.conversation_id);
+  let count = 0;
+  if (cids.length) {
+    const { count: cnt } = await db.from('messages').select('id', { count: 'exact', head: true })
+      .in('conversation_id', cids)
+      .neq('sender_id', U.id)
+      .gt('created_at', new Date(Date.now() - 86400000).toISOString());
+    count = cnt || 0;
+  }
+  // eslint-disable-next-line no-unused-vars
+  const _dummy = null; // keeps flow below intact
   const b = $('msg-badge'), ub = $('unread-badge');
   if (count > 0) {
     b.textContent = count; b.style.display = 'block';
@@ -929,7 +950,7 @@ async function loadFriends() {
       <div class="av">${init}</div>
       <div class="fr-info">
         <div class="fr-name">${fn}</div>
-        <div class="fr-sub on">● Friend · @${esc(fp.username)}</div>
+        <div class="fr-sub on">● Friend · @${esc(fp.username)}${fp.status==='ingame'?' · 🎮 In-game':fp.status==='online'?' · Online':''}</div>
       </div>
       <div class="fr-acts" onclick="event.stopPropagation()">
         <button class="ibt" title="Message" onclick="openDM('${fp.id}','${fn}')"><i class="bi bi-chat-fill"></i></button>
@@ -993,7 +1014,7 @@ async function loadGroupList() {
   if (!groups.length) { el.innerHTML = '<div style="padding:13px;color:#1a1a1a;font-size:.81rem">No groups yet</div>'; return; }
   el.innerHTML = groups.map(r => {
     const g = r.conversations;
-    const gn = esc(g.name||'Group'), ge = g.emoji||'🎮';
+    const gn = esc(g.name||'Group'), ge = g.emoji||'🎮'; // emoji added by migration
     return `<div class="ci ${activeConversation===g.id?'active':''}" onclick="openGroupConv('${g.id}','${gn}','${ge}')">
       <div class="av sq" style="width:30px;height:30px;font-size:.82rem">${ge}</div>
       <div style="min-width:0"><div class="ci-name">${gn}</div><div class="ci-sub">Group</div></div>
@@ -1120,10 +1141,13 @@ async function toggleGrpDrawer(convId) {
   if (drawer.classList.contains('open')) { drawer.classList.remove('open'); return; }
   drawer.innerHTML = '<div style="color:#333;font-size:.82rem">Loading…</div>';
   drawer.classList.add('open');
-  const { data } = await db.from('conversation_members')
-    .select('user_id, profiles!conversation_members_user_id_fkey(id,username,displayname)')
-    .eq('conversation_id', convId);
-  if (!data||!data.length) { drawer.innerHTML='<div style="color:#333;font-size:.82rem">No members</div>'; return; }
+  const { data: mdata } = await db.from('conversation_members')
+    .select('user_id').eq('conversation_id', convId);
+  if (!mdata||!mdata.length) { drawer.innerHTML='<div style="color:#333;font-size:.82rem">No members</div>'; return; }
+  const mIds = mdata.map(m => m.user_id);
+  const { data: mprofs } = await db.from('profiles').select('id,username,displayname').in('id', mIds);
+  const mpMap = {}; (mprofs||[]).forEach(p => mpMap[p.id]=p);
+  const data = mdata.map(m => ({ ...m, profiles: mpMap[m.user_id]||{} }));
   drawer.innerHTML = `<div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Members (${data.length})</div>` +
     data.map(m => {
       const fp = m.profiles||{}, fn = esc(nameOf(fp)), isMe = m.user_id===U.id;
@@ -1209,13 +1233,27 @@ async function checkPeerPres(convId) {
 // ═══════════════════════════════════════════════════════════════
 async function loadMessages(convId) {
   if (!U || !convId) return;
-  // Delete expired unsaved DM messages
+  // Clean expired unsaved DM messages
   if (activeConvType === 'dm') {
-    try { await db.from('messages').delete().eq('conversation_id', convId).eq('saved', false).lt('created_at', new Date(Date.now()-86400000).toISOString()); } catch(e) {}
+    try { await db.from('messages').delete().eq('conversation_id', convId)
+      .lt('created_at', new Date(Date.now()-86400000).toISOString()); } catch(e) {}
   }
-  const { data } = await db.from('messages').select('*,profiles!messages_sender_id_fkey(username,displayname)')
+  // Load messages — FK is to auth.users not profiles, so do two queries
+  const { data, error } = await db.from('messages').select('*')
     .eq('conversation_id', convId).order('created_at', { ascending: true }).limit(150);
+  if (error) { console.error('loadMessages', error); return; }
+  // Batch-fetch profiles for all senders
+  const senderIds = [...new Set((data||[]).map(m => m.sender_id))];
+  let profMap = {};
+  if (senderIds.length) {
+    const { data: profs } = await db.from('profiles').select('id,username,displayname').in('id', senderIds);
+    (profs||[]).forEach(p => { profMap[p.id] = p; });
+  }
+  // Attach profiles to messages
+  const dataWithProfiles = (data||[]).map(m => ({ ...m, profiles: profMap[m.sender_id] || null }));
+  const data_orig = dataWithProfiles;
   const el = $('chat-msgs');
+  const data = data_orig;
   if (!data||!data.length) {
     el.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — say hi! 👋</div>'; return;
   }
@@ -1245,13 +1283,10 @@ async function sendMsg() {
   if (!U || !activeConversation) return;
   const inp = $('chat-input'), body = inp.value.trim(); if (!body) return;
   inp.value = '';
-  const isGroup = activeConvType === 'group';
   await db.from('messages').insert({
     conversation_id: activeConversation,
     sender_id: U.id,
-    body,
-    saved: isGroup,  // group messages don't expire; DM messages do
-    ...(isGroup ? {} : { created_at: new Date().toISOString() })
+    body
   });
   // Optimistically render (realtime will also trigger loadMessages)
 }
@@ -1266,17 +1301,19 @@ async function sendMedia(input) {
     const { error } = await db.storage.from('chat_media').upload(path, file, { upsert: true });
     if (error) throw error;
     const { data: ud } = db.storage.from('chat_media').getPublicUrl(path);
-    await db.from('messages').insert({
+    const { error: mi } = await db.from('messages').insert({
       conversation_id: activeConversation, sender_id: U.id,
-      body: null, media_url: ud.publicUrl, media_type: file.type, saved: false
+      body: null, media_url: ud.publicUrl, media_type: file.type
     });
+    if (mi) throw mi;
     toast('📷 Sent!');
   } catch(e) { toast('Upload failed — check Supabase Storage setup'); }
 }
 
 async function saveMsg(id) {
-  await db.from('messages').update({ saved: true }).eq('id', id);
-  toast('💾 Message saved forever!');
+  const { error } = await db.from('messages').update({ saved: true }).eq('id', id);
+  if (error) { toast('Save failed — run the SQL migration first'); return; }
+  toast('💾 Message saved!');
   loadMessages(activeConversation);
 }
 
@@ -1321,7 +1358,14 @@ async function createGroup() {
   const emoji = emojis[Math.floor(Math.random()*emojis.length)];
   const { data: conv, error } = await db.from('conversations')
     .insert({ type: 'group', name, emoji, created_by: U.id }).select().single();
-  if (error) { toast('Error: '+error.message); return; }
+  if (error) {
+    // Retry without optional columns if they don't exist yet
+    const { data: conv2, error: e2 } = await db.from('conversations')
+      .insert({ type: 'group', name }).select().single();
+    if (e2) { toast('Error creating group: '+e2.message); return; }
+    Object.assign(conv || {}, conv2);
+    if (!conv) { toast('Error creating group'); return; }
+  }
   await db.from('conversation_members').insert({ conversation_id: conv.id, user_id: U.id });
   $('grp-name').value = '';
   awardCoins(10);

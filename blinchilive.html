@@ -549,15 +549,15 @@ async function onIn(user) {
   refreshTab(activeTab);
   setTimeout(listenCalls, 800);
   // Set online status
-  db.from('profiles').update({ status: 'online' }).eq('id', user.id).then(() => {});
-  // Set offline on page close
-  window.addEventListener('beforeunload', () => {
-    navigator.sendBeacon('/dev/null'); // keep page alive briefly
-    db.from('profiles').update({ status: 'offline' }).eq('id', user.id);
-  }, { once: true });
+  updateStatus('online');
+  window.addEventListener('beforeunload', () => updateStatus('offline'), { once: true });
   try {
     const ag = localStorage.getItem('bl_active_game');
-    if (ag) { const g = JSON.parse(ag); broadcastActivity(g.title, g.url); }
+    if (ag) {
+      const g = JSON.parse(ag);
+      broadcastActivity(g.title, g.url);
+      updateStatus('ingame');
+    }
   } catch(e) {}
 }
 
@@ -803,8 +803,25 @@ async function loadFeed() {
     const { data: acts } = await db.from('activity')
       .select('*,profiles(username,displayname)')
       .in('user_id', ids).order('updated_at', { ascending: false });
+    // Also fetch friend profiles for online status
+    const { data: fprofs } = await db.from('profiles')
+      .select('id,username,displayname,status').in('id', ids);
+
     if (!acts || !acts.length) {
-      el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are playing right now.</div>'; return;
+      // Show online friends even if not playing
+      const online = (fprofs||[]).filter(p => p.status === 'online' || p.status === 'ingame');
+      if (!online.length) {
+        el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are online right now.</div>'; return;
+      }
+      el.innerHTML = online.map(p => `<div class="fi">
+        <div class="av">${nameOf(p)[0].toUpperCase()}</div>
+        <div class="fi-text">
+          <div class="fi-name"><span class="online-dot" style="width:6px;height:6px;margin-right:4px;flex-shrink:0"></span>${esc(nameOf(p))}</div>
+          <div class="fi-desc">${p.status==='ingame'?'🎮 In a game':'● Online'}</div>
+        </div>
+        <button class="join-btn" onclick="openDM('${p.id}','${esc(nameOf(p))}')">💬 Chat</button>
+      </div>`).join('');
+      return;
     }
     el.innerHTML = acts.map(a => {
       const mins = Math.max(0, Math.round((Date.now() - new Date(a.updated_at)) / 60000));
@@ -943,7 +960,7 @@ async function loadFriends() {
     return;
   }
 
-  const { data: profiles } = await db.from('profiles').select('id,username,displayname').in('id', friendIds);
+  const { data: profiles } = await db.from('profiles').select('id,username,displayname,status').in('id', friendIds);
   el.innerHTML = (profiles||[]).map(fp => {
     const fn = esc(nameOf(fp)), init = fn[0].toUpperCase();
     return `<div class="fr-row" onclick="openDM('${fp.id}','${fn}')">
@@ -994,13 +1011,14 @@ async function loadDMList() {
     .or(`user1.eq.${U.id},user2.eq.${U.id}`).eq('status', 'accepted');
   const friendIds = (fs||[]).map(f => f.user1===U.id ? f.user2 : f.user1);
   if (!friendIds.length) { el.innerHTML = '<div style="padding:13px;color:#1a1a1a;font-size:.81rem">Add friends to chat</div>'; return; }
-  const { data: profiles } = await db.from('profiles').select('id,username,displayname').in('id', friendIds);
+  const { data: profiles } = await db.from('profiles').select('id,username,displayname,status').in('id', friendIds);
   el.innerHTML = (profiles||[]).map(fp => {
     const fn = esc(nameOf(fp));
     const isActive = activeConversation && activeConvType==='dm';
-    return `<div class="ci" id="ci_${fp.id}" onclick="openDM('${fp.id}','${fn}')">
+    const statusDot = fp.status==='online'?'🟢':fp.status==='ingame'?'🎮':'⚫';
+    return `<div class="ci ${activeConversation&&activeFid===fp.id?'active':''}" id="ci_${fp.id}" onclick="openDM('${fp.id}','${fn}')">
       <div class="av" style="width:30px;height:30px;font-size:.76rem">${fn[0].toUpperCase()}</div>
-      <div style="min-width:0"><div class="ci-name">${fn}</div><div class="ci-sub">DM</div></div>
+      <div style="min-width:0"><div class="ci-name">${fn}</div><div class="ci-sub">${statusDot} ${fp.status||'offline'}</div></div>
     </div>`;
   }).join('');
 }
@@ -1027,37 +1045,38 @@ async function loadGroupList() {
 // ═══════════════════════════════════════════════════════════════
 async function openDM(friendId, friendName) {
   if (!U) return;
-  // Switch to messages tab if not already there
-  if (activeTab !== 'messages') {
-    blTab('messages');
-    // blTab will call loadSidebar, which will re-call this via click
-    // Instead: set state then open after sidebar loads
-    await new Promise(r => setTimeout(r, 120));
-  }
 
-  // Find existing DM conversation between us
-  const { data: myConvs } = await db.from('conversation_members').select('conversation_id').eq('user_id', U.id);
-  const myIds = (myConvs||[]).map(c => c.conversation_id);
+  // Show messages tab first (no race condition — openConversation handles the UI)
+  if (activeTab !== 'messages') blTab('messages');
+
+  // Find existing DM conversation shared between me and this friend
+  const { data: myConvs } = await db.from('conversation_members')
+    .select('conversation_id').eq('user_id', U.id);
+  const myIds = (myConvs||[]).map(r => r.conversation_id);
 
   let convId = null;
   if (myIds.length) {
     const { data: shared } = await db.from('conversation_members')
       .select('conversation_id').eq('user_id', friendId).in('conversation_id', myIds);
-    // Filter to DM type
     for (const s of (shared||[])) {
-      const { data: conv } = await db.from('conversations').select('type').eq('id', s.conversation_id).maybeSingle();
+      const { data: conv } = await db.from('conversations')
+        .select('type').eq('id', s.conversation_id).maybeSingle();
       if (conv?.type === 'dm') { convId = s.conversation_id; break; }
     }
   }
 
-  // No DM conversation exists — create one
+  // Create DM conversation if none exists
   if (!convId) {
-    const { data: newConv } = await db.from('conversations').insert({ type: 'dm', created_by: U.id }).select().single();
+    // Don't include created_by — column may not exist yet (run SQL migration to add it)
+    const { data: newConv, error: ce } = await db.from('conversations')
+      .insert({ type: 'dm' }).select('id').single();
+    if (ce || !newConv) { toast('Could not open chat: ' + (ce?.message||'unknown error')); return; }
     convId = newConv.id;
-    await db.from('conversation_members').insert([
+    const { error: me } = await db.from('conversation_members').insert([
       { conversation_id: convId, user_id: U.id },
       { conversation_id: convId, user_id: friendId }
     ]);
+    if (me) { toast('Could not create conversation: ' + me.message); return; }
   }
 
   openConversation(convId, friendName, 'dm');
@@ -1100,13 +1119,23 @@ function openConversation(convId, name, type) {
       `}
     </div>`;
 
-  // Hide drawer
+  // Reset chat UI
   const drawer = $('grp-drawer');
-  drawer.classList.remove('open');
+  if (drawer) drawer.classList.remove('open');
 
-  $('chat-inp-row').style.display = 'flex';
-  $('eph-bar').style.display = isDM ? 'block' : 'none';
-  $('chat-input').placeholder = isDM ? 'Message ' + name + '…' : 'Message group…';
+  // Clear old messages immediately so there's no stale content
+  const msgsEl = $('chat-msgs');
+  if (msgsEl) msgsEl.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">Loading…</div>';
+
+  // Show input bar
+  const inpRow = $('chat-inp-row');
+  if (inpRow) inpRow.style.display = 'flex';
+
+  const ephEl = $('eph-bar');
+  if (ephEl) ephEl.style.display = isDM ? 'block' : 'none';
+
+  const inpEl = $('chat-input');
+  if (inpEl) { inpEl.placeholder = isDM ? 'Message ' + name + '…' : 'Message group…'; inpEl.focus(); }
 
   loadMessages(convId);
 
@@ -1172,7 +1201,7 @@ async function addToGroupPrompt(convId) {
   const friendIds = (fs||[]).map(f => f.user1===U.id ? f.user2 : f.user1).filter(id => !memberIds.has(id));
 
   if (!friendIds.length) { drawer.innerHTML='<div style="color:#333;font-size:.82rem">All friends already in group</div>'; return; }
-  const { data: profiles } = await db.from('profiles').select('id,username,displayname').in('id', friendIds);
+  const { data: profiles } = await db.from('profiles').select('id,username,displayname,status').in('id', friendIds);
 
   drawer.innerHTML = `<div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Add to group</div>` +
     (profiles||[]).map(fp => {
@@ -1281,12 +1310,14 @@ async function sendMsg() {
   if (!U || !activeConversation) return;
   const inp = $('chat-input'), body = inp.value.trim(); if (!body) return;
   inp.value = '';
-  await db.from('messages').insert({
+  const { error } = await db.from('messages').insert({
     conversation_id: activeConversation,
     sender_id: U.id,
     body
   });
-  // Optimistically render (realtime will also trigger loadMessages)
+  if (error) { toast('Send failed: ' + error.message); inp.value = body; return; }
+  // Reload immediately (don't wait for realtime)
+  loadMessages(activeConversation);
 }
 
 async function sendMedia(input) {
@@ -1354,15 +1385,18 @@ async function createGroup() {
   const name = $('grp-name').value.trim(); if (!name) return;
   const emojis = ['🎮','🕹️','🏆','⚡','🔥','💥','🌟','🚀','👾','🎯'];
   const emoji = emojis[Math.floor(Math.random()*emojis.length)];
-  const { data: conv, error } = await db.from('conversations')
-    .insert({ type: 'group', name, emoji, created_by: U.id }).select().single();
-  if (error) {
-    // Retry without optional columns if they don't exist yet
-    const { data: conv2, error: e2 } = await db.from('conversations')
-      .insert({ type: 'group', name }).select().single();
-    if (e2) { toast('Error creating group: '+e2.message); return; }
-    Object.assign(conv || {}, conv2);
-    if (!conv) { toast('Error creating group'); return; }
+  // Try with optional columns first, fall back to minimal insert
+  let conv = null;
+  {
+    const { data: d1, error: e1 } = await db.from('conversations')
+      .insert({ type: 'group', name, emoji }).select('id,name,emoji,type').single();
+    if (!e1) { conv = d1; }
+    else {
+      const { data: d2, error: e2 } = await db.from('conversations')
+        .insert({ type: 'group', name }).select('id,name,type').single();
+      if (e2 || !d2) { toast('Error creating group: '+(e2?.message||'unknown')); return; }
+      conv = d2;
+    }
   }
   await db.from('conversation_members').insert({ conversation_id: conv.id, user_id: U.id });
   $('grp-name').value = '';
@@ -1512,6 +1546,12 @@ async function loadAchievements() {
 // ═══════════════════════════════════════════════════════════════
 // COINS
 // ═══════════════════════════════════════════════════════════════
+// ── STATUS ──────────────────────────────────────────────────────
+async function updateStatus(status) {
+  if (!U) return;
+  try { await db.from('profiles').update({ status }).eq('id', U.id); } catch(e) {}
+}
+
 async function awardCoins(amount) {
   if(!U||!P)return;
   const nc=(P.coins||0)+amount;

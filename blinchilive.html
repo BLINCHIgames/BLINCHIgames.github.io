@@ -1250,14 +1250,12 @@ async function loadMessages(convId) {
     (profs||[]).forEach(p => { profMap[p.id] = p; });
   }
   // Attach profiles to messages
-  const dataWithProfiles = (data||[]).map(m => ({ ...m, profiles: profMap[m.sender_id] || null }));
-  const data_orig = dataWithProfiles;
+  const msgs = (data||[]).map(m => ({ ...m, profiles: profMap[m.sender_id] || null }));
   const el = $('chat-msgs');
-  const data = data_orig;
-  if (!data||!data.length) {
+  if (!msgs.length) {
     el.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — say hi! 👋</div>'; return;
   }
-  el.innerHTML = data.map(m => {
+  el.innerHTML = msgs.map(m => {
     const isMe = m.sender_id === U.id;
     const hrs = m.expires_at ? Math.max(0, Math.round((new Date(m.expires_at)-Date.now())/3600000)) : null;
     const ephTag = !m.saved && hrs!==null

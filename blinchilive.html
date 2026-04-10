@@ -49,13 +49,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .nbadge{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#ff3c3c;color:#fff;font-size:.58rem;font-weight:800;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}
 /* main */
 .main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
-.tab{display:none;padding:24px 26px 60px}
+.tab{display:none;padding:22px 24px 50px}
 .tab.active{display:block}
 .pg-title{font-family:var(--display);font-size:1.28rem;font-weight:800;margin-bottom:3px}
 .pg-sub{color:var(--muted);font-size:.82rem;margin-bottom:18px}
 /* shared */
 .card-s{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:15px 17px;margin-bottom:9px}
-.av{width:40px;height:40px;border-radius:50%;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:var(--brand);flex-shrink:0;border:2px solid rgba(50,255,14,.16)}
+.av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#13131a,#1c1c28);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;color:var(--brand);flex-shrink:0;border:1.5px solid rgba(50,255,14,.2)}
 .av.lg{width:62px;height:62px;font-size:1.35rem}
 .av.sq{border-radius:11px}
 .rowf{display:flex;align-items:center;gap:9px;margin-bottom:14px}
@@ -73,7 +73,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ibt.g:hover{background:#22c55e;border-color:#22c55e;color:#fff}
 .ibt.b:hover{background:#3b82f6;border-color:#3b82f6;color:#fff}
 .locked{text-align:center;padding:56px 18px}
-.locked i{font-size:2.2rem;color:#1a1a1a}
+.locked i{font-size:2rem;color:#222}
 .locked p{color:#2a2a2a;font-size:.87rem;margin:12px 0 16px}
 .prog-bar{background:#1a1a1a;border-radius:30px;height:4px;overflow:hidden;margin-top:7px}
 .prog-fill{height:100%;background:var(--brand);border-radius:30px}
@@ -91,31 +91,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .pstat-l{font-size:.69rem;color:#2a2a2a;margin-top:1px}
 .cb{background:linear-gradient(135deg,#181600,#0d0d00);border:1px solid rgba(50,255,14,.17);border-radius:12px;padding:13px 17px;display:flex;align-items:center;gap:11px;margin-bottom:15px}
 /* friends rows */
-.fr-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer}
+.fr-row{display:flex;align-items:center;gap:11px;padding:11px 8px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;border-radius:8px;margin:0 -8px;transition:background .13s}
 .fr-row:last-child{border:none}
-.fr-row:hover .fr-name{color:var(--brand)}
+.fr-row:hover{background:rgba(50,255,14,.04)}.fr-row:hover .fr-name{color:var(--brand)}
 .fr-info{flex:1;min-width:0}
 .fr-name{font-weight:600;font-size:.88rem;transition:color .13s}
 .fr-sub{font-size:.74rem;color:var(--muted);margin-top:1px}
 .fr-sub.on{color:var(--brand)}
 .fr-acts{display:flex;gap:5px;flex-shrink:0}
 /* request card */
-.req-card{background:var(--surf);border:1px solid rgba(50,255,14,.2);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.req-card{background:#0d0d14;border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 /* MESSAGES layout — full height, sidebar + chat */
-.chat-root{display:flex;height:calc(100vh - 168px);min-height:380px}
-.chat-sidebar{width:215px;flex-shrink:0;background:#080808;border:1px solid var(--border);border-radius:12px 0 0 12px;display:flex;flex-direction:column;overflow:hidden}
+.chat-root{display:flex;height:calc(100vh - 148px);min-height:360px}
+.chat-sidebar{width:215px;flex-shrink:0;background:#06060a;border:1px solid var(--border);border-radius:12px 0 0 12px;display:flex;flex-direction:column;overflow:hidden}
 .csb-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
 .csb-tab{flex:1;padding:10px 0;text-align:center;font-size:.76rem;font-weight:700;color:#2a2a2a;cursor:pointer;border:none;background:transparent;font-family:var(--font);border-bottom:2px solid transparent;transition:all .15s}
 .csb-tab.active{color:var(--brand);border-bottom-color:var(--brand)}
 .csb-list{flex:1;overflow-y:auto}
-.ci{display:flex;align-items:center;gap:9px;padding:11px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);transition:background .12s}
+.ci{display:flex;align-items:center;gap:9px;padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);transition:background .12s;position:relative}
 .ci:hover{background:#111}
 .ci.active{background:var(--brand-dim)}
 .ci-name{font-size:.83rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ci-sub{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 /* chat window */
-.chat-win{flex:1;min-width:0;background:#080808;border:1px solid var(--border);border-left:none;border-radius:0 12px 12px 0;display:flex;flex-direction:column;overflow:hidden}
-.chat-hdr{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:54px}
+.chat-win{flex:1;min-width:0;background:#06060a;border:1px solid var(--border);border-left:none;border-radius:0 12px 12px 0;display:flex;flex-direction:column;overflow:hidden}
+.chat-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:56px;background:#06060a}
 .chat-hdr-info{flex:1;min-width:0}
 .chat-hdr-name{font-weight:700;font-size:.88rem}
 .chat-hdr-sub{font-size:.7rem;color:var(--muted);margin-top:1px}
@@ -128,13 +128,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* group members drawer inside chat window */
 .grp-drawer{display:none;background:#090909;border-top:1px solid var(--border);flex-shrink:0;max-height:220px;overflow-y:auto;padding:10px 14px}
 .grp-drawer.open{display:block}
-.msgs{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:5px}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:7px;background:#06060a}
 .msg{max-width:72%}
 .msg.me{align-self:flex-end}
 .msg.them{align-self:flex-start}
 .bubble{padding:8px 12px;border-radius:13px;font-size:.84rem;line-height:1.5;word-break:break-word}
-.msg.me .bubble{background:var(--brand);color:#000;border-radius:13px 13px 3px 13px}
-.msg.them .bubble{background:var(--surf2);color:#fff;border-radius:13px 13px 13px 3px}
+.msg.me .bubble{background:var(--brand);color:#000;border-radius:16px 16px 4px 16px;font-weight:500}
+.msg.them .bubble{background:#1c1c24;color:#e8e8e8;border-radius:16px 16px 16px 4px}
 .bubble.saved{outline:1px solid rgba(50,255,14,.3)}
 .msg-meta{font-size:.66rem;color:#1a1a1a;margin-top:2px;display:flex;align-items:center;gap:4px}
 .msg.me .msg-meta{justify-content:flex-end}
@@ -143,22 +143,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .save-btn:hover{opacity:1;color:var(--brand)}
 .msg-media{border-radius:10px;overflow:hidden;max-width:210px;margin-bottom:3px}
 .msg-media img,.msg-media video{width:100%;display:block;border-radius:9px}
-.eph-bar{background:rgba(249,115,22,.07);border-top:1px solid rgba(249,115,22,.15);padding:5px 12px;font-size:.71rem;color:#f97316;text-align:center;flex-shrink:0}
-.chat-inp-row{padding:8px 11px;border-top:1px solid var(--border);display:flex;gap:7px;align-items:center;flex-shrink:0}
-.chat-inp-row input{flex:1;background:var(--surf2);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:8px 13px;color:#fff;outline:none;font-size:.84rem;font-family:var(--font)}
+.eph-bar{background:rgba(249,115,22,.05);border-top:1px solid rgba(249,115,22,.1);padding:5px 16px;font-size:.7rem;color:#c47a3a;text-align:center;flex-shrink:0;letter-spacing:.2px}
+.chat-inp-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0;background:#06060a}
+.chat-inp-row input{flex:1;background:#13131a;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:9px 16px;color:#fff;outline:none;font-size:.85rem;font-family:var(--font);transition:border-color .18s}
 .chat-inp-row input:focus{border-color:var(--brand)}
-.send-btn{background:var(--brand);color:#000;border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.media-btn{background:var(--surf2);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#444;font-size:.85rem}
+.send-btn{background:var(--brand);color:#000;border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .15s}.send-btn:hover{transform:scale(1.08)}
+.media-btn{background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#444;transition:all .15s}
 .media-btn:hover{background:var(--surf3);color:#fff}
 #media-input{display:none}
 /* gr-card in groups tab */
-.gr-card{background:var(--surf);border:1px solid var(--border);border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
-.gr-card:hover{border-color:rgba(50,255,14,.26)}
+.gr-card{background:#0d0d14;border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.gr-card:hover{border-color:rgba(50,255,14,.28);transform:translateX(2px)}
 /* FRIEND REQUEST CENTER POPUP */
 #fr-popup{display:none;position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.82);align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 #fr-popup.show{display:flex}
-.fr-popup-box{background:#111;border:1px solid rgba(50,255,14,.28);border-radius:20px;padding:32px 36px;width:90%;max-width:380px;text-align:center}
-.fr-popup-av{width:64px;height:64px;border-radius:50%;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:var(--brand);margin:0 auto 14px;border:3px solid var(--brand)}
+.fr-popup-box{background:#0d0d14;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:36px 40px;width:90%;max-width:380px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.fr-popup-av{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#13131a,#1c1c28);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:var(--brand);margin:0 auto 16px;border:2px solid rgba(50,255,14,.3)}
 .fr-popup-name{font-family:var(--display);font-size:1.15rem;font-weight:800;margin-bottom:4px}
 .fr-popup-sub{font-size:.82rem;color:var(--muted);margin-bottom:22px}
 .fr-popup-btns{display:flex;gap:11px;justify-content:center}
@@ -222,6 +222,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;border:1px solid rgba(50,255,14,.28);border-radius:11px;padding:10px 18px;color:#fff;font-size:.84rem;font-weight:600;z-index:9999;display:none;white-space:nowrap;box-shadow:0 5px 22px rgba(0,0,0,.5)}
 #toast.show{display:block;animation:fup .22s ease}
 @keyframes fup{from{opacity:0;transform:translateX(-50%) translateY(7px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;flex-shrink:0;vertical-align:middle}
+.status-dot.online{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
+.status-dot.ingame{background:var(--brand);box-shadow:0 0 6px rgba(50,255,14,.45)}
+.status-dot.offline{background:#333}
+.save-indicator{display:inline-flex;align-items:center;gap:3px;font-size:.67rem;color:var(--brand);font-weight:600}
+/* make the messages tab not have extra padding that creates a box */
+#tab-messages{padding:0!important}
+#tab-messages > .pg-title,#tab-messages > .pg-sub,#tab-messages > div:not(.chat-root):not(#msg-locked):not(#msg-content){padding:0 24px}
+#tab-messages .pg-title{padding-top:22px}
+#tab-messages .pg-sub{padding-bottom:0;margin-bottom:10px}
+#msg-content{padding:0 24px 14px}
 @media(max-width:900px){.ad-sidebar{display:none}}
 @media(max-width:600px){
   .nav{width:52px}.nav .nav-sec,.nav .nav-btn span{display:none}.nav-btn{justify-content:center;padding:11px 6px}
@@ -255,7 +266,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <span class="live-logo-wordmark">Blinchi<span class="live-logo-pill">Live</span></span>
     </div>
     <div class="topbar-r">
-      <div class="coins-pill">🪙 <b id="bl-coins">0</b></div>
+      <div class="coins-pill"><span style="font-size:.72rem;font-weight:600;color:#444">COINS</span> <b id="bl-coins">0</b></div>
       <div class="user-pill" id="bl-user-pill" style="display:none" onclick="blTab('profile')">
         <div class="online-dot"></div><span id="bl-username"></span>
       </div>
@@ -372,7 +383,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
                 <div style="margin:auto;color:#111;font-size:.82rem">Pick a conversation</div>
               </div>
               <div class="eph-bar" id="eph-bar" style="display:none">
-                ⏳ Unsaved messages are removed after 24 h — tap 💾 on a message to save it forever
+                Messages are removed after 24 hours — tap Keep on any message to save it permanently
               </div>
               <div class="chat-inp-row" id="chat-inp-row" style="display:none">
                 <button class="media-btn" onclick="document.getElementById('media-input').click()" title="Send image/video"><i class="bi bi-image"></i></button>
@@ -413,10 +424,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div class="fr-popup-av" id="fr-popup-av">?</div>
     <div class="fr-popup-name" id="fr-popup-name">Someone</div>
     <div class="fr-popup-sub">wants to be your friend on BlinchiLive</div>
-    <div style="font-size:.72rem;color:#f97316;margin-bottom:18px">⚠️ Only accept people you actually know</div>
+    <div style="font-size:.72rem;color:#f97316;margin-bottom:18px">Only add people you actually know</div>
     <div class="fr-popup-btns">
-      <button class="btn-acc" onclick="acceptFriendPopup()">✓ Accept</button>
-      <button class="btn-dec" onclick="declineFriendPopup()">✕ Decline</button>
+      <button class="btn-acc" onclick="acceptFriendPopup()">Accept</button>
+      <button class="btn-dec" onclick="declineFriendPopup()">Decline</button>
     </div>
   </div>
 </div>
@@ -676,9 +687,9 @@ function subscribeRealtime() {
       // Notify the sender when their request is accepted
       if (payload.new && payload.new.status==='accepted') {
         if (payload.new.user1===U.id)
-          toast('🎮 Your friend request was accepted!');
+          toast('Friend request accepted');
         else if (payload.new.user2===U.id)
-          toast('🎮 You are now friends!');
+          toast('You are now friends');
       }
     })
     // ── Friendship deleted (unfriend)
@@ -696,7 +707,7 @@ function subscribeRealtime() {
       if (payload.new.conversation_id === activeConversation) {
         loadMessages(activeConversation);
       } else if (payload.new.sender_id !== U.id) {
-        toast('💬 New message!');
+        toast('New message received');
       }
     })
     // ── New conversation member (someone added to group)
@@ -724,7 +735,7 @@ async function acceptFriendPopup() {
   await db.from('friendships').update({ status: 'accepted' }).eq('id', pendingRequest.id);
   $('fr-popup').classList.remove('show');
   pendingRequest = null;
-  toast('🎮 You are now friends!');
+  toast('You are now friends');
   awardCoins(5);
   loadFriends();
   loadSidebar();
@@ -811,15 +822,15 @@ async function loadFeed() {
       // Show online friends even if not playing
       const online = (fprofs||[]).filter(p => p.status === 'online' || p.status === 'ingame');
       if (!online.length) {
-        el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are online right now.</div>'; return;
+        el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are online.</div>'; return;
       }
       el.innerHTML = online.map(p => `<div class="fi">
         <div class="av">${nameOf(p)[0].toUpperCase()}</div>
         <div class="fi-text">
-          <div class="fi-name"><span class="online-dot" style="width:6px;height:6px;margin-right:4px;flex-shrink:0"></span>${esc(nameOf(p))}</div>
-          <div class="fi-desc">${p.status==='ingame'?'🎮 In a game':'● Online'}</div>
+          <div class="fi-name"><span class="status-dot online" style="margin-right:4px"></span>${esc(nameOf(p))}</div>
+          <div class="fi-desc">${p.status==='ingame'?'In a game':'Online'}</div>
         </div>
-        <button class="join-btn" onclick="openDM('${p.id}','${esc(nameOf(p))}')">💬 Chat</button>
+        <button class="join-btn" onclick="openDM('${p.id}','${esc(nameOf(p))}')">Chat</button>
       </div>`).join('');
       return;
     }
@@ -830,7 +841,7 @@ async function loadFeed() {
       return `<div class="fi">
         <div class="av">${init}</div>
         <div class="fi-text">
-          <div class="fi-name"><span class="online-dot" style="width:6px;height:6px;margin-right:4px;flex-shrink:0"></span>${esc(nameOf(a.profiles))}</div>
+          <div class="fi-name"><span class="status-dot online" style="margin-right:4px"></span>${esc(nameOf(a.profiles))}</div>
           <div class="fi-desc">Playing <strong style="color:#ccc">${esc(a.game_title||'')}</strong> · ${when}</div>
         </div>
         <a href="index.html" onclick="localStorage.setItem('bl_join_game','${encodeURIComponent(a.game_url||'')}')"
@@ -867,14 +878,14 @@ function renderProfile() {
       <button class="btn-g" onclick="db.auth.signOut()">Sign Out</button>
     </div>
     <div class="cb">
-      <div style="font-size:1.7rem">🪙</div>
+      <div style="width:38px;height:38px;border-radius:9px;background:var(--brand-dim);border:1px solid rgba(50,255,14,.2);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:var(--brand)">COIN</div>
       <div>
         <div style="font-family:var(--display);font-size:1.35rem;font-weight:800;color:var(--brand)">${P.coins||0}</div>
-        <div style="color:#2a2a2a;font-size:.77rem">BlinchiCoins · spend in future custom games</div>
+        <div style="color:#2a2a2a;font-size:.77rem">BlinchiCoins — unlocked in future updates</div>
       </div>
     </div>
     <div class="card-s" style="display:flex;align-items:center;gap:11px">
-      <div style="font-size:1.35rem">🎨</div>
+      <div style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#333">ART</div>
       <div style="flex:1"><div style="font-weight:700;font-size:.88rem;margin-bottom:1px">Character Creator</div>
       <div style="font-size:.75rem;color:#2a2a2a">Customise your avatar — coming soon!</div></div>
       <span style="font-size:.68rem;background:#111;color:#444;border:1px solid #1a1a1a;border-radius:20px;padding:3px 9px">Soon™</span>
@@ -937,8 +948,8 @@ async function sendRequest(toId, toName) {
   const { error } = await db.from('friendships').insert({ user1: U.id, user2: toId, status: 'pending' });
   if (error) { toast('Error: ' + error.message); return; }
   const btn = $('ab_' + toId);
-  if (btn) { btn.textContent = 'Sent ✓'; btn.disabled = true; btn.style.opacity = '.5'; }
-  toast('🤝 Request sent to ' + toName + '!');
+  if (btn) { btn.textContent = 'Sent'; btn.disabled = true; btn.style.opacity = '.5'; }
+  toast('Request sent to ' + toName);
   loadSuggested();
 }
 
@@ -967,7 +978,7 @@ async function loadFriends() {
       <div class="av">${init}</div>
       <div class="fr-info">
         <div class="fr-name">${fn}</div>
-        <div class="fr-sub on">● Friend · @${esc(fp.username)}${fp.status==='ingame'?' · 🎮 In-game':fp.status==='online'?' · Online':''}</div>
+        <div class="fr-sub on">● Friend · @${esc(fp.username)}${fp.status==='ingame'?' · In game':fp.status==='online'?' · Online':''}</div>
       </div>
       <div class="fr-acts" onclick="event.stopPropagation()">
         <button class="ibt" title="Message" onclick="openDM('${fp.id}','${fn}')"><i class="bi bi-chat-fill"></i></button>
@@ -985,7 +996,7 @@ async function unfriend(friendId) {
     .or(`and(user1.eq.${U.id},user2.eq.${friendId}),and(user1.eq.${friendId},user2.eq.${U.id})`);
   loadFriends();
   if (activeTab==='messages') loadSidebar();
-  toast('Removed from friends.');
+  toast('Removed from friends');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1015,10 +1026,10 @@ async function loadDMList() {
   el.innerHTML = (profiles||[]).map(fp => {
     const fn = esc(nameOf(fp));
     const isActive = activeConversation && activeConvType==='dm';
-    const statusDot = fp.status==='online'?'🟢':fp.status==='ingame'?'🎮':'⚫';
+    const statusDot = `<span class='status-dot ${fp.status||'offline'}'></span>`;
     return `<div class="ci ${activeConversation&&activeFid===fp.id?'active':''}" id="ci_${fp.id}" onclick="openDM('${fp.id}','${fn}')">
       <div class="av" style="width:30px;height:30px;font-size:.76rem">${fn[0].toUpperCase()}</div>
-      <div style="min-width:0"><div class="ci-name">${fn}</div><div class="ci-sub">${statusDot} ${fp.status||'offline'}</div></div>
+      <div style="min-width:0"><div class="ci-name">${fn}</div><div class="ci-sub">${statusDot}${fp.status==='ingame'?'In a game':fp.status==='online'?'Online':'Offline'}</div></div>
     </div>`;
   }).join('');
 }
@@ -1032,9 +1043,9 @@ async function loadGroupList() {
   if (!groups.length) { el.innerHTML = '<div style="padding:13px;color:#1a1a1a;font-size:.81rem">No groups yet</div>'; return; }
   el.innerHTML = groups.map(r => {
     const g = r.conversations;
-    const gn = esc(g.name||'Group'), ge = g.emoji||'🎮'; // emoji added by migration
+    const gn = esc(g.name||'Group'), ge = g.emoji||''; // text avatar below
     return `<div class="ci ${activeConversation===g.id?'active':''}" onclick="openGroupConv('${g.id}','${gn}','${ge}')">
-      <div class="av sq" style="width:30px;height:30px;font-size:.82rem">${ge}</div>
+      <div class="av sq" style="width:30px;height:30px;font-size:.78rem;font-weight:700">${gn[0].toUpperCase()}</div>
       <div style="min-width:0"><div class="ci-name">${gn}</div><div class="ci-sub">Group</div></div>
     </div>`;
   }).join('');
@@ -1076,7 +1087,7 @@ async function openDM(friendId, friendName) {
       { conversation_id: convId, user_id: U.id },
       { conversation_id: convId, user_id: friendId }
     ]);
-    if (me) { toast('Could not create conversation: ' + me.message); return; }
+    if (me) { toast('Error creating conversation: ' + me.message); return; }
   }
 
   openConversation(convId, friendName, 'dm');
@@ -1087,7 +1098,7 @@ async function openDM(friendId, friendName) {
 // OPEN GROUP CONV
 // ═══════════════════════════════════════════════════════════════
 function openGroupConv(convId, name, emoji) {
-  openConversation(convId, emoji + ' ' + name, 'group');
+  openConversation(convId, name, 'group');
   loadGroupList();
 }
 
@@ -1219,8 +1230,8 @@ async function addMemberToGroup(convId, userId, name) {
   const { error } = await db.from('conversation_members').insert({ conversation_id: convId, user_id: userId });
   if (error && !error.message.includes('duplicate')) { toast('Error: '+error.message); return; }
   const btn = $('gab_' + userId);
-  if (btn) { btn.textContent='Added ✓'; btn.disabled=true; btn.style.opacity='.5'; }
-  toast('➕ ' + name + ' added!');
+  if (btn) { btn.textContent='Added'; btn.disabled=true; btn.style.opacity='.5'; }
+  toast(name + ' added to group');
   // Update member_count in conversations if you track it
 }
 
@@ -1282,16 +1293,16 @@ async function loadMessages(convId) {
   const msgs = (data||[]).map(m => ({ ...m, profiles: profMap[m.sender_id] || null }));
   const el = $('chat-msgs');
   if (!msgs.length) {
-    el.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — say hi! 👋</div>'; return;
+    el.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — start the conversation</div>'; return;
   }
   el.innerHTML = msgs.map(m => {
     const isMe = m.sender_id === U.id;
     const hrs = m.expires_at ? Math.max(0, Math.round((new Date(m.expires_at)-Date.now())/3600000)) : null;
     const ephTag = !m.saved && hrs!==null
-      ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">⏳${hrs}h</span>`
-      : (m.saved ? '<span style="color:var(--brand)">💾</span>' : '');
+      ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
+      : (m.saved ? '<span class="save-indicator">Saved</span>' : '');
     const saveBtn = !m.saved && m.body
-      ? `<button class="save-btn" onclick="saveMsg('${m.id}')" title="Save forever">💾</button>` : '';
+      ? `<button class="save-btn" onclick="saveMsg('${m.id}')" title="Keep message">Keep</button>` : '';
     let media = '';
     if (m.media_url) media = m.media_type?.startsWith('video/')
       ? `<div class="msg-media"><video src="${esc(m.media_url)}" controls></video></div>`
@@ -1335,14 +1346,14 @@ async function sendMedia(input) {
       body: null, media_url: ud.publicUrl, media_type: file.type
     });
     if (mi) throw mi;
-    toast('📷 Sent!');
-  } catch(e) { toast('Upload failed — check Supabase Storage setup'); }
+    toast('Media sent');
+  } catch(e) { toast('Upload failed — check Storage configuration'); }
 }
 
 async function saveMsg(id) {
   const { error } = await db.from('messages').update({ saved: true }).eq('id', id);
-  if (error) { toast('Save failed — run the SQL migration first'); return; }
-  toast('💾 Message saved!');
+  if (error) { toast('Save failed — ensure database migration is applied'); return; }
+  toast('Message saved');
   loadMessages(activeConversation);
 }
 
@@ -1361,10 +1372,10 @@ async function loadGroupsTab() {
   }
   el.innerHTML = groups.map(r => {
     const g = r.conversations;
-    const gn = esc(g.name||'Group'), ge = g.emoji||'🎮';
+    const gn = esc(g.name||'Group'), ge = g.emoji||'';
     const isOwner = g.created_by === U.id;
     return `<div class="gr-card" onclick="openGroupViaTab('${g.id}','${gn}','${ge}')">
-      <div class="av sq" style="width:40px;height:40px;font-size:1.2rem">${ge}</div>
+      <div class="av sq" style="width:40px;height:40px;font-size:1rem;font-weight:700">${gn[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:.88rem">${gn}</div>
         <div style="font-size:.74rem;color:var(--muted)">Group${isOwner?' · Owner':''}</div>
@@ -1377,14 +1388,13 @@ async function loadGroupsTab() {
 function openGroupViaTab(id, name, emoji) {
   // Switch to messages tab, groups sidebar, open this group
   blTab('messages');
-  setTimeout(() => { csbSwitch('groups'); setTimeout(() => openGroupConv(id, name, emoji), 80); }, 80);
+  setTimeout(() => { csbSwitch('groups'); setTimeout(() => openGroupConv(id, name, ''), 80); }, 80);
 }
 
 async function createGroup() {
   if (!U) return;
   const name = $('grp-name').value.trim(); if (!name) return;
-  const emojis = ['🎮','🕹️','🏆','⚡','🔥','💥','🌟','🚀','👾','🎯'];
-  const emoji = emojis[Math.floor(Math.random()*emojis.length)];
+  const emoji = ''; // No emoji — clean professional look
   // Try with optional columns first, fall back to minimal insert
   let conv = null;
   {
@@ -1401,7 +1411,7 @@ async function createGroup() {
   await db.from('conversation_members').insert({ conversation_id: conv.id, user_id: U.id });
   $('grp-name').value = '';
   awardCoins(10);
-  toast('🎮 Group "' + name + '" created!');
+  toast('Group created: ' + name);
   loadGroupsTab();
   // Immediately open it in messages
   openGroupViaTab(conv.id, name, emoji);
@@ -1459,7 +1469,7 @@ function listenCalls() {
     callPid=row.caller_id; callPname=row.caller_name||'Someone'; callType=row.call_type||'voice';
     window._pendingOffer=JSON.parse(row.payload);
     $('inc-nm').textContent=callPname+' is calling…';
-    $('inc-type').textContent=callType==='video'?'📹 Video call':'📞 Voice call';
+    $('inc-type').textContent=callType==='video'?'Video call':'Voice call';
     $('inc-call').classList.add('show');
   }).subscribe();
 }
@@ -1486,14 +1496,14 @@ function declineCall(){$('inc-call').classList.remove('show');window._pendingOff
 // CHALLENGES
 // ═══════════════════════════════════════════════════════════════
 const CTMPLS=[
-  {icon:'🎮',name:'Play 3 games',desc:'Play any 3 games today',coins:15,type:'play_count',target:3},
-  {icon:'⏰',name:'10 min session',desc:'Stay in any game 10+ min',coins:20,type:'play_time',target:600},
-  {icon:'💬',name:'Leave 2 comments',desc:'Comment on any 2 games',coins:10,type:'comment_count',target:2},
-  {icon:'👍',name:'Like 5 games',desc:'Like any 5 games',coins:10,type:'like_count',target:5},
-  {icon:'🤝',name:'Add a friend',desc:'Send or accept a friend request',coins:25,type:'friend_count',target:1},
-  {icon:'🏆',name:'Play 5 games',desc:'Explore 5 different games',coins:30,type:'play_count',target:5},
-  {icon:'💾',name:'Save a message',desc:'Save a message before it expires',coins:15,type:'save_msg',target:1},
-  {icon:'👥',name:'Create a group',desc:'Start a BlinchiLive group',coins:20,type:'group_count',target:1},
+  {icon:'P3',name:'Play 3 Games',desc:'Play any 3 games today',coins:15,type:'play_count',target:3},
+  {icon:'10M',name:'10 Min Session',desc:'Stay in any game for 10 minutes',coins:20,type:'play_time',target:600},
+  {icon:'C2',name:'Leave 2 Comments',desc:'Comment on any 2 games',coins:10,type:'comment_count',target:2},
+  {icon:'L5',name:'Like 5 Games',desc:'Like any 5 games',coins:10,type:'like_count',target:5},
+  {icon:'FR',name:'Add a Friend',desc:'Send or accept a friend request',coins:25,type:'friend_count',target:1},
+  {icon:'P5',name:'Play 5 Games',desc:'Play 5 different games',coins:30,type:'play_count',target:5},
+  {icon:'SV',name:'Save a Message',desc:'Save a message before it expires',coins:15,type:'save_msg',target:1},
+  {icon:'GR',name:'Create a Group',desc:'Create a BlinchiLive group',coins:20,type:'group_count',target:1},
 ];
 async function loadChallenges() {
   if(!U)return;
@@ -1508,12 +1518,12 @@ async function loadChallenges() {
   el.innerHTML=ch.map(c=>{
     const t=CTMPLS.find(x=>x.type===c.type)||CTMPLS[0];
     const pct=Math.min(100,Math.round(((c.progress||0)/c.target)*100));
-    return`<div class="ch-card"><div class="ch-icon">${t.icon}</div><div class="ch-info">
+    return`<div class="ch-card"><div class="ch-icon" style="width:36px;height:36px;border-radius:8px;background:var(--brand-dim);border:1px solid rgba(50,255,14,.18);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900;color:var(--brand);letter-spacing:.5px;flex-shrink:0">${t.icon}</div><div class="ch-info">
       <div class="ch-name">${t.name}</div><div class="ch-desc">${t.desc}</div>
       <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
       <div style="font-size:.68rem;color:#1a1a1a;margin-top:2px">${c.progress||0}/${c.target}</div>
-      <div class="ch-coins">🪙 ${c.coins}</div>
-    </div>${c.completed?'<div style="color:var(--brand);font-size:1.2rem">✅</div>':''}</div>`;
+      <div class="ch-coins">${c.coins} coins</div>
+    </div>${c.completed?'<div style="color:var(--brand);font-size:.75rem;font-weight:800;letter-spacing:.5px">DONE</div>':''}</div>`;
   }).join('');
 }
 
@@ -1521,15 +1531,15 @@ async function loadChallenges() {
 // ACHIEVEMENTS
 // ═══════════════════════════════════════════════════════════════
 const ACHS=[
-  {id:'first_game',icon:'🎮',name:'First Play',desc:'Play your first game',coins:5},
-  {id:'ten_games',icon:'🕹️',name:'Gamer',desc:'Play 10 games',coins:20},
-  {id:'fifty_games',icon:'🏆',name:'Elite Gamer',desc:'Play 50 games',coins:100},
-  {id:'first_comment',icon:'💬',name:'Commentator',desc:'Leave your first comment',coins:5},
-  {id:'first_friend',icon:'🤝',name:'Social Butterfly',desc:'Add your first friend',coins:15},
-  {id:'coin_100',icon:'🪙',name:'Coin Collector',desc:'Earn 100 BlinchiCoins',coins:25},
-  {id:'first_group',icon:'👥',name:'Group Founder',desc:'Create your first group',coins:20},
-  {id:'play_hour',icon:'⏰',name:'Marathon',desc:'Play for 1 hour total',coins:30},
-  {id:'saved_msg',icon:'💾',name:'Memory Keeper',desc:'Save your first message',coins:10},
+  {id:'first_game',icon:'01',name:'First Play',desc:'Play your first game',coins:5},
+  {id:'ten_games',icon:'10',name:'Gamer',desc:'Play 10 games',coins:20},
+  {id:'fifty_games',icon:'50',name:'Elite Gamer',desc:'Play 50 games',coins:100},
+  {id:'first_comment',icon:'CM',name:'Commentator',desc:'Leave your first comment',coins:5},
+  {id:'first_friend',icon:'FR',name:'Social',desc:'Add your first friend',coins:15},
+  {id:'coin_100',icon:'C+',name:'Coin Collector',desc:'Earn 100 BlinchiCoins',coins:25},
+  {id:'first_group',icon:'GR',name:'Group Founder',desc:'Create your first group',coins:20},
+  {id:'play_hour',icon:'1H',name:'Marathon',desc:'Play for 1 hour total',coins:30},
+  {id:'saved_msg',icon:'SV',name:'Memory',desc:'Save your first message',coins:10},
 ];
 async function loadAchievements() {
   if(!U)return;
@@ -1537,9 +1547,9 @@ async function loadAchievements() {
   const uids=new Set((ul||[]).map(a=>a.achievement_id));
   const el=$('ach-list');if(!el)return;
   el.innerHTML=`<div class="ach-grid">${ACHS.map(a=>`<div class="ach-card ${uids.has(a.id)?'unlocked':''}">
-    <div class="ach-icon">${a.icon}</div><div class="ach-name">${a.name}</div>
-    <div class="ach-desc">${a.desc}</div><div class="ach-coins">🪙 ${a.coins}</div>
-    ${uids.has(a.id)?'<div style="color:var(--brand);font-size:.67rem;font-weight:800;margin-top:3px">✓ UNLOCKED</div>':'<div style="color:#111;font-size:.67rem;margin-top:2px">Locked</div>'}
+    <div class="ach-icon" style="width:38px;height:38px;border-radius:9px;background:${uids.has(a.id)?'var(--brand-dim)':'rgba(255,255,255,.04)'};border:1px solid ${uids.has(a.id)?'rgba(50,255,14,.25)':'rgba(255,255,255,.07)'};display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:900;color:${uids.has(a.id)?'var(--brand)':'#2a2a2a'};letter-spacing:.5px;margin-bottom:8px">${a.icon}</div><div class="ach-name">${a.name}</div>
+    <div class="ach-desc">${a.desc}</div><div class="ach-coins">${a.coins} coins</div>
+    ${uids.has(a.id)?'<div style="color:var(--brand);font-size:.67rem;font-weight:800;margin-top:3px">UNLOCKED</div>':'<div style="color:#111;font-size:.67rem;margin-top:2px">Locked</div>'}
   </div>`).join('')}</div>`;
 }
 

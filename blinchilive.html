@@ -501,7 +501,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 </div>
 
 <div id="toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 'use strict';
@@ -911,6 +910,10 @@ function renderProfile() {
       <div style="font-size:.75rem;color:#2a2a2a">Customise your avatar — coming soon!</div></div>
       <span style="font-size:.68rem;background:#111;color:#444;border:1px solid #1a1a1a;border-radius:20px;padding:3px 9px">Soon™</span>
     </div>`;
+  // Re-init 3D diamond in profile since innerHTML replaced the canvas
+  requestAnimationFrame(() => {
+    if (window._initProfileDiamond) window._initProfileDiamond();
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1319,14 +1322,19 @@ async function loadMessages(convId) {
 async function sendMsg() {
   if (!U || !activeConversation) return;
   const inp = $('chat-input'), body = inp.value.trim(); if (!body) return;
+  console.log('sending to convo:', activeConversation, '| user:', U.id);
   inp.value = '';
   const { error } = await db.from('messages').insert({
-    conversation_id: activeConversation,
     sender_id: U.id,
+    conversation_id: activeConversation,
     body
   });
-  if (error) { toast('Send failed: ' + error.message); inp.value = body; return; }
-  // Reload immediately (don't wait for realtime)
+  if (error) {
+    console.error('SEND ERROR:', error);
+    toast('Send failed: ' + error.message);
+    inp.value = body;
+    return;
+  }
   loadMessages(activeConversation);
   stopTyping();
 }
@@ -1602,122 +1610,126 @@ async function awardCoins(amount) {
 // BOOT
 // ═══════════════════════════════════════════════════════════════
 
-// ══════════════════════════════════════════════════════════════
-// THREE.JS 3D DIAMOND COINS
-// ══════════════════════════════════════════════════════════════
-function initDiamond(canvasId, size) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas || typeof THREE === 'undefined') return;
 
+window.onload = () => initAuth().catch(console.error);
+</script>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
+
+function initDiamond(canvasId, size) {
+  // Wait for DOM then find canvas
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+
+  // Renderer — draw onto the existing canvas element
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setSize(size, size);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x000000, 0);
+  renderer.shadowMap.enabled = false;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
   camera.position.set(0, 0, 2.8);
 
-  // Custom diamond geometry using BufferGeometry
-  // Octahedron elongated vertically — classic gem cut
+  // ── DIAMOND GEOMETRY ─────────────────────────────────────────
+  // Custom gem: top apex → girdle ring (8 pts) → bottom culet
   const geo = new THREE.BufferGeometry();
-  const s = 0.72, t = 0.95, b = 0.5;
+  const s = 0.72, top = 0.92, bot = 0.52;
   const verts = new Float32Array([
-    // top point
-    0,  t,  0,
-    // belt ring (8 points)
-     s,  0.15,  0,
-     s*0.707,  0.15,  s*0.707,
-     0,  0.15,  s,
-    -s*0.707,  0.15,  s*0.707,
-    -s,  0.15,  0,
-    -s*0.707,  0.15, -s*0.707,
-     0,  0.15, -s,
-     s*0.707,  0.15, -s*0.707,
-    // bottom point
-     0, -b,  0,
+    0,  top,  0,                           // 0  apex
+     s,  0.12,  0,                         // 1
+     s*0.707, 0.12,  s*0.707,              // 2
+     0,  0.12,  s,                         // 3
+    -s*0.707, 0.12,  s*0.707,              // 4
+    -s,  0.12,  0,                         // 5
+    -s*0.707, 0.12, -s*0.707,             // 6
+     0,  0.12, -s,                         // 7
+     s*0.707, 0.12, -s*0.707,             // 8
+     0, -bot,  0,                          // 9  culet
   ]);
-  // Faces: top to belt, belt to bottom
   const idx = [];
-  // top cap (fan from vertex 0)
-  for (let i = 1; i <= 8; i++) idx.push(0, i, i%8+1);
-  // bottom cap (fan from vertex 9)
-  for (let i = 1; i <= 8; i++) idx.push(9, i%8+1, i);
-
+  for (let i=1;i<=8;i++) idx.push(0,i,i%8+1);   // top cap
+  for (let i=1;i<=8;i++) idx.push(9,i%8+1,i);   // bottom cap
   geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
   geo.setIndex(idx);
   geo.computeVertexNormals();
 
-  // Real glass diamond material (requires Three.js r149+)
+  // ── MAIN GEM MATERIAL — MeshPhysicalMaterial glass ──────────
   const mat = new THREE.MeshPhysicalMaterial({
     color: 0x32ff0e,
     metalness: 0.0,
     roughness: 0.0,
     transmission: 1.0,
-    thickness: 1.5,
+    thickness: 1.4,
     transparent: true,
     ior: 2.42,
     reflectivity: 1.0,
-    envMapIntensity: 1.0,
     side: THREE.DoubleSide,
   });
-
   const diamond = new THREE.Mesh(geo, mat);
   scene.add(diamond);
 
-  // Outline — cartoon edge
-  const edgeMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide });
-  const edgeGeo = geo.clone();
-  // Scale slightly outward for outline effect
-  const edgeVerts = edgeGeo.attributes.position.array;
-  for (let i = 0; i < edgeVerts.length; i++) edgeVerts[i] *= 1.08;
-  edgeGeo.attributes.position.needsUpdate = true;
-  const outline = new THREE.Mesh(edgeGeo, edgeMat);
+  // ── CARTOON BLACK OUTLINE ────────────────────────────────────
+  const outlineGeo = geo.clone();
+  const outV = outlineGeo.attributes.position.array;
+  for (let i=0;i<outV.length;i++) outV[i] *= 1.10;
+  outlineGeo.attributes.position.needsUpdate = true;
+  outlineGeo.computeVertexNormals();
+  const outline = new THREE.Mesh(outlineGeo,
+    new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide }));
   scene.add(outline);
 
-  // Lighting setup for gem rendering
-  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-  scene.add(ambient);
+  // ── LIGHTING ────────────────────────────────────────────────
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-  const keyLight = new THREE.PointLight(0x32ff0e, 4, 12);
-  keyLight.position.set(2, 3, 2);
-  scene.add(keyLight);
+  const key = new THREE.DirectionalLight(0x32ff0e, 4);
+  key.position.set(2, 3, 2);
+  scene.add(key);
 
-  const fillLight = new THREE.PointLight(0xffffff, 2, 12);
-  fillLight.position.set(-2, 1, 3);
-  scene.add(fillLight);
+  const fill = new THREE.DirectionalLight(0xffffff, 2);
+  fill.position.set(-2, 1, 3);
+  scene.add(fill);
 
-  const rimLight = new THREE.PointLight(0x00ffaa, 2, 8);
-  rimLight.position.set(0, -4, -1);
-  scene.add(rimLight);
+  const rim = new THREE.DirectionalLight(0x00ffaa, 1.8);
+  rim.position.set(0, -4, -1);
+  scene.add(rim);
 
-  const topLight = new THREE.PointLight(0xffffff, 1.5, 8);
-  topLight.position.set(0, 5, 0);
-  scene.add(topLight);
+  // Sparkle point light — moves around to create glint
+  const sparkle = new THREE.PointLight(0xffffff, 2.5, 6);
+  sparkle.position.set(1, 2, 1);
+  scene.add(sparkle);
 
+  // ── ANIMATION ───────────────────────────────────────────────
   let frame = 0;
   function animate() {
     requestAnimationFrame(animate);
     frame++;
     diamond.rotation.y += 0.022;
-    diamond.rotation.x = Math.sin(frame * 0.008) * 0.3;
+    diamond.rotation.x = Math.sin(frame * 0.009) * 0.28;
     outline.rotation.copy(diamond.rotation);
-    // Pulse the glow
-    keyLight.intensity = 2.5 + Math.sin(frame * 0.04) * 0.8;
+    // Orbit sparkle light for glint effect
+    sparkle.position.x = Math.cos(frame * 0.04) * 2;
+    sparkle.position.z = Math.sin(frame * 0.04) * 2;
+    sparkle.intensity = 2.2 + Math.sin(frame * 0.06) * 1.0;
     renderer.render(scene, camera);
   }
   animate();
 }
 
-// Init diamonds after page loads
-window.addEventListener('load', () => {
-  setTimeout(() => {
+// Run after DOM is ready — handles both fresh load and cached page
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
     initDiamond('diamond-canvas', 28);
-    initDiamond('diamond-profile', 42);
-  }, 300);
-});
+  });
+} else {
+  initDiamond('diamond-canvas', 28);
+}
 
-window.onload = () => initAuth().catch(console.error);
+// Profile diamond re-initialises when profile tab renders (canvas is in dynamic HTML)
+window._initProfileDiamond = () => initDiamond('diamond-profile', 42);
 </script>
+
 </body>
 </html>

@@ -719,10 +719,11 @@ function subscribeRealtime() {
     .on('postgres_changes', {
       event: 'INSERT', schema: 'public', table: 'messages'
     }, payload => {
+      console.log('global realtime msg:', payload.new);
       countUnread();
-      if (payload.new.conversation_id === activeConversation) {
+      if (payload.new?.conversation_id === activeConversation) {
         loadMessages(activeConversation);
-      } else if (payload.new.sender_id !== U.id) {
+      } else if (payload.new?.sender_id !== U.id) {
         toast('New message received');
       }
     })
@@ -1149,13 +1150,19 @@ function openConversation(convId, name, type) {
   loadMessages(convId);
 
   // Realtime for this conversation
-  if (rtMsg) rtMsg.unsubscribe();
-  rtMsg = db.channel('conv_' + convId)
+  if (rtMsg) { try { rtMsg.unsubscribe(); } catch(e){} }
+  rtMsg = db.channel('rt_conv_' + convId)
     .on('postgres_changes', {
-      event: 'INSERT', schema: 'public', table: 'messages',
-      filter: `conversation_id=eq.${convId}`
-    }, () => loadMessages(convId))
-    .subscribe();
+      event: 'INSERT', schema: 'public', table: 'messages'
+    }, payload => {
+      console.log('realtime message received:', payload.new?.conversation_id, 'active:', convId);
+      if (payload.new?.conversation_id === convId) {
+        loadMessages(convId);
+      }
+    })
+    .subscribe(status => {
+      console.log('realtime status for conv', convId, ':', status);
+    });
 
   // Typing indicator
   listenTyping(convId);
@@ -1275,15 +1282,17 @@ async function checkPeerPres(convId) {
 // ═══════════════════════════════════════════════════════════════
 async function loadMessages(convId) {
   if (!U || !convId) return;
-  // Clean expired unsaved DM messages
-  if (activeConvType === 'dm') {
-    try { await db.from('messages').delete().eq('conversation_id', convId)
-      .lt('created_at', new Date(Date.now()-86400000).toISOString()); } catch(e) {}
-  }
-  // Load messages — FK is to auth.users not profiles, so do two queries
+  console.log('loadMessages called for:', convId);
+  // Load messages — fresh query, no cache
   const { data, error } = await db.from('messages').select('*')
-    .eq('conversation_id', convId).order('created_at', { ascending: true }).limit(150);
-  if (error) { console.error('loadMessages', error); return; }
+    .eq('conversation_id', convId)
+    .order('created_at', { ascending: true })
+    .limit(200);
+  if (error) {
+    console.error('loadMessages ERROR:', error);
+    return;
+  }
+  console.log('loadMessages got', data?.length, 'messages');
   // Batch-fetch profiles for all senders
   const senderIds = [...new Set((data||[]).map(m => m.sender_id))];
   let profMap = {};
@@ -1320,23 +1329,33 @@ async function loadMessages(convId) {
 }
 
 async function sendMsg() {
-  if (!U || !activeConversation) return;
-  const inp = $('chat-input'), body = inp.value.trim(); if (!body) return;
-  console.log('sending to convo:', activeConversation, '| user:', U.id);
-  inp.value = '';
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+
+  console.log('sending to convo:', activeConversation, '| user:', U?.id);
+
+  if (!text || !activeConversation) {
+    console.warn('sendMsg blocked — text:', !!text, 'convo:', activeConversation);
+    return;
+  }
+
   const { error } = await db.from('messages').insert({
     sender_id: U.id,
     conversation_id: activeConversation,
-    body
+    body: text
   });
+
   if (error) {
     console.error('SEND ERROR:', error);
-    toast('Send failed: ' + error.message);
-    inp.value = body;
+    alert(error.message);
     return;
   }
-  loadMessages(activeConversation);
+
+  input.value = '';
   stopTyping();
+
+  // Force reload immediately after insert
+  await loadMessages(activeConversation);
 }
 
 // ── TYPING INDICATOR ────────────────────────────────────────

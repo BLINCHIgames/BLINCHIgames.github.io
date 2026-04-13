@@ -148,7 +148,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 .chat-inp-row{padding:10px 12px;border-top:1px solid var(--glass-border);display:flex;gap:8px;align-items:center;flex-shrink:0;background:rgba(6,6,8,.7)}
 .chat-inp-row input{flex:1;background:#13131a;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:9px 16px;color:#fff;outline:none;font-size:.85rem;font-family:var(--font);transition:border-color .18s}
 .chat-inp-row input:focus{border-color:var(--brand)}
-.send-btn{background:var(--brand);color:#000;border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .15s}.send-btn:hover{transform:scale(1.08)}
+.send-btn{background:#111;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}.send-btn:hover{background:#1a1a1a;border-color:rgba(255,255,255,.22);transform:scale(1.06)}.send-btn:active{transform:scale(.92)}
 .media-btn{background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#444;transition:all .15s}
 .media-btn:hover{background:var(--surf3);color:#fff}
 #media-input{display:none}
@@ -325,7 +325,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
   .nav{transition:width .2s var(--ease)}
 }
 
-/* 3D diamond rendered via Three.js — see initDiamond() */
+@keyframes rhombPulse{0%,100%{filter:drop-shadow(0 0 3px rgba(50,255,14,.4))}50%{filter:drop-shadow(0 0 8px rgba(50,255,14,.7))}}
 @media(max-width:900px){.ad-sidebar{display:none}}
 @media(max-width:600px){
   .nav{width:52px}.nav .nav-sec,.nav .nav-btn span{display:none}.nav-btn{justify-content:center;padding:11px 6px}
@@ -359,7 +359,23 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
       <span class="live-logo-wordmark">Blinchi<span class="live-logo-pill">Live</span></span>
     </div>
     <div class="topbar-r">
-      <div class="coins-pill"><canvas id="diamond-canvas" width="28" height="28" style="display:block;flex-shrink:0"></canvas><b id="bl-coins">0</b></div>
+      <div class="coins-pill"><svg width="20" height="20" viewBox="0 0 100 100" style="flex-shrink:0">
+  <defs>
+    <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3dff1a"/>
+      <stop offset="50%" stop-color="#22cc08"/>
+      <stop offset="100%" stop-color="#0e8a04"/>
+    </linearGradient>
+    <linearGradient id="rg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,.55)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+  </defs>
+  <polygon points="50,4 96,50 50,96 4,50" fill="#000"/>
+  <polygon points="50,9 91,50 50,91 9,50" fill="url(#rg1)"/>
+  <polygon points="50,17 83,50 50,83 17,50" fill="rgba(0,0,0,.18)"/>
+  <polygon points="50,9 91,50 50,50" fill="url(#rg2)"/>
+</svg><b id="bl-coins">0</b></div>
       <div class="user-pill" id="bl-user-pill" style="display:none" onclick="blTab('profile')">
         <div class="online-dot"></div><span id="bl-username"></span>
       </div>
@@ -489,7 +505,11 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
               <div class="chat-inp-row" id="chat-inp-row" style="display:none">
                 <button class="media-btn" onclick="document.getElementById('media-input').click()" title="Send image/video"><i class="bi bi-image"></i></button>
                 <input id="chat-input" placeholder="Type a message…" oninput="onInputTyping()" onkeydown="if(event.key==='Enter'){sendMsg();stopTyping()}">
-                <button class="send-btn" onclick="sendMsg()"><i class="bi bi-send-fill"></i></button>
+                <button class="send-btn" onclick="sendMsg()" title="Send">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>
+  </svg>
+</button>
               </div>
             </div>
           </div>
@@ -607,14 +627,23 @@ const db = supabase.createClient(SB_URL, SB_KEY, {
 // ═══════════════════════════════════════════════════════════════
 let U = null, P = null;
 let activeTab = 'feed';
-let activeConversation = null;   // UUID of open conversation
+let activeConversation = null;
 let activeConvName = '';
-let activeConvType = '';          // 'dm' | 'group'
-let csbMode = 'friends';         // chat sidebar mode
-
-let pendingRequest = null;        // friendship row waiting for response
-
+let activeConvType = '';
+let csbMode = 'friends';
+let pendingRequest = null;
 let rtAll = null, rtMsg = null, rtPres = null, presTimer = null;
+
+// ── Load locks — prevent concurrent collisions ──
+const _loading = {
+  friends: false, feed: false, sidebar: false,
+  groups: false, challenges: false, achievements: false, messages: false
+};
+function _lock(key, fn) {
+  if (_loading[key]) return Promise.resolve();
+  _loading[key] = true;
+  return Promise.resolve(fn()).finally(() => { _loading[key] = false; });
+}
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
@@ -801,9 +830,9 @@ function subscribeRealtime() {
       event: 'UPDATE', schema: 'public', table: 'friendships'
     }, payload => {
       checkReqBadge();
-      // Always refresh friends + sidebar regardless of active tab
-      loadFriends();
-      loadSidebar();
+      // Only refresh what's currently visible
+      if (activeTab==='friends') loadFriends();
+      if (activeTab==='messages') loadSidebar();
       if (activeTab==='addfriends') loadSuggested();
       // Notify the sender when their request is accepted
       if (payload.new && payload.new.status==='accepted') {
@@ -850,9 +879,11 @@ function subscribeRealtime() {
     .on('postgres_changes', {
       event: '*', schema: 'public', table: 'friendships'
     }, () => {
-      loadFriends();
-      loadSidebar();
+      // Only reload what's visible — no unconditional spam
       checkReqBadge();
+      if (activeTab === 'friends') loadFriends();
+      if (activeTab === 'messages') loadSidebar();
+      if (activeTab === 'addfriends') loadSuggested();
     })
     .subscribe();
 
@@ -900,9 +931,9 @@ async function acceptFriendPopup() {
   // Auto-create DM so chat is ready immediately
   const otherId = req.user1 === U.id ? req.user2 : req.user1;
   db.rpc('create_dm', { other_user: otherId }).catch(() => {});
-  loadFriends();
-  loadSidebar();
   checkReqBadge();
+  if (activeTab === 'friends') loadFriends();
+  if (activeTab === 'messages') loadSidebar();
 }
 function declineFriendPopup() {
   if (!pendingRequest) return;
@@ -961,7 +992,8 @@ async function countUnread() {
 // FEED
 // ═══════════════════════════════════════════════════════════════
 async function loadFeed() {
-  if (!U) return;
+  if (!U || _loading.feed) return;
+  _loading.feed = true;
   const el = $('feed-content');
   el.innerHTML = '<div style="color:#111;padding:14px;font-size:.83rem">Loading…</div>';
   try {
@@ -1014,9 +1046,9 @@ async function loadFeed() {
       </div>`;
     }).join('');
   } catch(e) {
-    el.innerHTML = '<div style="color:#333;padding:14px;font-size:.83rem">Could not load feed. Check your connection.</div>';
+    el.innerHTML = '<div style="color:#333;padding:14px;font-size:.83rem">Could not load feed.</div>';
     console.error('loadFeed error:', e);
-  }
+  } finally { _loading.feed = false; }
 }
 async function broadcastActivity(title, url) {
   if (!U) return;
@@ -1043,7 +1075,23 @@ function renderProfile() {
       <button class="btn-g" onclick="db.auth.signOut()">Sign Out</button>
     </div>
     <div class="cb">
-      <canvas id="diamond-profile" width="42" height="42" style="display:block;flex-shrink:0"></canvas>
+      <svg width="38" height="38" viewBox="0 0 100 100" style="flex-shrink:0;animation:rhombPulse 3s ease-in-out infinite">
+  <defs>
+    <linearGradient id="rpg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3dff1a"/>
+      <stop offset="50%" stop-color="#22cc08"/>
+      <stop offset="100%" stop-color="#0e8a04"/>
+    </linearGradient>
+    <linearGradient id="rpg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,.6)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+  </defs>
+  <polygon points="50,4 96,50 50,96 4,50" fill="#000"/>
+  <polygon points="50,9 91,50 50,91 9,50" fill="url(#rpg1)"/>
+  <polygon points="50,17 83,50 50,83 17,50" fill="rgba(0,0,0,.18)"/>
+  <polygon points="50,9 91,50 50,50" fill="url(#rpg2)"/>
+</svg>
       <div>
         <div style="font-family:var(--display);font-size:1.35rem;font-weight:800;color:var(--brand)">${P.coins||0}</div>
         <div style="color:#2a2a2a;font-size:.77rem">BlinchiCoins — unlocked in future updates</div>
@@ -1055,10 +1103,7 @@ function renderProfile() {
       <div style="font-size:.75rem;color:#2a2a2a">Customise your avatar — coming soon!</div></div>
       <span style="font-size:.68rem;background:#111;color:#444;border:1px solid #1a1a1a;border-radius:20px;padding:3px 9px">Soon™</span>
     </div>`;
-  // Re-init 3D diamond in profile since innerHTML replaced the canvas
-  requestAnimationFrame(() => {
-    if (window._initProfileDiamond) window._initProfileDiamond();
-  });
+
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1126,7 +1171,8 @@ async function sendRequest(toId, toName) {
 // FRIENDS LIST
 // ═══════════════════════════════════════════════════════════════
 async function loadFriends() {
-  if (!U) return;
+  if (!U || _loading.friends) return;
+  _loading.friends = true;
   showLoader('friends-list');
   // Get ALL accepted friendships in one query (both directions)
   const { data: fs, error } = await db.from('friendships').select('user1,user2,status')
@@ -1138,6 +1184,7 @@ async function loadFriends() {
 
   if (!friendIds.length) {
     el.innerHTML = `<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No friends yet — <a style="color:var(--brand);cursor:pointer" onclick="blTab('addfriends')">find some!</a></div>`;
+    _loading.friends = false;
     return;
   }
 
@@ -1161,6 +1208,7 @@ async function loadFriends() {
       </div>
     </div>`;
   }).join('');
+  _loading.friends = false;
 }
 
 async function unfriend(friendId) {
@@ -1729,7 +1777,8 @@ const CTMPLS=[
   {icon:'GR',name:'Create a Group',desc:'Create a BlinchiLive group',coins:20,type:'group_count',target:1},
 ];
 async function loadChallenges() {
-  if(!U)return;
+  if(!U||_loading.challenges)return;
+  _loading.challenges=true;
   const today=new Date().toISOString().split('T')[0];
   let{data:ch}=await db.from('daily_challenges').select('*').eq('user_id',U.id).eq('date',today);
   if(!ch||!ch.length){
@@ -1748,6 +1797,7 @@ async function loadChallenges() {
       <div class="ch-coins">${c.coins} coins</div>
     </div>${c.completed?'<div style="color:var(--brand);font-size:.75rem;font-weight:800;letter-spacing:.5px">DONE</div>':''}</div>`;
   }).join('');
+  _loading.challenges=false;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1909,122 +1959,7 @@ window.onload = () => {
 
 </script>
 
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
 
-function initDiamond(canvasId, size) {
-  // Wait for DOM then find canvas
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-
-  // Renderer — draw onto the existing canvas element
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setSize(size, size);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-  renderer.shadowMap.enabled = false;
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
-  camera.position.set(0, 0, 2.8);
-
-  // ── DIAMOND GEOMETRY ─────────────────────────────────────────
-  // Custom gem: top apex → girdle ring (8 pts) → bottom culet
-  const geo = new THREE.BufferGeometry();
-  const s = 0.72, top = 0.92, bot = 0.52;
-  const verts = new Float32Array([
-    0,  top,  0,                           // 0  apex
-     s,  0.12,  0,                         // 1
-     s*0.707, 0.12,  s*0.707,              // 2
-     0,  0.12,  s,                         // 3
-    -s*0.707, 0.12,  s*0.707,              // 4
-    -s,  0.12,  0,                         // 5
-    -s*0.707, 0.12, -s*0.707,             // 6
-     0,  0.12, -s,                         // 7
-     s*0.707, 0.12, -s*0.707,             // 8
-     0, -bot,  0,                          // 9  culet
-  ]);
-  const idx = [];
-  for (let i=1;i<=8;i++) idx.push(0,i,i%8+1);   // top cap
-  for (let i=1;i<=8;i++) idx.push(9,i%8+1,i);   // bottom cap
-  geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
-  geo.setIndex(idx);
-  geo.computeVertexNormals();
-
-  // ── MAIN GEM MATERIAL — MeshPhysicalMaterial glass ──────────
-  const mat = new THREE.MeshPhysicalMaterial({
-    color: 0x32ff0e,
-    metalness: 0.0,
-    roughness: 0.0,
-    transmission: 1.0,
-    thickness: 1.4,
-    transparent: true,
-    ior: 2.42,
-    reflectivity: 1.0,
-    side: THREE.DoubleSide,
-  });
-  const diamond = new THREE.Mesh(geo, mat);
-  scene.add(diamond);
-
-  // ── CARTOON BLACK OUTLINE ────────────────────────────────────
-  const outlineGeo = geo.clone();
-  const outV = outlineGeo.attributes.position.array;
-  for (let i=0;i<outV.length;i++) outV[i] *= 1.10;
-  outlineGeo.attributes.position.needsUpdate = true;
-  outlineGeo.computeVertexNormals();
-  const outline = new THREE.Mesh(outlineGeo,
-    new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide }));
-  scene.add(outline);
-
-  // ── LIGHTING ────────────────────────────────────────────────
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-  const key = new THREE.DirectionalLight(0x32ff0e, 4);
-  key.position.set(2, 3, 2);
-  scene.add(key);
-
-  const fill = new THREE.DirectionalLight(0xffffff, 2);
-  fill.position.set(-2, 1, 3);
-  scene.add(fill);
-
-  const rim = new THREE.DirectionalLight(0x00ffaa, 1.8);
-  rim.position.set(0, -4, -1);
-  scene.add(rim);
-
-  // Sparkle point light — moves around to create glint
-  const sparkle = new THREE.PointLight(0xffffff, 2.5, 6);
-  sparkle.position.set(1, 2, 1);
-  scene.add(sparkle);
-
-  // ── ANIMATION ───────────────────────────────────────────────
-  let frame = 0;
-  function animate() {
-    requestAnimationFrame(animate);
-    frame++;
-    diamond.rotation.y += 0.022;
-    diamond.rotation.x = Math.sin(frame * 0.009) * 0.28;
-    outline.rotation.copy(diamond.rotation);
-    // Orbit sparkle light for glint effect
-    sparkle.position.x = Math.cos(frame * 0.04) * 2;
-    sparkle.position.z = Math.sin(frame * 0.04) * 2;
-    sparkle.intensity = 2.2 + Math.sin(frame * 0.06) * 1.0;
-    renderer.render(scene, camera);
-  }
-  animate();
-}
-
-// Run after DOM is ready — handles both fresh load and cached page
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    initDiamond('diamond-canvas', 28);
-  });
-} else {
-  initDiamond('diamond-canvas', 28);
-}
-
-// Profile diamond re-initialises when profile tab renders (canvas is in dynamic HTML)
-window._initProfileDiamond = () => initDiamond('diamond-profile', 42);
-</script>
 
 </body>
 </html>

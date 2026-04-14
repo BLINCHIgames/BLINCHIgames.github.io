@@ -1259,6 +1259,7 @@ async function loadSidebar() {
 
 async function loadDMList() {
   const el = $('convo-list');
+  el.innerHTML = '<div style="padding:13px;color:#1a1a1a;font-size:.81rem">Loading…</div>';
   // Get friends, then find/show their DM conversations
   const { data: fs } = await db.from('friendships').select('user1,user2')
     .or(`user1.eq.${U.id},user2.eq.${U.id}`).eq('status', 'accepted');
@@ -1280,6 +1281,7 @@ async function loadDMList() {
 
 async function loadGroupList() {
   const el = $('convo-list');
+  el.innerHTML = '<div style="padding:13px;color:#1a1a1a;font-size:.81rem">Loading…</div>';
   const { data } = await db.from('conversation_members')
     .select('conversation_id, conversations(id,name,emoji,type)')
     .eq('user_id', U.id);
@@ -1301,15 +1303,47 @@ async function loadGroupList() {
 async function openDM(friendId, friendName) {
   if (!U) return;
   if (activeTab !== 'messages') blTab('messages');
-  // Use SECURITY DEFINER RPC — bypasses RLS, handles duplicate check
-  const { data: convId, error } = await db.rpc('create_dm', { other_user: friendId });
-  if (error || !convId) {
-    toast('Could not open chat: ' + (error?.message || 'unknown'));
-    console.error('openDM error:', error);
-    return;
+
+  try {
+    // ── Step 1: Find all conversation IDs I'm in ──────────────────
+    const { data: myRows } = await db.from('conversation_members')
+      .select('conversation_id').eq('user_id', U.id);
+    const myIds = (myRows || []).map(r => r.conversation_id);
+
+    let convId = null;
+
+    if (myIds.length) {
+      // ── Step 2: Of those, find any where the friend is also in ──
+      const { data: sharedRows } = await db.from('conversation_members')
+        .select('conversation_id').eq('user_id', friendId).in('conversation_id', myIds);
+      const sharedIds = (sharedRows || []).map(r => r.conversation_id);
+
+      if (sharedIds.length) {
+        // ── Step 3: Of those shared convs, pick the DM one ────────
+        const { data: dmConvs } = await db.from('conversations')
+          .select('id').eq('type', 'dm').in('id', sharedIds).limit(1);
+        if (dmConvs && dmConvs.length) convId = dmConvs[0].id;
+      }
+    }
+
+    if (!convId) {
+      // ── Step 4: No existing DM — create conversation + members ──
+      const { data: newConv, error: ce } = await db.from('conversations')
+        .insert({ type: 'dm', name: null }).select('id').single();
+      if (ce || !newConv) { toast('Could not open chat — try again'); console.error('openDM create conv:', ce); return; }
+      convId = newConv.id;
+
+      const { error: me } = await db.from('conversation_members')
+        .insert([{ conversation_id: convId, user_id: U.id }, { conversation_id: convId, user_id: friendId }]);
+      if (me) { toast('Could not open chat — try again'); console.error('openDM add members:', me); return; }
+    }
+
+    openConversation(convId, friendName, 'dm');
+    loadDMList();
+  } catch(e) {
+    toast('Could not open chat — try again');
+    console.error('openDM exception:', e);
   }
-  openConversation(convId, friendName, 'dm');
-  loadDMList();
 }
 
 // ═══════════════════════════════════════════════════════════════

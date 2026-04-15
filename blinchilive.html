@@ -21,18 +21,17 @@
   --r:13px;--ease:cubic-bezier(.4,0,.2,1)
 }
 html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-family:var(--font);margin:0}
-.shell{display:flex;flex-direction:column;height:100vh}
+.shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 .ctx-ad-bar{background:#0a0a0a;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;min-height:58px;overflow:hidden;flex-shrink:0}
 /* topbar */
-.topbar{height:54px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+.topbar{display:none}
 .live-logo{display:inline-flex;align-items:center;gap:7px}
 .live-logo-icon{width:28px;height:28px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .live-logo-icon svg{width:16px;height:16px}
 .live-logo-wordmark{font-family:var(--display);font-size:1.08rem;font-weight:800;color:#fff;white-space:nowrap}
 .live-logo-pill{display:inline-flex;align-items:center;background:var(--brand);color:#000;font-family:var(--display);font-size:.78rem;font-weight:900;letter-spacing:.6px;padding:2px 9px;border-radius:20px;margin-left:3px;position:relative;top:-1px}
 .topbar-r{margin-left:auto;display:flex;align-items:center;gap:9px}
-.coins-pill{display:flex;align-items:center;gap:5px;background:var(--surf);border:1px solid rgba(50,255,14,.22);border-radius:20px;padding:5px 12px;font-size:.8rem}
-.coins-pill b{color:var(--brand)}
+/* coins-pill moved to nav-bottom */
 .user-pill{display:flex;align-items:center;gap:6px;background:var(--surf);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:.82rem;cursor:pointer}
 .online-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 5px var(--brand);flex-shrink:0;animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
@@ -42,15 +41,32 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 /* body */
 .body{display:flex;flex:1;min-height:0;overflow:hidden}
 /* nav */
-.nav{width:196px;flex-shrink:0;background:rgba(8,8,10,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;padding:10px 8px;gap:1px;overflow-y:auto}
+.nav{width:220px;flex-shrink:0;background:rgba(8,8,12,.96);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.nav-top{padding:20px 16px 14px;border-bottom:1px solid var(--glass-border);flex-shrink:0}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.nav-brand-logo{flex-shrink:0}
+.nav-brand-text{display:flex;flex-direction:column;gap:2px}
+.nav-brand-name{font-family:var(--display);font-size:1.22rem;font-weight:800;color:#fff;line-height:1}
+.nav-brand-pill{display:inline-flex;align-items:center;background:var(--brand);color:#000;font-family:var(--display);font-size:.68rem;font-weight:900;letter-spacing:.5px;padding:2px 7px;border-radius:20px;width:fit-content}
+.nav-back{display:flex;align-items:center;gap:6px;margin-top:12px;color:#333;font-size:.78rem;font-weight:600;text-decoration:none;transition:color .14s}
+.nav-back:hover{color:var(--brand)}
+.nav-back svg{flex-shrink:0}
+.nav-inner{flex:1;overflow-y:auto;padding:8px 8px;display:flex;flex-direction:column;gap:1px}
+.nav-bottom{padding:12px 14px;border-top:1px solid var(--glass-border);flex-shrink:0;background:rgba(6,6,8,.7)}
+.nav-user-row{display:flex;align-items:center;gap:9px;cursor:pointer;margin-bottom:7px}
+.nav-user-row:hover .nav-user-name{color:var(--brand)}
+.nav-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#13131a,#1c1c28);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;color:var(--brand);flex-shrink:0;border:1.5px solid rgba(50,255,14,.25)}
+.nav-user-name{font-size:.84rem;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#ccc;transition:color .14s}
+.nav-coins-row{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)}
+.nav-coins-row b{color:var(--brand);font-weight:800}
 .nav-sec{font-size:.6rem;text-transform:uppercase;letter-spacing:1.5px;color:#1a1a1a;font-weight:800;padding:14px 10px 5px}
 .nav-btn{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;cursor:pointer;color:#444;font-size:.86rem;font-weight:500;border:none;background:transparent;width:100%;text-align:left;transition:all .14s;position:relative;font-family:var(--font)}
 .nav-btn:hover{background:var(--surf);color:#fff}
-.nav-btn.active{background:var(--brand-dim);color:var(--brand);border-left:3px solid var(--brand);border-radius:3px 10px 10px 3px}
+.nav-btn.active{background:var(--brand-dim);color:var(--brand);border-left:3px solid var(--brand);border-radius:3px 10px 10px 3px;box-shadow:inset 0 0 20px rgba(50,255,14,.06)}
 .nbadge{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#ff3c3c;color:#fff;font-size:.58rem;font-weight:800;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}
 /* main */
 .main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
-.tab{display:none;padding:22px 24px 50px}
+.tab{display:none;padding:18px 22px 50px}
 .tab.active{display:block}
 .pg-title{font-family:var(--display);font-size:1.28rem;font-weight:800;margin-bottom:3px}
 .pg-sub{color:var(--muted);font-size:.82rem;margin-bottom:18px}
@@ -103,7 +119,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 /* request card */
 .req-card{background:#0d0d14;border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 /* MESSAGES layout — full height, sidebar + chat */
-.chat-root{display:flex;height:calc(100vh - 148px);min-height:360px}
+.chat-root{display:flex;height:calc(100vh - 20px);min-height:360px}
 .chat-sidebar{width:215px;flex-shrink:0;background:rgba(6,6,8,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:12px 0 0 12px;display:flex;flex-direction:column;overflow:hidden}
 .csb-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
 .csb-tab{flex:1;padding:10px 0;text-align:center;font-size:.76rem;font-weight:700;color:#2a2a2a;cursor:pointer;border:none;background:transparent;font-family:var(--font);border-bottom:2px solid transparent;transition:all .15s}
@@ -293,8 +309,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 .av{transition:box-shadow .18s,transform .18s}
 .fr-row:hover .av,.ci:hover .av{box-shadow:0 0 0 2px rgba(50,255,14,.3)}
 
-/* ── Topbar glass ── */
-.topbar{background:rgba(10,14,22,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border)}
+
 
 /* ── Auth modal glass ── */
 .modal-box{background:rgba(6,6,8,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
@@ -330,7 +345,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 @media(max-width:600px){
   .nav{width:52px}.nav .nav-sec,.nav .nav-btn span{display:none}.nav-btn{justify-content:center;padding:11px 6px}
   .tab{padding:12px 10px 40px}
-  .chat-root{height:calc(100vh - 195px)}
+  .chat-root{height:calc(100vh - 20px)}
   .chat-sidebar{width:54px}
   .csb-tabs{display:none}
   .ci-name,.ci-sub{display:none}
@@ -347,62 +362,74 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
     <script>atOptions={'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':60,'width':468,'params':{}}</script>
     <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
   </div>
-  <div class="topbar">
-    <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Back</a>
-    <div class="live-logo">
-      <div class="live-logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="2" fill="#000" stroke="none"/>
-          <path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>
-          <path d="M5 5a10 10 0 0 0 0 14"/><path d="M19 5a10 10 0 0 1 0 14"/>
-        </svg>
-      </div>
-      <span class="live-logo-wordmark">Blinchi<span class="live-logo-pill">Live</span></span>
-    </div>
-    <div class="topbar-r">
-      <div class="coins-pill"><svg width="20" height="20" viewBox="0 0 100 100" style="flex-shrink:0">
-  <defs>
-    <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3dff1a"/>
-      <stop offset="50%" stop-color="#22cc08"/>
-      <stop offset="100%" stop-color="#0e8a04"/>
-    </linearGradient>
-    <linearGradient id="rg2" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="rgba(255,255,255,.55)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-    </linearGradient>
-  </defs>
-  <polygon points="50,4 96,50 50,96 4,50" fill="#000"/>
-  <polygon points="50,9 91,50 50,91 9,50" fill="url(#rg1)"/>
-  <polygon points="50,17 83,50 50,83 17,50" fill="rgba(0,0,0,.18)"/>
-  <polygon points="50,9 91,50 50,50" fill="url(#rg2)"/>
-</svg><b id="bl-coins">0</b></div>
-      <div class="user-pill" id="bl-user-pill" style="display:none" onclick="blTab('profile')">
-        <div class="online-dot"></div><span id="bl-username"></span>
-      </div>
-      <button class="btn-sm" id="bl-signin-btn" onclick="openAuth()">Sign In</button>
-    </div>
-  </div>
-
   <div class="body">
     <nav class="nav">
-      <div class="nav-sec">Main</div>
-      <button class="nav-btn active" data-tab="feed" onclick="blTab('feed')"><i class="bi bi-house-fill"></i> <span>Home Feed</span></button>
-      <button class="nav-btn" data-tab="profile" onclick="blTab('profile')"><i class="bi bi-person-fill"></i> <span>My Profile</span></button>
-      <button class="nav-btn" data-tab="challenges" onclick="blTab('challenges')"><i class="bi bi-lightning-fill"></i> <span>Challenges</span></button>
-      <button class="nav-btn" data-tab="achievements" onclick="blTab('achievements')"><i class="bi bi-trophy-fill"></i> <span>Achievements</span></button>
-      <div class="nav-sec">Social</div>
-      <button class="nav-btn" data-tab="addfriends" onclick="blTab('addfriends')">
-        <i class="bi bi-person-plus-fill"></i> <span>Add Friends</span>
-        <span class="nbadge" id="req-badge" style="display:none">0</span>
-      </button>
-      <button class="nav-btn" data-tab="friends" onclick="blTab('friends')"><i class="bi bi-people-fill"></i> <span>Friends</span></button>
-      <button class="nav-btn" data-tab="messages" onclick="blTab('messages')">
-        <i class="bi bi-chat-fill"></i> <span>Messages</span>
-        <span class="nbadge" id="msg-badge" style="display:none">!</span>
-      </button>
-      <button class="nav-btn" data-tab="groups" onclick="blTab('groups')"><i class="bi bi-collection-fill"></i> <span>Groups</span></button>
-    </nav>
+  <!-- Brand + back at top -->
+  <div class="nav-top">
+    <div class="nav-brand">
+      <!-- Big green signal icon -->
+      <svg class="nav-brand-logo" width="48" height="48" viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="5" fill="#32ff0e"/>
+        <path d="M19 19a15.5 15.5 0 0 0 0 22" stroke="#32ff0e" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".9"/>
+        <path d="M41 19a15.5 15.5 0 0 1 0 22" stroke="#32ff0e" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".9"/>
+        <path d="M11 11a26 26 0 0 0 0 38" stroke="#32ff0e" stroke-width="3" stroke-linecap="round" fill="none" opacity=".5"/>
+        <path d="M49 11a26 26 0 0 1 0 38" stroke="#32ff0e" stroke-width="3" stroke-linecap="round" fill="none" opacity=".5"/>
+      </svg>
+      <div class="nav-brand-text">
+        <div class="nav-brand-name">Blinchi</div>
+        <div class="nav-brand-pill">LIVE</div>
+      </div>
+    </div>
+    <a href="index.html" class="nav-back">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Games
+    </a>
+  </div>
+
+  <!-- Nav items -->
+  <div class="nav-inner">
+    <div class="nav-sec">Main</div>
+    <button class="nav-btn active" data-tab="feed" onclick="blTab('feed')"><i class="bi bi-house-fill"></i> <span>Home Feed</span></button>
+    <button class="nav-btn" data-tab="profile" onclick="blTab('profile')"><i class="bi bi-person-fill"></i> <span>My Profile</span></button>
+    <button class="nav-btn" data-tab="challenges" onclick="blTab('challenges')"><i class="bi bi-lightning-fill"></i> <span>Challenges</span></button>
+    <button class="nav-btn" data-tab="achievements" onclick="blTab('achievements')"><i class="bi bi-trophy-fill"></i> <span>Achievements</span></button>
+    <div class="nav-sec">Social</div>
+    <button class="nav-btn" data-tab="addfriends" onclick="blTab('addfriends')">
+      <i class="bi bi-person-plus-fill"></i> <span>Add Friends</span>
+      <span class="nbadge" id="req-badge" style="display:none">0</span>
+    </button>
+    <button class="nav-btn" data-tab="friends" onclick="blTab('friends')"><i class="bi bi-people-fill"></i> <span>Friends</span></button>
+    <button class="nav-btn" data-tab="messages" onclick="blTab('messages')">
+      <i class="bi bi-chat-fill"></i> <span>Messages</span>
+      <span class="nbadge" id="msg-badge" style="display:none">!</span>
+    </button>
+    <button class="nav-btn" data-tab="groups" onclick="blTab('groups')"><i class="bi bi-collection-fill"></i> <span>Groups</span></button>
+  </div>
+
+  <!-- User + coins at bottom -->
+  <div class="nav-bottom">
+    <!-- Signed in state -->
+    <div id="nav-bottom-auth" style="display:none">
+      <div class="nav-user-row" onclick="blTab('profile')">
+        <div class="nav-av" id="nav-av">?</div>
+        <div class="nav-user-name" id="nav-username-bottom">Guest</div>
+      </div>
+      <div class="nav-coins-row">
+        <svg width="13" height="13" viewBox="0 0 100 100" style="flex-shrink:0">
+          <polygon points="50,4 96,50 50,96 4,50" fill="#000" stroke="rgba(50,255,14,.4)" stroke-width="2"/>
+          <polygon points="50,9 91,50 50,91 9,50" fill="url(#rg1)"/>
+          <polygon points="50,17 83,50 50,83 17,50" fill="rgba(0,0,0,.2)"/>
+          <polygon points="50,9 91,50 50,50" fill="rgba(255,255,255,.25)"/>
+        </svg>
+        <b id="bl-coins">0</b>&nbsp;<span>BlinchiCoins</span>
+      </div>
+    </div>
+    <!-- Signed out state -->
+    <div id="nav-bottom-signout" style="display:block">
+      <button class="btn" style="width:100%;padding:9px" id="bl-signin-btn" onclick="openAuth()">Sign In</button>
+    </div>
+  </div>
+</nav>
 
     <div class="main">
       <!-- FEED -->
@@ -697,11 +724,13 @@ async function onIn(user) {
   updateStatus('online');
   window.addEventListener('beforeunload', () => updateStatus('offline'), { once: true });
 
-  // Heartbeat: update last_seen every 30 seconds
+  // Immediate ping on login
+  db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id);
+  // Heartbeat: update last_seen every 20 seconds (faster than 90s threshold)
   if (window._presenceInterval) clearInterval(window._presenceInterval);
   window._presenceInterval = setInterval(() => {
     if (U) db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id);
-  }, 30000);
+  }, 20000);
 
   // Instant update on any activity
   const _pingPresence = () => {
@@ -750,17 +779,27 @@ function applyAuth() {
     if (le) le.style.display = on ? 'none' : '';
     if (ce) ce.style.display = on ? 'block' : 'none';
   });
-  const up = $('bl-user-pill'), sb = $('bl-signin-btn');
+  const sb = $('bl-signin-btn');
+  const navBottom = $('nav-bottom-auth');
   if (on) {
-    up.style.display = 'flex'; sb.style.display = 'none';
-    $('bl-username').textContent = nameOf(P);
+    if (sb) sb.style.display = 'none';
+    if (navBottom) navBottom.style.display = 'block';
+    const navBSignout = $('nav-bottom-signout');
+    if (navBSignout) navBSignout.style.display = 'none';
+    const navAv = $('nav-av');
+    const navUn = $('nav-username-bottom');
+    if (navAv) navAv.textContent = nameOf(P)[0].toUpperCase();
+    if (navUn) navUn.textContent = nameOf(P);
     $('bl-coins').textContent = P.coins || 0;
     const fc = $('feed-content');
     if (fc && fc.querySelector('.locked')) fc.innerHTML = '';
     const pc = $('profile-content');
     if (pc && pc.querySelector('.locked')) pc.innerHTML = '';
   } else {
-    up.style.display = 'none'; sb.style.display = '';
+    if (sb) sb.style.display = '';
+    if (navBottom) navBottom.style.display = 'none';
+    const navBSignout2 = $('nav-bottom-signout');
+    if (navBSignout2) navBSignout2.style.display = 'block';
     $('bl-coins').textContent = 0;
   }
 }
@@ -1037,33 +1076,52 @@ async function loadFeed() {
       .select('id,username,displayname,status,last_seen').in('id', ids);
 
     if (!acts || !acts.length) {
-      // Show online friends even if not playing
-      const online = (fprofs||[]).filter(p => p.status === 'online' || p.status === 'ingame');
-      if (!online.length) {
-        el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are online.</div>'; return;
+      // Show ALL friends with live computed status (not stale status string)
+      if (!fprofs || !fprofs.length) {
+        el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are active.</div>'; return;
       }
-      el.innerHTML = online.map(p => `<div class="fi">
-        <div class="av">${nameOf(p)[0].toUpperCase()}</div>
-        <div class="fi-text">
-          <div class="fi-name"><span class="status-dot online" style="margin-right:4px"></span>${esc(nameOf(p))}</div>
-          <div class="fi-desc">${p.status==='ingame'?'In a game':'Online'}</div>
-        </div>
-        <button onclick="openDM('${p.id}','${esc(nameOf(p))}')" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 11px;cursor:pointer;color:#666;display:flex;align-items:center;gap:5px;font-size:.76rem;font-family:var(--font);font-weight:600;transition:all .16s" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Message</button>
-      </div>`).join('');
+      // Sort: online first, then ingame, then offline
+      const sorted = [...fprofs].sort((a,b) => {
+        const order = {online:0,ingame:1,offline:2};
+        return (order[getStatus(a.last_seen,a.status)]||2) - (order[getStatus(b.last_seen,b.status)]||2);
+      });
+      el.innerHTML = sorted.map(p => {
+        const s = getStatus(p.last_seen, p.status);
+        const col = statusColor(p.last_seen, p.status);
+        const lbl = statusLabel(p.last_seen, p.status);
+        return `<div class="fi" data-uid="${p.id}">
+          <div style="position:relative">
+            <div class="av">${nameOf(p)[0].toUpperCase()}</div>
+            <span style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${col};border:2px solid #000"></span>
+          </div>
+          <div class="fi-text">
+            <div class="fi-name">${esc(nameOf(p))}</div>
+            <div class="fi-desc" style="color:${col}">${lbl}</div>
+          </div>
+          <button onclick="openDM('${p.id}','${esc(nameOf(p))}')" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 11px;cursor:pointer;color:#666;display:flex;align-items:center;gap:5px;font-size:.76rem;font-family:var(--font);font-weight:600;transition:all .16s" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button>
+        </div>`;
+      }).join('');
       return;
     }
+    // Build a lookup from fprofs for status
+    const fpMap = {}; (fprofs||[]).forEach(p => fpMap[p.id] = p);
     el.innerHTML = acts.map(a => {
       const mins = Math.max(0, Math.round((Date.now() - new Date(a.updated_at)) / 60000));
       const when = mins<1?'just now':mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
       const init = nameOf(a.profiles)[0].toUpperCase();
-      return `<div class="fi">
-        <div class="av">${init}</div>
+      const fp = fpMap[a.user_id] || {};
+      const actCol = statusColor(fp.last_seen, fp.status);
+      return `<div class="fi" data-uid="${a.user_id}">
+        <div style="position:relative">
+          <div class="av">${init}</div>
+          <span style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${actCol};border:2px solid #000"></span>
+        </div>
         <div class="fi-text">
-          <div class="fi-name"><span class="status-dot online" style="margin-right:4px"></span>${esc(nameOf(a.profiles))}</div>
+          <div class="fi-name">${esc(nameOf(a.profiles))}</div>
           <div class="fi-desc">Playing <strong style="color:#ccc">${esc(a.game_title||'')}</strong> · ${when}</div>
         </div>
         <a href="index.html" onclick="localStorage.setItem('bl_join_game','${encodeURIComponent(a.game_url||'')}')"
-          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">▶ Play</a>
+          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">Play</a>
       </div>`;
     }).join('');
   } catch(e) {
@@ -1259,7 +1317,6 @@ async function loadSidebar() {
 
 async function loadDMList() {
   const el = $('convo-list');
-  el.innerHTML = '<div style="padding:13px;color:#1a1a1a;font-size:.81rem">Loading…</div>';
   // Get friends, then find/show their DM conversations
   const { data: fs } = await db.from('friendships').select('user1,user2')
     .or(`user1.eq.${U.id},user2.eq.${U.id}`).eq('status', 'accepted');
@@ -1281,7 +1338,6 @@ async function loadDMList() {
 
 async function loadGroupList() {
   const el = $('convo-list');
-  el.innerHTML = '<div style="padding:13px;color:#1a1a1a;font-size:.81rem">Loading…</div>';
   const { data } = await db.from('conversation_members')
     .select('conversation_id, conversations(id,name,emoji,type)')
     .eq('user_id', U.id);
@@ -1303,47 +1359,31 @@ async function loadGroupList() {
 async function openDM(friendId, friendName) {
   if (!U) return;
   if (activeTab !== 'messages') blTab('messages');
-
+  // Try SECURITY DEFINER RPC first (handles find-or-create atomically)
+  const { data: rpcId, error: rpcErr } = await db.rpc('create_dm', { other_user: friendId });
+  if (!rpcErr && rpcId) {
+    openConversation(rpcId, friendName, 'dm');
+    loadDMList();
+    return;
+  }
+  // RPC not available — find existing DM manually
+  console.warn('create_dm RPC unavailable, searching manually:', rpcErr?.message);
   try {
-    // ── Step 1: Find all conversation IDs I'm in ──────────────────
-    const { data: myRows } = await db.from('conversation_members')
-      .select('conversation_id').eq('user_id', U.id);
-    const myIds = (myRows || []).map(r => r.conversation_id);
-
+    const { data: myRows } = await db.from('conversation_members').select('conversation_id').eq('user_id', U.id);
+    const myIds = (myRows||[]).map(r => r.conversation_id);
     let convId = null;
-
     if (myIds.length) {
-      // ── Step 2: Of those, find any where the friend is also in ──
-      const { data: sharedRows } = await db.from('conversation_members')
-        .select('conversation_id').eq('user_id', friendId).in('conversation_id', myIds);
-      const sharedIds = (sharedRows || []).map(r => r.conversation_id);
-
+      const { data: shared } = await db.from('conversation_members').select('conversation_id').eq('user_id', friendId).in('conversation_id', myIds);
+      const sharedIds = (shared||[]).map(r => r.conversation_id);
       if (sharedIds.length) {
-        // ── Step 3: Of those shared convs, pick the DM one ────────
-        const { data: dmConvs } = await db.from('conversations')
-          .select('id').eq('type', 'dm').in('id', sharedIds).limit(1);
-        if (dmConvs && dmConvs.length) convId = dmConvs[0].id;
+        const { data: dms } = await db.from('conversations').select('id').eq('type','dm').in('id',sharedIds).limit(1);
+        if (dms?.length) convId = dms[0].id;
       }
     }
-
-    if (!convId) {
-      // ── Step 4: No existing DM — create conversation + members ──
-      const { data: newConv, error: ce } = await db.from('conversations')
-        .insert({ type: 'dm', name: null }).select('id').single();
-      if (ce || !newConv) { toast('Could not open chat — try again'); console.error('openDM create conv:', ce); return; }
-      convId = newConv.id;
-
-      const { error: me } = await db.from('conversation_members')
-        .insert([{ conversation_id: convId, user_id: U.id }, { conversation_id: convId, user_id: friendId }]);
-      if (me) { toast('Could not open chat — try again'); console.error('openDM add members:', me); return; }
-    }
-
+    if (!convId) { toast('Run the SQL migration to enable chat'); return; }
     openConversation(convId, friendName, 'dm');
     loadDMList();
-  } catch(e) {
-    toast('Could not open chat — try again');
-    console.error('openDM exception:', e);
-  }
+  } catch(e) { toast('Could not open chat'); console.error('openDM:', e); }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1370,7 +1410,7 @@ function openConversation(convId, name, type) {
     <div class="av ${isDM?'':'sq'}" style="width:28px;height:28px;font-size:.74rem">${name[0].toUpperCase()}</div>
     <div class="chat-hdr-info">
       <div class="chat-hdr-name">${esc(name)}</div>
-      <div class="chat-hdr-sub" id="peer-pres">${isDM?'● Offline':'Group chat'}</div>
+      <div class="chat-hdr-sub" id="peer-pres">${isDM?'Checking…':'Group chat'}</div>
     </div>
     <div class="chat-hdr-acts">
       ${isDM ? `
@@ -1515,13 +1555,17 @@ async function addMemberToGroup(convId, userId, name) {
 // ═══════════════════════════════════════════════════════════════
 async function startPresence(convId) {
   if (presTimer) clearInterval(presTimer);
-  if (rtPres) rtPres.unsubscribe();
-  await pingPres(convId);
-  presTimer = setInterval(() => pingPres(convId), 20000);
-  rtPres = db.channel('pres_' + convId)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'dm_presence' }, () => checkPeerPres(convId))
-    .subscribe();
+  if (rtPres) { try{rtPres.unsubscribe();}catch(e){} }
+  // Check immediately
   checkPeerPres(convId);
+  // Ping dm_presence (for in-chat indicator) + recheck every 20s
+  await pingPres(convId);
+  presTimer = setInterval(() => { pingPres(convId); checkPeerPres(convId); }, 20000);
+  // Subscribe to profiles UPDATE for this friend's presence
+  rtPres = db.channel('peer_pres_' + convId)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' },
+      payload => { if (payload.new) checkPeerPres(convId); })
+    .subscribe();
 }
 async function pingPres(convId) {
   // Find friend id in this conv
@@ -1536,10 +1580,13 @@ async function checkPeerPres(convId) {
     const { data: mems } = await db.from('conversation_members').select('user_id').eq('conversation_id', convId);
     const fid = (mems||[]).map(r=>r.user_id).find(id=>id!==U.id);
     if (!fid) return;
-    const { data } = await db.from('dm_presence').select('last_seen').eq('user_id', fid).eq('friend_id', U.id).maybeSingle();
+    // Use profiles.last_seen for accurate presence (updated by global heartbeat)
+    const { data: fp } = await db.from('profiles').select('last_seen,status').eq('id', fid).maybeSingle();
     const el = $('peer-pres'); if (!el) return;
-    if (data && (Date.now()-new Date(data.last_seen))/1000 < 35) { el.textContent='● In chat now'; el.className='chat-hdr-sub on'; }
-    else { el.textContent='● Offline'; el.className='chat-hdr-sub'; }
+    const s = fp ? getStatus(fp.last_seen, fp.status) : 'offline';
+    const labels = { online: '● Online', ingame: '● In a game', offline: '● Offline' };
+    el.textContent = labels[s] || '● Offline';
+    el.className = 'chat-hdr-sub' + (s !== 'offline' ? ' on' : '');
   } catch(e) {}
 }
 
@@ -1574,10 +1621,11 @@ async function loadMessages(convId) {
   if (!window._profCache) window._profCache = {};
   Object.assign(window._profCache, profMap);
   const msgs = (data||[]).map(m => ({ ...m, profiles: profMap[m.sender_id] || null }));
+  const msgsEl = $('chat-msgs');
   if (!msgs.length) {
-    el.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — start the conversation</div>'; return;
+    msgsEl.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — start the conversation</div>'; return;
   }
-  el.innerHTML = msgs.map(m => {
+  msgsEl.innerHTML = msgs.map(m => {
     const isMe = m.sender_id === U.id;
     const hrs = m.expires_at ? Math.max(0, Math.round((new Date(m.expires_at)-Date.now())/3600000)) : null;
     const ephTag = !m.saved && hrs!==null
@@ -1597,8 +1645,8 @@ async function loadMessages(convId) {
     </div>`;
   }).join('');
   // Smart scroll — only auto-jump if near bottom or first load
-  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-  if (atBottom || el.scrollTop === 0) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+  const atBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 80;
+  if (atBottom || msgsEl.scrollTop === 0) msgsEl.scrollTo({ top: msgsEl.scrollHeight, behavior: 'smooth' });
 }
 
 let _sending = false; // double-send lock
@@ -1670,7 +1718,16 @@ async function sendMsg() {
     toast('Send failed: ' + error.message);
     return;
   }
-  // Realtime handles the append — NO loadMessages() call here
+  // Optimistically append message locally for instant feel
+  appendMessage({
+    id: 'tmp_' + Date.now(),
+    sender_id: U.id,
+    conversation_id: activeConversation,
+    body: text,
+    created_at: new Date().toISOString(),
+    saved: false
+  });
+  // Realtime will also fire for the other user — they get it via appendMessage
 }
 
 // ── TYPING INDICATOR ────────────────────────────────────────
@@ -1794,25 +1851,71 @@ let lStream=null, pc=null, callTimer=null, callSecs=0, isMuted=false, isCamOff=f
 let callType='voice', callPid=null, callPname=null, sigCh=null;
 
 async function startCall(fid, fname, type) {
-  if (!U) return;
+  if (!U || pc) { if(pc) toast('Already in a call'); return; }
   callType=type; callPid=fid; callPname=fname;
-  try { lStream = await navigator.mediaDevices.getUserMedia(type==='video'?{audio:true,video:true}:{audio:true,video:false}); }
-  catch(e) { toast('Could not access ' + (type==='video'?'camera/':'') + 'microphone'); return; }
+
+  try {
+    lStream = await navigator.mediaDevices.getUserMedia(
+      type==='video' ? {audio:true,video:true} : {audio:true,video:false}
+    );
+  } catch(e) {
+    toast('Microphone' + (type==='video'?' / camera':'') + ' access denied'); return;
+  }
+
   showCallUI(fname, 'Calling…', type);
   pc = new RTCPeerConnection(ICE);
+
+  // Add local tracks
   lStream.getTracks().forEach(t => pc.addTrack(t, lStream));
-  pc.ontrack = e => { const rv=$('remote-vid'); if(rv) rv.srcObject=e.streams[0]; };
-  sigCh = db.channel('call_'+[U.id,fid].sort().join('_'));
-  pc.onicecandidate = e => { if(e.candidate && sigCh) sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}}); };
-  sigCh
-    .on('broadcast',{event:'answer'},async e => { if(e.payload.from!==fid)return; await pc.setRemoteDescription(new RTCSessionDescription(e.payload.sdp)); startCallTimer(); })
-    .on('broadcast',{event:'ice'},async e => { if(e.payload.from!==fid||!pc)return; try{await pc.addIceCandidate(new RTCIceCandidate(e.payload.c));}catch(_){} })
-    .on('broadcast',{event:'end'},e => { if(e.payload.from===fid) endCall(); })
-    .subscribe();
-  const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
-  await db.from('call_signals').insert({ caller_id: U.id, callee_id: fid, type: 'offer', payload: JSON.stringify(offer), call_type: type, caller_name: nameOf(P) });
-  sigCh.send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
   if (type==='video') { const lv=$('local-vid'); if(lv) lv.srcObject=lStream; }
+
+  // Remote track handler
+  pc.ontrack = e => { const rv=$('remote-vid'); if(rv && e.streams[0]) rv.srcObject=e.streams[0]; };
+
+  // ICE state monitoring
+  pc.onconnectionstatechange = () => {
+    if (pc && (pc.connectionState==='failed'||pc.connectionState==='disconnected')) endCall();
+  };
+
+  // Set up signalling channel FIRST, before creating offer
+  sigCh = db.channel('call_' + [U.id,fid].sort().join('_'));
+
+  pc.onicecandidate = e => {
+    if (e.candidate && sigCh) {
+      sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
+    }
+  };
+
+  sigCh
+    .on('broadcast',{event:'answer'}, async e => {
+      if (e.payload?.from !== fid || !pc) return;
+      try { await pc.setRemoteDescription(new RTCSessionDescription(e.payload.sdp)); startCallTimer(); } catch(_){}
+    })
+    .on('broadcast',{event:'ice'}, async e => {
+      if (e.payload?.from !== fid || !pc) return;
+      try { await pc.addIceCandidate(new RTCIceCandidate(e.payload.c)); } catch(_){}
+    })
+    .on('broadcast',{event:'end'}, e => { if (e.payload?.from===fid) endCall(); })
+    .subscribe(async status => {
+      if (status !== 'SUBSCRIBED') return;
+      // Channel ready — now create and send offer
+      try {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        // Store in DB (for users who miss the broadcast)
+        await db.from('call_signals').insert({
+          caller_id: U.id, callee_id: fid, type: 'offer',
+          payload: JSON.stringify(offer), call_type: type, caller_name: nameOf(P)
+        }).catch(()=>{});
+        // Broadcast the offer
+        sigCh.send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
+        // Also send to callee's personal broadcast channel
+        db.channel('inc_broadcast_' + fid).send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
+      } catch(err) {
+        console.error('offer error:', err);
+        endCall();
+      }
+    });
 }
 function showCallUI(name,status,type) {
   $('call-nm').textContent=name; $('call-st').textContent=status; $('call-tm').textContent='';
@@ -1834,32 +1937,80 @@ function endCall() {
 function toggleMute() { isMuted=!isMuted; if(lStream)lStream.getAudioTracks().forEach(t=>t.enabled=!isMuted); const b=$('btn-mute'); b.classList.toggle('on',isMuted); b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i>':'<i class="bi bi-mic-fill"></i>'; }
 function toggleCam() { isCamOff=!isCamOff; if(lStream)lStream.getVideoTracks().forEach(t=>t.enabled=!isCamOff); const b=$('btn-cam'); b.classList.toggle('on',isCamOff); b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i>':'<i class="bi bi-camera-video-fill"></i>'; }
 function listenCalls() {
-  if(!U)return;
-  db.channel('inc_'+U.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'call_signals',filter:`callee_id=eq.${U.id}`},e=>{
-    const row=e.new; if(row.type!=='offer'||pc)return;
-    callPid=row.caller_id; callPname=row.caller_name||'Someone'; callType=row.call_type||'voice';
-    window._pendingOffer=JSON.parse(row.payload);
-    $('inc-nm').textContent=callPname+' is calling…';
-    $('inc-type').textContent=callType==='video'?'Video call':'Voice call';
-    $('inc-call').classList.add('show');
-  }).subscribe();
+  if (!U) return;
+  db.channel('inc_' + U.id)
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'call_signals',
+      filter: `callee_id=eq.${U.id}`
+    }, e => {
+      const row = e.new;
+      if (row.type !== 'offer' || pc) return;
+      callPid = row.caller_id; callPname = row.caller_name||'Someone';
+      callType = row.call_type||'voice';
+      window._pendingOffer = JSON.parse(row.payload);
+      showIncomingCall(callPname, callType);
+    })
+    .subscribe();
+  // Also listen via broadcast (catches live calls faster than DB polling)
+  db.channel('inc_broadcast_' + U.id)
+    .on('broadcast', {event:'offer'}, e => {
+      if (pc || !e.payload) return;
+      callPid = e.payload.from; callPname = e.payload.name||'Someone';
+      callType = e.payload.call_type||'voice';
+      window._pendingOffer = e.payload.sdp;
+      showIncomingCall(callPname, callType);
+    })
+    .subscribe();
+}
+
+function showIncomingCall(name, type) {
+  $('inc-nm').textContent = name + ' is calling…';
+  $('inc-type').textContent = type==='video' ? 'Video call' : 'Voice call';
+  $('inc-call').classList.add('show');
+  playMsgSound();
 }
 async function acceptCall() {
   $('inc-call').classList.remove('show');
-  const offer=window._pendingOffer; if(!offer||!callPid)return;
-  try{lStream=await navigator.mediaDevices.getUserMedia(callType==='video'?{audio:true,video:true}:{audio:true,video:false});}
-  catch(e){toast('Could not access microphone');return;}
-  showCallUI(callPname,'Connected',callType); startCallTimer();
-  pc=new RTCPeerConnection(ICE); lStream.getTracks().forEach(t=>pc.addTrack(t,lStream));
-  pc.ontrack=e=>{const rv=$('remote-vid');if(rv)rv.srcObject=e.streams[0];};
-  sigCh=db.channel('call_'+[U.id,callPid].sort().join('_'));
-  pc.onicecandidate=e=>{if(e.candidate&&sigCh)sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});};
-  sigCh.on('broadcast',{event:'ice'},async e=>{if(e.payload.from!==callPid||!pc)return;try{await pc.addIceCandidate(new RTCIceCandidate(e.payload.c));}catch(_){}})
-    .on('broadcast',{event:'end'},()=>endCall()).subscribe();
-  await pc.setRemoteDescription(new RTCSessionDescription(offer));
-  const answer=await pc.createAnswer(); await pc.setLocalDescription(answer);
-  sigCh.send({type:'broadcast',event:'answer',payload:{from:U.id,sdp:answer}});
-  if(callType==='video'){const lv=$('local-vid');if(lv)lv.srcObject=lStream;}
+  const offer = window._pendingOffer;
+  if (!offer || !callPid) return;
+
+  try {
+    lStream = await navigator.mediaDevices.getUserMedia(
+      callType==='video' ? {audio:true,video:true} : {audio:true,video:false}
+    );
+  } catch(e) { toast('Microphone' + (callType==='video'?' / camera':'') + ' access denied'); return; }
+
+  showCallUI(callPname, 'Connecting…', callType);
+  pc = new RTCPeerConnection(ICE);
+  lStream.getTracks().forEach(t => pc.addTrack(t, lStream));
+  if (callType==='video') { const lv=$('local-vid'); if(lv) lv.srcObject=lStream; }
+
+  pc.ontrack = e => { const rv=$('remote-vid'); if(rv && e.streams[0]) rv.srcObject=e.streams[0]; };
+  pc.onconnectionstatechange = () => {
+    if (pc && pc.connectionState==='connected') { $('call-st').textContent='Connected'; startCallTimer(); }
+    if (pc && (pc.connectionState==='failed'||pc.connectionState==='disconnected')) endCall();
+  };
+
+  sigCh = db.channel('call_' + [U.id,callPid].sort().join('_'));
+  pc.onicecandidate = e => {
+    if (e.candidate && sigCh) sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
+  };
+
+  sigCh
+    .on('broadcast',{event:'ice'}, async e => {
+      if (e.payload?.from!==callPid || !pc) return;
+      try { await pc.addIceCandidate(new RTCIceCandidate(e.payload.c)); } catch(_){}
+    })
+    .on('broadcast',{event:'end'}, () => endCall())
+    .subscribe(async status => {
+      if (status !== 'SUBSCRIBED') return;
+      try {
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        sigCh.send({type:'broadcast',event:'answer',payload:{from:U.id,sdp:answer}});
+      } catch(err) { console.error('acceptCall answer error:', err); endCall(); }
+    });
 }
 function declineCall(){$('inc-call').classList.remove('show');window._pendingOffer=null;}
 
@@ -2096,6 +2247,18 @@ window.onload = () => {
   requestNotifPermission();
   initScrollWatcher();
 };
+
+// Refresh when user returns to tab (coming back from index.html etc.)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && U) {
+    // Re-ping presence immediately
+    db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id).catch(()=>{});
+    // Refresh current tab data
+    refreshTab(activeTab);
+    countUnread();
+    checkReqBadge();
+  }
+});
 
 </script>
 

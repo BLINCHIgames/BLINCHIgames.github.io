@@ -21,93 +21,38 @@
   --r:13px;--ease:cubic-bezier(.4,0,.2,1)
 }
 html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-family:var(--font);margin:0}
-.shell{display:flex;flex-direction:row;height:100vh;overflow:hidden}
+.shell{display:flex;flex-direction:column;height:100vh}
 .ctx-ad-bar{background:#0a0a0a;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;min-height:58px;overflow:hidden;flex-shrink:0}
-/* topbar */
-.topbar{display:none}
-.live-logo{display:inline-flex;align-items:center;gap:7px}
-.live-logo-icon{width:28px;height:28px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.live-logo-icon svg{width:16px;height:16px}
-.live-logo-wordmark{font-family:var(--display);font-size:1.08rem;font-weight:800;color:#fff;white-space:nowrap}
-.live-logo-pill{display:inline-flex;align-items:center;background:var(--brand);color:#000;font-family:var(--display);font-size:.78rem;font-weight:900;letter-spacing:.6px;padding:2px 9px;border-radius:20px;margin-left:3px;position:relative;top:-1px}
-.topbar-r{margin-left:auto;display:flex;align-items:center;gap:9px}
-/* coins-pill moved to nav-bottom */
-.user-pill{display:flex;align-items:center;gap:6px;background:var(--surf);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:.82rem;cursor:pointer}
-.online-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 5px var(--brand);flex-shrink:0;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-.btn-back{display:flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;text-decoration:none;transition:all .18s}
+/* topbar removed — logo lives in sidebar */
+.btn-back{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:7px 12px;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;text-decoration:none;transition:all .18s;width:100%}
 .btn-back:hover{color:#fff;border-color:var(--brand)}
-.btn-sm{background:var(--brand);color:#000;border:none;border-radius:10px;padding:6px 15px;font-weight:700;font-size:.8rem;cursor:pointer;font-family:var(--font)}
+.btn-sm{background:var(--brand);color:#000;border:none;border-radius:10px;padding:8px 14px;font-weight:700;font-size:.8rem;cursor:pointer;font-family:var(--font);width:100%}
 /* body */
-.body{display:flex;flex:1;min-height:0;overflow:hidden;height:100vh}
+.body{display:flex;flex:1;min-height:0;overflow:hidden}
 /* nav */
-/* ── FLOATING SIDEBAR ─────────────────────────────────────────── */
-.nav{
-  position:fixed;top:0;left:0;height:100vh;z-index:8000;
-  width:56px; /* collapsed icon rail by default */
-  background:rgba(8,8,12,.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
-  border-right:1px solid var(--glass-border);
-  display:flex;flex-direction:column;overflow:hidden;
-  transition:width .22s cubic-bezier(.4,0,.2,1),box-shadow .22s;
-}
-/* Expanded — overlays content */
-.nav.expanded{
-  width:220px;
-  box-shadow:6px 0 40px rgba(0,0,0,.7);
-}
-/* Collapsed — icon rail, no overlay effect */
-.nav:not(.expanded) .nav-sec,
-.nav:not(.expanded) .nav-btn span,
-.nav:not(.expanded) .nav-brand-text,
-.nav:not(.expanded) .nav-back,
-.nav:not(.expanded) .nav-user-name,
-.nav:not(.expanded) .nav-coins-row,
-.nav:not(.expanded) .nav-bottom-label{opacity:0;pointer-events:none;width:0;overflow:hidden;white-space:nowrap}
-.nav:not(.expanded) .nav-btn{justify-content:center;padding:10px 0}
-.nav:not(.expanded) .nav-top{padding:12px 8px}
-.nav:not(.expanded) .nav-brand{justify-content:center}
-.nav:not(.expanded) .nav-inner{padding:8px 4px}
-.nav:not(.expanded) .nav-bottom{padding:10px 8px}
-.nav:not(.expanded) .nav-user-row{justify-content:center}
-.nav:not(.expanded) .nbadge{right:2px}
-/* Toggle button */
-.nav-toggle{position:absolute;top:14px;right:-13px;width:26px;height:26px;
-  background:rgba(8,8,12,.97);border:1px solid var(--glass-border);
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;z-index:8001;color:#444;transition:all .18s}
-.nav-toggle:hover{color:#fff;border-color:var(--brand)}
-.nav-toggle svg{transition:transform .22s}
-.nav.expanded .nav-toggle svg{transform:rotate(180deg)}
-/* Collapsed tooltip on nav-btns */
-.nav:not(.expanded) .nav-btn{position:relative}
-/* Main content shifts right by icon rail width */
-.body{margin-left:56px;transition:margin-left .22s cubic-bezier(.4,0,.2,1)}
-
-/* ── NAV SECTIONS ──────────────────────────────────────────────── */
-.nav-top{padding:16px 14px 12px;border-bottom:1px solid var(--glass-border);flex-shrink:0;position:relative}
-.nav-brand{display:flex;align-items:center;gap:10px}
-.nav-brand-logo{flex-shrink:0}
-.nav-brand-text{display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:hidden}
-.nav-brand-name{font-family:var(--display);font-size:1.15rem;font-weight:800;color:#fff;line-height:1}
-.nav-brand-pill{display:inline-flex;align-items:center;background:var(--brand);color:#000;font-family:var(--display);font-size:.66rem;font-weight:900;letter-spacing:.5px;padding:2px 8px;border-radius:20px;flex-shrink:0}
-.nav-back{display:flex;align-items:center;gap:6px;margin-top:10px;color:#333;font-size:.76rem;font-weight:600;text-decoration:none;transition:color .14s;white-space:nowrap;overflow:hidden}
-.nav-back:hover{color:var(--brand)}
-.nav-inner{flex:1;overflow-y:auto;padding:8px 6px;display:flex;flex-direction:column;gap:1px}
-.nav-bottom{padding:10px 12px;border-top:1px solid var(--glass-border);flex-shrink:0;background:rgba(6,6,8,.7)}
-.nav-user-row{display:flex;align-items:center;gap:9px;cursor:pointer;margin-bottom:5px;overflow:hidden}
-.nav-user-row:hover .nav-user-name{color:var(--brand)}
-.nav-av{width:30px;height:30px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#13131a,#1c1c28);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.76rem;color:var(--brand);border:1.5px solid rgba(50,255,14,.25)}
-.nav-user-name{font-size:.82rem;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#ccc;transition:color .14s}
-.nav-coins-row{display:flex;align-items:center;gap:5px;font-size:.73rem;color:var(--muted);overflow:hidden;white-space:nowrap}
-.nav-coins-row b{color:var(--brand);font-weight:800}
+.nav{width:210px;flex-shrink:0;background:rgba(8,9,12,.97);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;overflow:hidden}
+.nav-top{padding:20px 16px 14px;border-bottom:1px solid var(--glass-border);flex-shrink:0}
+.nav-brand{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.nav-brand-svg{flex-shrink:0}
+.nav-brand-text{display:flex;flex-direction:column;gap:1px}
+.nav-brand-name{font-family:var(--display);font-size:1.18rem;font-weight:800;color:#fff;line-height:1}
+.nav-brand-pill{display:inline-flex;align-items:center;background:var(--brand);color:#000;font-family:var(--display);font-size:.65rem;font-weight:900;letter-spacing:.6px;padding:1px 7px;border-radius:20px;width:fit-content;margin-top:2px}
+.nav-inner{flex:1;overflow-y:auto;padding:8px 8px;display:flex;flex-direction:column;gap:1px}
+.nav-bottom{padding:12px 12px;border-top:1px solid var(--glass-border);flex-shrink:0;background:rgba(6,6,8,.7)}
+.nav-user-row{display:flex;align-items:center;gap:9px;cursor:pointer;padding:7px 8px;border-radius:10px;transition:background .14s;margin-bottom:7px}
+.nav-user-row:hover{background:var(--surf)}
+.nav-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#13131a,#1c1c28);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;color:var(--brand);flex-shrink:0;border:1.5px solid rgba(50,255,14,.25)}
+.nav-user-name{font-size:.82rem;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-coins-row{display:flex;align-items:center;gap:5px;font-size:.73rem;color:var(--muted);padding:0 8px;margin-bottom:9px}
+.nav-coins-row b{color:var(--brand)}
 .nav-sec{font-size:.6rem;text-transform:uppercase;letter-spacing:1.5px;color:#1a1a1a;font-weight:800;padding:14px 10px 5px}
 .nav-btn{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;cursor:pointer;color:#444;font-size:.86rem;font-weight:500;border:none;background:transparent;width:100%;text-align:left;transition:all .14s;position:relative;font-family:var(--font)}
 .nav-btn:hover{background:var(--surf);color:#fff}
-.nav-btn.active{background:var(--brand-dim);color:var(--brand);border-left:3px solid var(--brand);border-radius:3px 10px 10px 3px;box-shadow:inset 0 0 20px rgba(50,255,14,.06)}
+.nav-btn.active{background:var(--brand-dim);color:var(--brand);border-left:3px solid var(--brand);border-radius:3px 10px 10px 3px}
 .nbadge{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#ff3c3c;color:#fff;font-size:.58rem;font-weight:800;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}
 /* main */
 .main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
-.tab{display:none;padding:18px 22px 50px}
+.tab{display:none;padding:22px 24px 50px}
 .tab.active{display:block}
 .pg-title{font-family:var(--display);font-size:1.28rem;font-weight:800;margin-bottom:3px}
 .pg-sub{color:var(--muted);font-size:.82rem;margin-bottom:18px}
@@ -160,7 +105,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 /* request card */
 .req-card{background:#0d0d14;border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 /* MESSAGES layout — full height, sidebar + chat */
-.chat-root{display:flex;height:calc(100vh - 20px);min-height:360px}
+.chat-root{display:flex;height:calc(100vh - 90px);min-height:360px}
 .chat-sidebar{width:215px;flex-shrink:0;background:rgba(6,6,8,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:12px 0 0 12px;display:flex;flex-direction:column;overflow:hidden}
 .csb-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
 .csb-tab{flex:1;padding:10px 0;text-align:center;font-size:.76rem;font-weight:700;color:#2a2a2a;cursor:pointer;border:none;background:transparent;font-family:var(--font);border-bottom:2px solid transparent;transition:all .15s}
@@ -350,8 +295,6 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 .av{transition:box-shadow .18s,transform .18s}
 .fr-row:hover .av,.ci:hover .av{box-shadow:0 0 0 2px rgba(50,255,14,.3)}
 
-
-
 /* ── Auth modal glass ── */
 .modal-box{background:rgba(6,6,8,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
 
@@ -384,9 +327,9 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 @keyframes rhombPulse{0%,100%{filter:drop-shadow(0 0 3px rgba(50,255,14,.4))}50%{filter:drop-shadow(0 0 8px rgba(50,255,14,.7))}}
 @media(max-width:900px){.ad-sidebar{display:none}}
 @media(max-width:600px){
-  .nav{width:52px}.nav .nav-sec,.nav .nav-btn span{display:none}.nav-btn{justify-content:center;padding:11px 6px}
+  .nav{width:54px}.nav .nav-sec,.nav .nav-btn span,.nav-brand-text,.nav-coins-row,.nav-user-name{display:none!important}.nav-btn{justify-content:center;padding:11px 6px}.nav-top{padding:10px 6px}.nav-bottom{padding:8px 6px}
   .tab{padding:12px 10px 40px}
-  .chat-root{height:calc(100vh - 20px)}
+  .chat-root{height:calc(100vh - 190px)}
   .chat-sidebar{width:54px}
   .csb-tabs{display:none}
   .ci-name,.ci-sub{display:none}
@@ -398,85 +341,78 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 <input style="position:absolute;opacity:0;pointer-events:none;height:0;width:0" type="password" name="bl_pt" tabindex="-1" aria-hidden="true">
 
 <div class="shell">
-  <!-- Contextual ad — shown only in messages/groups/calls via showContextAd() -->
+  <!-- Contextual ad — shown only in messages/groups/calls -->
   <div class="ctx-ad-bar" id="ctx-ad-bar" style="display:none">
     <script>atOptions={'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':60,'width':468,'params':{}}</script>
     <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
   </div>
+
   <div class="body">
     <nav class="nav">
-  <!-- Collapse toggle -->
-  <button class="nav-toggle" onclick="toggleNav()" id="nav-toggle-btn" title="Toggle menu">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
 
-  <!-- Brand + back at top -->
-  <div class="nav-top">
-    <div class="nav-brand">
-      <!-- Green signal icon -->
-      <svg class="nav-brand-logo" width="34" height="34" viewBox="0 0 60 60" fill="none" style="flex-shrink:0">
-        <circle cx="30" cy="30" r="5" fill="#32ff0e"/>
-        <path d="M20 20a14 14 0 0 0 0 20" stroke="#32ff0e" stroke-width="3.5" stroke-linecap="round"/>
-        <path d="M40 20a14 14 0 0 1 0 20" stroke="#32ff0e" stroke-width="3.5" stroke-linecap="round"/>
-        <path d="M11 11a26 26 0 0 0 0 38" stroke="#32ff0e" stroke-width="3" stroke-linecap="round" opacity=".55"/>
-        <path d="M49 11a26 26 0 0 1 0 38" stroke="#32ff0e" stroke-width="3" stroke-linecap="round" opacity=".55"/>
-      </svg>
-      <!-- Blinchi + Live pill on same line -->
-      <div class="nav-brand-text">
-        <span class="nav-brand-name">Blinchi</span>
-        <span class="nav-brand-pill">Live</span>
+      <!-- ── LOGO at top ── -->
+      <div class="nav-top">
+        <div class="nav-brand">
+          <!-- Big green signal SVG — no box, just waves -->
+          <svg class="nav-brand-svg" width="46" height="46" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- center dot -->
+            <circle cx="30" cy="40" r="4.5" fill="#32ff0e"/>
+            <!-- ring 1 -->
+            <path d="M21 31 a12.7 12.7 0 0 1 18 0" stroke="#32ff0e" stroke-width="3.2" stroke-linecap="round"/>
+            <!-- ring 2 -->
+            <path d="M13.5 23.5 a23.3 23.3 0 0 1 33 0" stroke="#32ff0e" stroke-width="2.4" stroke-linecap="round" opacity=".65"/>
+            <!-- ring 3 -->
+            <path d="M6 16 a34 34 0 0 1 48 0" stroke="#32ff0e" stroke-width="1.8" stroke-linecap="round" opacity=".3"/>
+          </svg>
+          <div class="nav-brand-text">
+            <div class="nav-brand-name">BlinchiLive</div>
+            <div class="nav-brand-pill">LIVE</div>
+          </div>
+        </div>
+        <!-- Back button -->
+        <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> <span>Back to Games</span></a>
       </div>
-    </div>
-    <a href="index.html" class="nav-back">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to Games
-    </a>
-  </div>
 
-  <!-- Nav items -->
-  <div class="nav-inner">
-    <div class="nav-sec">Main</div>
-    <button class="nav-btn active" data-tab="feed" onclick="blTab('feed')"><i class="bi bi-house-fill"></i> <span>Home Feed</span></button>
-    <button class="nav-btn" data-tab="profile" onclick="blTab('profile')"><i class="bi bi-person-fill"></i> <span>My Profile</span></button>
-    <button class="nav-btn" data-tab="challenges" onclick="blTab('challenges')"><i class="bi bi-lightning-fill"></i> <span>Challenges</span></button>
-    <button class="nav-btn" data-tab="achievements" onclick="blTab('achievements')"><i class="bi bi-trophy-fill"></i> <span>Achievements</span></button>
-    <div class="nav-sec">Social</div>
-    <button class="nav-btn" data-tab="addfriends" onclick="blTab('addfriends')">
-      <i class="bi bi-person-plus-fill"></i> <span>Add Friends</span>
-      <span class="nbadge" id="req-badge" style="display:none">0</span>
-    </button>
-    <button class="nav-btn" data-tab="friends" onclick="blTab('friends')"><i class="bi bi-people-fill"></i> <span>Friends</span></button>
-    <button class="nav-btn" data-tab="messages" onclick="blTab('messages')">
-      <i class="bi bi-chat-fill"></i> <span>Messages</span>
-      <span class="nbadge" id="msg-badge" style="display:none">!</span>
-    </button>
-    <button class="nav-btn" data-tab="groups" onclick="blTab('groups')"><i class="bi bi-collection-fill"></i> <span>Groups</span></button>
-  </div>
+      <!-- ── NAV ITEMS ── -->
+      <div class="nav-inner">
+        <div class="nav-sec">Main</div>
+        <button class="nav-btn active" data-tab="feed" onclick="blTab('feed')"><i class="bi bi-house-fill"></i> <span>Home Feed</span></button>
+        <button class="nav-btn" data-tab="profile" onclick="blTab('profile')"><i class="bi bi-person-fill"></i> <span>My Profile</span></button>
+        <button class="nav-btn" data-tab="challenges" onclick="blTab('challenges')"><i class="bi bi-lightning-fill"></i> <span>Challenges</span></button>
+        <button class="nav-btn" data-tab="achievements" onclick="blTab('achievements')"><i class="bi bi-trophy-fill"></i> <span>Achievements</span></button>
+        <div class="nav-sec">Social</div>
+        <button class="nav-btn" data-tab="addfriends" onclick="blTab('addfriends')">
+          <i class="bi bi-person-plus-fill"></i> <span>Add Friends</span>
+          <span class="nbadge" id="req-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-btn" data-tab="friends" onclick="blTab('friends')"><i class="bi bi-people-fill"></i> <span>Friends</span></button>
+        <button class="nav-btn" data-tab="messages" onclick="blTab('messages')">
+          <i class="bi bi-chat-fill"></i> <span>Messages</span>
+          <span class="nbadge" id="msg-badge" style="display:none">!</span>
+        </button>
+        <button class="nav-btn" data-tab="groups" onclick="blTab('groups')"><i class="bi bi-collection-fill"></i> <span>Groups</span></button>
+      </div>
 
-  <!-- User + coins at bottom -->
-  <div class="nav-bottom">
-    <!-- Signed in state -->
-    <div id="nav-bottom-auth" style="display:none">
-      <div class="nav-user-row" onclick="blTab('profile')">
-        <div class="nav-av" id="nav-av">?</div>
-        <div class="nav-user-name" id="nav-username-bottom">Guest</div>
+      <!-- ── USER / SIGN-IN at bottom ── -->
+      <div class="nav-bottom">
+        <!-- Signed in state -->
+        <div id="nav-bottom-auth" style="display:none">
+          <div class="nav-user-row" onclick="blTab('profile')">
+            <div class="nav-av" id="nav-av">?</div>
+            <div class="nav-user-name" id="nav-username-bottom">Guest</div>
+          </div>
+          <div class="nav-coins-row">
+            <svg width="11" height="11" viewBox="0 0 100 100"><defs><linearGradient id="cg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3dff1a"/><stop offset="100%" stop-color="#0e8a04"/></linearGradient></defs><polygon points="50,9 91,50 50,91 9,50" fill="url(#cg1)"/></svg>
+            <b id="bl-coins">0</b>&nbsp;BlinchiCoins
+          </div>
+        </div>
+        <!-- Signed out state -->
+        <div id="nav-bottom-signout">
+          <button class="btn-sm" id="bl-signin-btn" onclick="openAuth()">Sign In</button>
+        </div>
       </div>
-      <div class="nav-coins-row">
-        <svg width="13" height="13" viewBox="0 0 100 100" style="flex-shrink:0">
-          <polygon points="50,4 96,50 50,96 4,50" fill="#000" stroke="rgba(50,255,14,.4)" stroke-width="2"/>
-          <polygon points="50,9 91,50 50,91 9,50" fill="url(#rg1)"/>
-          <polygon points="50,17 83,50 50,83 17,50" fill="rgba(0,0,0,.2)"/>
-          <polygon points="50,9 91,50 50,50" fill="rgba(255,255,255,.25)"/>
-        </svg>
-        <b id="bl-coins">0</b>&nbsp;<span>BlinchiCoins</span>
-      </div>
-    </div>
-    <!-- Signed out state -->
-    <div id="nav-bottom-signout" style="display:block">
-      <button class="btn" style="width:100%;padding:9px" id="bl-signin-btn" onclick="openAuth()">Sign In</button>
-    </div>
-  </div>
-</nav>
+
+    </nav>
 
     <div class="main">
       <!-- FEED -->
@@ -709,10 +645,6 @@ let csbMode = 'friends';
 let pendingRequest = null;
 let rtAll = null, rtMsg = null, rtPres = null, presTimer = null;
 
-// ── Simple data cache ───────────────────────────────────────────
-const _cache = { friends: null, feed: null, ts: {} };
-function _cacheAge(key) { return Date.now() - (_cache.ts[key]||0); }
-
 // ── Load locks — prevent concurrent collisions ──
 const _loading = {
   friends: false, feed: false, sidebar: false,
@@ -775,13 +707,11 @@ async function onIn(user) {
   updateStatus('online');
   window.addEventListener('beforeunload', () => updateStatus('offline'), { once: true });
 
-  // Immediate ping on login
-  db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id);
-  // Heartbeat: update last_seen every 20 seconds (faster than 90s threshold)
+  // Heartbeat: update last_seen every 30 seconds
   if (window._presenceInterval) clearInterval(window._presenceInterval);
   window._presenceInterval = setInterval(() => {
     if (U) db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id);
-  }, 20000);
+  }, 30000);
 
   // Instant update on any activity
   const _pingPresence = () => {
@@ -826,32 +756,30 @@ function applyAuth() {
    ['msg-locked','msg-content'],['groups-locked','groups-content'],
    ['ch-locked','ch-list'],['ach-locked','ach-list']
   ].forEach(([l,c]) => {
-    const le=$( l), ce=$(c);
+    const le=$(l), ce=$(c);
     if (le) le.style.display = on ? 'none' : '';
     if (ce) ce.style.display = on ? 'block' : 'none';
   });
-  const sb = $('bl-signin-btn');
-  const navBottom = $('nav-bottom-auth');
+  const navAuth = $('nav-bottom-auth');
+  const navSignout = $('nav-bottom-signout');
   if (on) {
-    if (sb) sb.style.display = 'none';
-    if (navBottom) navBottom.style.display = 'block';
-    const navBSignout = $('nav-bottom-signout');
-    if (navBSignout) navBSignout.style.display = 'none';
+    if (navAuth) navAuth.style.display = 'block';
+    if (navSignout) navSignout.style.display = 'none';
     const navAv = $('nav-av');
     const navUn = $('nav-username-bottom');
     if (navAv) navAv.textContent = nameOf(P)[0].toUpperCase();
     if (navUn) navUn.textContent = nameOf(P);
-    $('bl-coins').textContent = P.coins || 0;
+    const coinsEl = $('bl-coins');
+    if (coinsEl) coinsEl.textContent = P.coins || 0;
     const fc = $('feed-content');
     if (fc && fc.querySelector('.locked')) fc.innerHTML = '';
     const pc = $('profile-content');
     if (pc && pc.querySelector('.locked')) pc.innerHTML = '';
   } else {
-    if (sb) sb.style.display = '';
-    if (navBottom) navBottom.style.display = 'none';
-    const navBSignout2 = $('nav-bottom-signout');
-    if (navBSignout2) navBSignout2.style.display = 'block';
-    $('bl-coins').textContent = 0;
+    if (navAuth) navAuth.style.display = 'none';
+    if (navSignout) navSignout.style.display = 'block';
+    const coinsEl = $('bl-coins');
+    if (coinsEl) coinsEl.textContent = 0;
   }
 }
 
@@ -991,7 +919,6 @@ function subscribeRealtime() {
     }, () => {
       // Only reload what's visible — no unconditional spam
       checkReqBadge();
-      _cache.friends = null; _cache.feed = null; // invalidate caches
       if (activeTab === 'friends') loadFriends();
       if (activeTab === 'messages') loadSidebar();
       if (activeTab === 'addfriends') loadSuggested();
@@ -1107,18 +1034,9 @@ async function loadFeed() {
   if (!U || _loading.feed) return;
   _loading.feed = true;
   const el = $('feed-content');
-  // Show cached immediately (< 20s old)
-  if (_cache.feed && _cacheAge('feed') < 20000) {
-    el.innerHTML = _cache.feed;
-    _loading.feed = false;
-    if (_cacheAge('feed') > 8000) setTimeout(() => { _cache.feed=null; loadFeed(); }, 50);
-    return;
-  }
-  if (!el.innerHTML || el.innerHTML.includes('Loading')) {
-    el.innerHTML = '<div style="color:#111;padding:14px;font-size:.83rem">Loading…</div>';
-  }
+  el.innerHTML = '<div style="color:#111;padding:14px;font-size:.83rem">Loading…</div>';
   try {
-    // Get friend IDs
+    // Get all accepted friend IDs (both directions)
     const { data: fs } = await db.from('friendships').select('user1,user2')
       .or(`user1.eq.${U.id},user2.eq.${U.id}`).eq('status', 'accepted');
     const ids = [...new Set((fs||[]).map(f => f.user1===U.id ? f.user2 : f.user1))];
@@ -1127,76 +1045,65 @@ async function loadFeed() {
         <div style="font-weight:700;color:#2a2a2a;margin-bottom:5px">No friends yet</div>
         <div style="color:#1a1a1a;font-size:.82rem;margin-bottom:13px">Add friends to see what they're playing</div>
         <button class="btn" onclick="blTab('addfriends')">Find Friends</button>
-      </div>`; _loading.feed = false; return;
+      </div>`; return;
     }
-    // Fetch activity + profiles IN PARALLEL (cuts latency in half)
-    const [actsRes, fprofsRes] = await Promise.all([
-      db.from('activity').select('*,profiles(username,displayname)').in('user_id', ids).order('updated_at', {ascending:false}),
-      db.from('profiles').select('id,username,displayname,status,last_seen').in('id', ids)
-    ]);
-    const acts = actsRes.data;
-    const fprofs = fprofsRes.data;
+    const { data: acts } = await db.from('activity')
+      .select('*,profiles(username,displayname,status,last_seen)')
+      .in('user_id', ids).order('updated_at', { ascending: false });
+    // Fetch friend profiles for online status
+    const { data: fprofs } = await db.from('profiles')
+      .select('id,username,displayname,status,last_seen').in('id', ids);
+    const fpMap = {}; (fprofs||[]).forEach(p => fpMap[p.id] = p);
 
     if (!acts || !acts.length) {
-      // Show ALL friends with live computed status (not stale status string)
-      if (!fprofs || !fprofs.length) {
-        el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are active.</div>'; return;
-      }
-      // Sort: online first, then ingame, then offline
-      const sorted = [...fprofs].sort((a,b) => {
+      // Show all friends sorted: online first, then ingame, then offline
+      const sorted = [...(fprofs||[])].sort((a,b) => {
         const order = {online:0,ingame:1,offline:2};
         return (order[getStatus(a.last_seen,a.status)]||2) - (order[getStatus(b.last_seen,b.status)]||2);
       });
+      if (!sorted.length) {
+        el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are active.</div>'; return;
+      }
       el.innerHTML = sorted.map(p => {
         const s = getStatus(p.last_seen, p.status);
         const col = statusColor(p.last_seen, p.status);
-        const lbl = statusLabel(p.last_seen, p.status);
         return `<div class="fi" data-uid="${p.id}">
           <div style="position:relative">
             <div class="av">${nameOf(p)[0].toUpperCase()}</div>
-            <span style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${col};border:2px solid #000"></span>
+            <span class="feed-pres-dot" style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${col};border:2px solid #000"></span>
           </div>
           <div class="fi-text">
             <div class="fi-name">${esc(nameOf(p))}</div>
-            <div class="fi-desc" style="color:${col}">${lbl}</div>
+            <div class="fi-desc feed-pres-lbl" style="color:${col}">${statusLabel(p.last_seen, p.status)}</div>
           </div>
-          <button onclick="openDM('${p.id}','${esc(nameOf(p))}')" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 11px;cursor:pointer;color:#666;display:flex;align-items:center;gap:5px;font-size:.76rem;font-family:var(--font);font-weight:600;transition:all .16s" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button>
+          <button onclick="openDM('${p.id}','${esc(nameOf(p))}')" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 11px;cursor:pointer;color:#666;display:flex;align-items:center;gap:5px;font-size:.76rem;font-family:var(--font);font-weight:600;transition:all .16s" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'">Chat</button>
         </div>`;
       }).join('');
       return;
     }
-    // Build a lookup from fprofs for status
-    const fpMap = {}; (fprofs||[]).forEach(p => fpMap[p.id] = p);
     el.innerHTML = acts.map(a => {
       const mins = Math.max(0, Math.round((Date.now() - new Date(a.updated_at)) / 60000));
       const when = mins<1?'just now':mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
       const init = nameOf(a.profiles)[0].toUpperCase();
-      const fp = fpMap[a.user_id] || {};
-      const actCol = statusColor(fp.last_seen, fp.status);
+      const fp = fpMap[a.user_id] || a.profiles || {};
+      const col = statusColor(fp.last_seen, fp.status);
       return `<div class="fi" data-uid="${a.user_id}">
         <div style="position:relative">
           <div class="av">${init}</div>
-          <span style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${actCol};border:2px solid #000"></span>
+          <span class="feed-pres-dot" style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${col};border:2px solid #000"></span>
         </div>
         <div class="fi-text">
           <div class="fi-name">${esc(nameOf(a.profiles))}</div>
           <div class="fi-desc">Playing <strong style="color:#ccc">${esc(a.game_title||'')}</strong> · ${when}</div>
         </div>
         <a href="index.html" onclick="localStorage.setItem('bl_join_game','${encodeURIComponent(a.game_url||'')}')"
-          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">Play</a>
+          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">▶ Play</a>
       </div>`;
     }).join('');
   } catch(e) {
     el.innerHTML = '<div style="color:#333;padding:14px;font-size:.83rem">Could not load feed.</div>';
     console.error('loadFeed error:', e);
-  } finally {
-    // Cache rendered HTML for instant re-display
-    if (el.innerHTML && !el.innerHTML.includes('Loading')) {
-      _cache.feed = el.innerHTML;
-      _cache.ts.feed = Date.now();
-    }
-    _loading.feed = false;
-  }
+  } finally { _loading.feed = false; }
 }
 async function broadcastActivity(title, url) {
   if (!U) return;
@@ -1321,79 +1228,43 @@ async function sendRequest(toId, toName) {
 async function loadFriends() {
   if (!U || _loading.friends) return;
   _loading.friends = true;
+  showLoader('friends-list');
+  // Get ALL accepted friendships in one query (both directions)
+  const { data: fs, error } = await db.from('friendships').select('user1,user2,status')
+    .or(`user1.eq.${U.id},user2.eq.${U.id}`).eq('status', 'accepted');
+  if (error) { console.error('loadFriends error:', error); $('friends-list').innerHTML='<div style="color:#444;padding:13px;font-size:.82rem">Could not load friends — check connection</div>'; return; }
+
+  const friendIds = (fs||[]).map(f => f.user1===U.id ? f.user2 : f.user1);
   const el = $('friends-list');
-  // Show cached content immediately if available, then refresh
-  if (el && !el.querySelector('.fr-row')) showLoader('friends-list');
 
-  try {
-    // Show cached data instantly if fresh (< 30s), then refresh
-    if (_cache.friends && _cacheAge('friends') < 30000) {
-      renderFriendsList(_cache.friends, el);
-      _loading.friends = false;
-      // Refresh silently in background if > 10s old
-      if (_cacheAge('friends') > 10000) setTimeout(() => { _cache.friends=null; loadFriends(); }, 100);
-      return;
-    }
-    // Get friend IDs (lightweight query)
-    const { data: fs, error } = await db.from('friendships')
-      .select('user1,user2')
-      .or(`user1.eq.${U.id},user2.eq.${U.id}`)
-      .eq('status', 'accepted');
-    if (error) throw error;
-
-    const friendIds = (fs||[]).map(f => f.user1===U.id ? f.user2 : f.user1);
-
-    if (!friendIds.length) {
-      el.innerHTML = `<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No friends yet — <a style="color:var(--brand);cursor:pointer" onclick="blTab('addfriends')">find some!</a></div>`;
-      _loading.friends = false;
-      return;
-    }
-
-    // Fetch profiles in parallel (limit fields for speed)
-    const { data: profiles, error: pe } = await db.from('profiles')
-      .select('id,username,displayname,status,last_seen')
-      .in('id', friendIds);
-    if (pe) throw pe;
-    // Cache for instant re-renders
-    _cache.friends = profiles||[];
-    _cache.ts.friends = Date.now();
-    renderFriendsList(profiles||[], el);
-  // renderFriendsList called above handles rendering
-  } catch(e) {
-    console.error('loadFriends error:', e);
-    if (el) el.innerHTML = '<div style="color:#444;padding:13px;font-size:.82rem">Could not load — tap to retry</div>';
-  } finally {
-    _loading.friends = false;
-  }
-}
-
-// Renders the friends list — called from cache or fresh fetch
-function renderFriendsList(profiles, el) {
-  if (!el) el = $('friends-list');
-  if (!el) return;
-  if (!profiles || !profiles.length) {
+  if (!friendIds.length) {
     el.innerHTML = `<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No friends yet — <a style="color:var(--brand);cursor:pointer" onclick="blTab('addfriends')">find some!</a></div>`;
+    _loading.friends = false;
     return;
   }
-  el.innerHTML = profiles.map(fp => {
+
+  const { data: profiles } = await db.from('profiles').select('id,username,displayname,status,last_seen').in('id', friendIds);
+  el.innerHTML = (profiles||[]).map(fp => {
     const fn = esc(nameOf(fp)), init = fn[0].toUpperCase();
+    const col = statusColor(fp.last_seen, fp.status);
+    const lbl = statusLabel(fp.last_seen, fp.status);
     return `<div class="fr-row" data-uid="${fp.id}" onclick="openDM('${fp.id}','${fn}')">
       <div class="av">${init}</div>
       <div class="fr-info">
         <div class="fr-name">${fn}</div>
-        <div class="fr-sub presence-lbl" style="color:${statusColor(fp.last_seen, fp.status)}">
-          <span class="presence-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${statusColor(fp.last_seen, fp.status)};margin-right:4px;vertical-align:middle"></span>
-          ${statusLabel(fp.last_seen, fp.status)} · @${esc(fp.username)}
+        <div class="fr-sub">
+          <span class="presence-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${col};margin-right:4px;vertical-align:middle;flex-shrink:0"></span><span class="presence-lbl" style="color:${col}">${lbl}</span> · @${esc(fp.username)}
         </div>
       </div>
       <div class="fr-acts" onclick="event.stopPropagation()">
         <button class="ibt" title="Message" onclick="openDM('${fp.id}','${fn}')"><i class="bi bi-chat-fill"></i></button>
-        <button class="ibt g" title="Voice call" onclick="startCall('${fp.id}','${fn}','voice')"><i class="bi bi-telephone-fill"></i></button>
-        <button class="ibt b" title="Video call" onclick="startCall('${fp.id}','${fn}','video')"><i class="bi bi-camera-video-fill"></i></button>
+        <button class="ibt g" title="Voice" onclick="startCall('${fp.id}','${fn}','voice')"><i class="bi bi-telephone-fill"></i></button>
+        <button class="ibt b" title="Video" onclick="startCall('${fp.id}','${fn}','video')"><i class="bi bi-camera-video-fill"></i></button>
         <button class="ibt r" title="Unfriend" onclick="unfriend('${fp.id}')"><i class="bi bi-person-x-fill"></i></button>
       </div>
     </div>`;
   }).join('');
+  _loading.friends = false;
 }
 
 async function unfriend(friendId) {
@@ -1465,31 +1336,44 @@ async function loadGroupList() {
 async function openDM(friendId, friendName) {
   if (!U) return;
   if (activeTab !== 'messages') blTab('messages');
-  // Try SECURITY DEFINER RPC first (handles find-or-create atomically)
-  const { data: rpcId, error: rpcErr } = await db.rpc('create_dm', { other_user: friendId });
-  if (!rpcErr && rpcId) {
-    openConversation(rpcId, friendName, 'dm');
-    loadDMList();
-    return;
-  }
-  // RPC not available — find existing DM manually
-  console.warn('create_dm RPC unavailable, searching manually:', rpcErr?.message);
   try {
-    const { data: myRows } = await db.from('conversation_members').select('conversation_id').eq('user_id', U.id);
+    // Step 1 — try the RPC (atomic, handles RLS)
+    const { data: rpcId, error: rpcErr } = await db.rpc('create_dm', { other_user: friendId });
+    if (!rpcErr && rpcId) {
+      openConversation(rpcId, friendName, 'dm');
+      loadDMList();
+      return;
+    }
+    // Step 2 — RPC missing, find existing DM directly
+    const { data: myRows } = await db.from('conversation_members')
+      .select('conversation_id').eq('user_id', U.id);
     const myIds = (myRows||[]).map(r => r.conversation_id);
     let convId = null;
     if (myIds.length) {
-      const { data: shared } = await db.from('conversation_members').select('conversation_id').eq('user_id', friendId).in('conversation_id', myIds);
-      const sharedIds = (shared||[]).map(r => r.conversation_id);
+      const { data: sharedRows } = await db.from('conversation_members')
+        .select('conversation_id').eq('user_id', friendId).in('conversation_id', myIds);
+      const sharedIds = (sharedRows||[]).map(r => r.conversation_id);
       if (sharedIds.length) {
-        const { data: dms } = await db.from('conversations').select('id').eq('type','dm').in('id',sharedIds).limit(1);
-        if (dms?.length) convId = dms[0].id;
+        const { data: dmConvs } = await db.from('conversations')
+          .select('id').eq('type','dm').in('id', sharedIds).limit(1);
+        if (dmConvs?.length) convId = dmConvs[0].id;
       }
     }
-    if (!convId) { toast('Run the SQL migration to enable chat'); return; }
+    // Step 3 — no existing DM, create one
+    if (!convId) {
+      const { data: newConv, error: ce } = await db.from('conversations')
+        .insert({ type: 'dm', name: null }).select('id').single();
+      if (ce || !newConv) { toast('Could not open chat — check DB permissions'); return; }
+      convId = newConv.id;
+      await db.from('conversation_members')
+        .insert([{ conversation_id: convId, user_id: U.id }, { conversation_id: convId, user_id: friendId }]);
+    }
     openConversation(convId, friendName, 'dm');
     loadDMList();
-  } catch(e) { toast('Could not open chat'); console.error('openDM:', e); }
+  } catch(e) {
+    toast('Could not open chat');
+    console.error('openDM:', e);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1516,7 +1400,7 @@ function openConversation(convId, name, type) {
     <div class="av ${isDM?'':'sq'}" style="width:28px;height:28px;font-size:.74rem">${name[0].toUpperCase()}</div>
     <div class="chat-hdr-info">
       <div class="chat-hdr-name">${esc(name)}</div>
-      <div class="chat-hdr-sub" id="peer-pres">${isDM?'Checking…':'Group chat'}</div>
+      <div class="chat-hdr-sub" id="peer-pres">${isDM?'● Offline':'Group chat'}</div>
     </div>
     <div class="chat-hdr-acts">
       ${isDM ? `
@@ -1662,37 +1546,32 @@ async function addMemberToGroup(convId, userId, name) {
 async function startPresence(convId) {
   if (presTimer) clearInterval(presTimer);
   if (rtPres) { try{rtPres.unsubscribe();}catch(e){} }
-  // Check immediately
   checkPeerPres(convId);
-  // Ping dm_presence (for in-chat indicator) + recheck every 20s
-  await pingPres(convId);
-  presTimer = setInterval(() => { pingPres(convId); checkPeerPres(convId); }, 20000);
-  // Subscribe to profiles UPDATE for this friend's presence
+  presTimer = setInterval(() => checkPeerPres(convId), 20000);
+  // Subscribe to any profile UPDATE — patch header instantly
   rtPres = db.channel('peer_pres_' + convId)
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' },
-      payload => { if (payload.new) checkPeerPres(convId); })
+      () => checkPeerPres(convId))
     .subscribe();
 }
-async function pingPres(convId) {
-  // Find friend id in this conv
-  try {
-    const { data } = await db.from('conversation_members').select('user_id').eq('conversation_id', convId);
-    const fid = (data||[]).map(r=>r.user_id).find(id=>id!==U.id);
-    if (fid) await db.from('dm_presence').upsert({ user_id: U.id, friend_id: fid, last_seen: new Date().toISOString() }, { onConflict: 'user_id,friend_id' });
-  } catch(e) {}
-}
+// pingPres kept as no-op so existing callers don't break
+async function pingPres(convId) {}
 async function checkPeerPres(convId) {
   try {
-    const { data: mems } = await db.from('conversation_members').select('user_id').eq('conversation_id', convId);
+    const { data: mems } = await db.from('conversation_members')
+      .select('user_id').eq('conversation_id', convId);
     const fid = (mems||[]).map(r=>r.user_id).find(id=>id!==U.id);
     if (!fid) return;
-    // Use profiles.last_seen for accurate presence (updated by global heartbeat)
-    const { data: fp } = await db.from('profiles').select('last_seen,status').eq('id', fid).maybeSingle();
-    const el = $('peer-pres'); if (!el) return;
+    const { data: fp } = await db.from('profiles')
+      .select('last_seen,status').eq('id', fid).maybeSingle();
+    const pres = $('peer-pres'); if (!pres) return;
     const s = fp ? getStatus(fp.last_seen, fp.status) : 'offline';
-    const labels = { online: '● Online', ingame: '● In a game', offline: '● Offline' };
-    el.textContent = labels[s] || '● Offline';
-    el.className = 'chat-hdr-sub' + (s !== 'offline' ? ' on' : '');
+    const col = s==='online' ? '#22c55e' : s==='ingame' ? 'var(--brand)' : 'var(--muted)';
+    const lbl = s==='online' ? '● Online' : s==='ingame' ? '● In a game' : '● Offline';
+    pres.textContent = lbl;
+    pres.style.color = s !== 'offline' ? col : '';
+    pres.className = 'chat-hdr-sub' + (s !== 'offline' ? ' on' : '');
+    pres.dataset.fid = fid;
   } catch(e) {}
 }
 
@@ -1727,11 +1606,10 @@ async function loadMessages(convId) {
   if (!window._profCache) window._profCache = {};
   Object.assign(window._profCache, profMap);
   const msgs = (data||[]).map(m => ({ ...m, profiles: profMap[m.sender_id] || null }));
-  const msgsEl = $('chat-msgs');
   if (!msgs.length) {
-    msgsEl.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — start the conversation</div>'; return;
+    el.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — start the conversation</div>'; return;
   }
-  msgsEl.innerHTML = msgs.map(m => {
+  el.innerHTML = msgs.map(m => {
     const isMe = m.sender_id === U.id;
     const hrs = m.expires_at ? Math.max(0, Math.round((new Date(m.expires_at)-Date.now())/3600000)) : null;
     const ephTag = !m.saved && hrs!==null
@@ -1751,8 +1629,8 @@ async function loadMessages(convId) {
     </div>`;
   }).join('');
   // Smart scroll — only auto-jump if near bottom or first load
-  const atBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 80;
-  if (atBottom || msgsEl.scrollTop === 0) msgsEl.scrollTo({ top: msgsEl.scrollHeight, behavior: 'smooth' });
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  if (atBottom || el.scrollTop === 0) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
 }
 
 let _sending = false; // double-send lock
@@ -1824,16 +1702,7 @@ async function sendMsg() {
     toast('Send failed: ' + error.message);
     return;
   }
-  // Optimistically append message locally for instant feel
-  appendMessage({
-    id: 'tmp_' + Date.now(),
-    sender_id: U.id,
-    conversation_id: activeConversation,
-    body: text,
-    created_at: new Date().toISOString(),
-    saved: false
-  });
-  // Realtime will also fire for the other user — they get it via appendMessage
+  // Realtime handles the append — NO loadMessages() call here
 }
 
 // ── TYPING INDICATOR ────────────────────────────────────────
@@ -1865,7 +1734,7 @@ function listenTyping(convId) {
     })
     .on('broadcast', { event: 'stopped' }, p => {
       if (p.payload.uid === U.id) return;
-      const el = $('typing-indicator'); if (el) el.classList.remove('show');
+      const tyEl = $('typing-indicator'); if (tyEl) tyEl.classList.remove('show');
     })
     .subscribe();
 }
@@ -1959,39 +1828,25 @@ let callType='voice', callPid=null, callPname=null, sigCh=null;
 async function startCall(fid, fname, type) {
   if (!U || pc) { if(pc) toast('Already in a call'); return; }
   callType=type; callPid=fid; callPname=fname;
-
   try {
     lStream = await navigator.mediaDevices.getUserMedia(
       type==='video' ? {audio:true,video:true} : {audio:true,video:false}
     );
-  } catch(e) {
-    toast('Microphone' + (type==='video'?' / camera':'') + ' access denied'); return;
-  }
+  } catch(e) { toast('Microphone' + (type==='video'?' / camera':'') + ' access denied'); return; }
 
   showCallUI(fname, 'Calling…', type);
   pc = new RTCPeerConnection(ICE);
-
-  // Add local tracks
   lStream.getTracks().forEach(t => pc.addTrack(t, lStream));
   if (type==='video') { const lv=$('local-vid'); if(lv) lv.srcObject=lStream; }
-
-  // Remote track handler
   pc.ontrack = e => { const rv=$('remote-vid'); if(rv && e.streams[0]) rv.srcObject=e.streams[0]; };
-
-  // ICE state monitoring
   pc.onconnectionstatechange = () => {
     if (pc && (pc.connectionState==='failed'||pc.connectionState==='disconnected')) endCall();
   };
 
-  // Set up signalling channel FIRST, before creating offer
   sigCh = db.channel('call_' + [U.id,fid].sort().join('_'));
-
   pc.onicecandidate = e => {
-    if (e.candidate && sigCh) {
-      sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
-    }
+    if (e.candidate && sigCh) sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
   };
-
   sigCh
     .on('broadcast',{event:'answer'}, async e => {
       if (e.payload?.from !== fid || !pc) return;
@@ -2004,25 +1859,22 @@ async function startCall(fid, fname, type) {
     .on('broadcast',{event:'end'}, e => { if (e.payload?.from===fid) endCall(); })
     .subscribe(async status => {
       if (status !== 'SUBSCRIBED') return;
-      // Channel ready — now create and send offer
       try {
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-        // Store in DB (for users who miss the broadcast)
-        await db.from('call_signals').insert({
+        // DB row — callee picks this up via postgres_changes if they miss broadcast
+        db.from('call_signals').insert({
           caller_id: U.id, callee_id: fid, type: 'offer',
           payload: JSON.stringify(offer), call_type: type, caller_name: nameOf(P)
         }).catch(()=>{});
-        // Broadcast the offer
+        // Broadcast on shared channel
         sigCh.send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
-        // Also send to callee's personal broadcast channel
-        db.channel('inc_broadcast_' + fid).send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
-      } catch(err) {
-        console.error('offer error:', err);
-        endCall();
-      }
+        // Also broadcast on callee's personal channel (faster delivery)
+        db.channel('inc_bcast_'+fid).send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
+      } catch(err) { console.error('offer error:', err); endCall(); }
     });
 }
+
 function showCallUI(name,status,type) {
   $('call-nm').textContent=name; $('call-st').textContent=status; $('call-tm').textContent='';
   $('call-overlay').classList.add('show');
@@ -2031,55 +1883,65 @@ function showCallUI(name,status,type) {
   if(type==='video'){vg.style.display='grid';if(cb)cb.style.display='flex';}
   else{vg.style.display='none';if(cb)cb.style.display='none';}
 }
-function startCallTimer() { $('call-st').textContent='Connected'; callSecs=0; callTimer=setInterval(()=>{callSecs++;const m=Math.floor(callSecs/60),s=callSecs%60;$('call-tm').textContent=m+':'+(s<10?'0':'')+s;},1000); }
+function startCallTimer() {
+  $('call-st').textContent='Connected'; callSecs=0;
+  callTimer=setInterval(()=>{callSecs++;const m=Math.floor(callSecs/60),s=callSecs%60;$('call-tm').textContent=m+':'+(s<10?'0':'')+s;},1000);
+}
 function endCall() {
-  if(callTimer)clearInterval(callTimer); if(lStream)lStream.getTracks().forEach(t=>t.stop()); if(pc)pc.close();
+  if(callTimer)clearInterval(callTimer);
+  if(lStream)lStream.getTracks().forEach(t=>t.stop());
+  if(pc)pc.close();
   if(sigCh){sigCh.send({type:'broadcast',event:'end',payload:{from:U?.id}});sigCh.unsubscribe();}
   lStream=null;pc=null;callTimer=null;sigCh=null;
   $('call-overlay').classList.remove('show');
-  const _cad2 = $('ctx-ad-bar'); if(_cad2 && !['messages','groups'].includes(activeTab)) _cad2.style.display='none';
+  const _cad2=$('ctx-ad-bar'); if(_cad2&&!['messages','groups'].includes(activeTab)) _cad2.style.display='none';
   callPid=null;callPname=null;isMuted=false;isCamOff=false;
 }
-function toggleMute() { isMuted=!isMuted; if(lStream)lStream.getAudioTracks().forEach(t=>t.enabled=!isMuted); const b=$('btn-mute'); b.classList.toggle('on',isMuted); b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i>':'<i class="bi bi-mic-fill"></i>'; }
-function toggleCam() { isCamOff=!isCamOff; if(lStream)lStream.getVideoTracks().forEach(t=>t.enabled=!isCamOff); const b=$('btn-cam'); b.classList.toggle('on',isCamOff); b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i>':'<i class="bi bi-camera-video-fill"></i>'; }
-function listenCalls() {
-  if (!U) return;
-  db.channel('inc_' + U.id)
-    .on('postgres_changes', {
-      event: 'INSERT', schema: 'public', table: 'call_signals',
-      filter: `callee_id=eq.${U.id}`
-    }, e => {
-      const row = e.new;
-      if (row.type !== 'offer' || pc) return;
-      callPid = row.caller_id; callPname = row.caller_name||'Someone';
-      callType = row.call_type||'voice';
-      window._pendingOffer = JSON.parse(row.payload);
-      showIncomingCall(callPname, callType);
-    })
-    .subscribe();
-  // Also listen via broadcast (catches live calls faster than DB polling)
-  db.channel('inc_broadcast_' + U.id)
-    .on('broadcast', {event:'offer'}, e => {
-      if (pc || !e.payload) return;
-      callPid = e.payload.from; callPname = e.payload.name||'Someone';
-      callType = e.payload.call_type||'voice';
-      window._pendingOffer = e.payload.sdp;
-      showIncomingCall(callPname, callType);
-    })
-    .subscribe();
+function toggleMute() {
+  isMuted=!isMuted;
+  if(lStream)lStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);
+  const b=$('btn-mute'); b.classList.toggle('on',isMuted);
+  b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i>':'<i class="bi bi-mic-fill"></i>';
+}
+function toggleCam() {
+  isCamOff=!isCamOff;
+  if(lStream)lStream.getVideoTracks().forEach(t=>t.enabled=!isCamOff);
+  const b=$('btn-cam'); b.classList.toggle('on',isCamOff);
+  b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i>':'<i class="bi bi-camera-video-fill"></i>';
 }
 
-function showIncomingCall(name, type) {
+function _showIncomingCall(name, type, offer) {
+  if (pc) return; // already in a call
+  window._pendingOffer = offer;
   $('inc-nm').textContent = name + ' is calling…';
   $('inc-type').textContent = type==='video' ? 'Video call' : 'Voice call';
   $('inc-call').classList.add('show');
   playMsgSound();
 }
+
+function listenCalls() {
+  if (!U) return;
+  // DB row listener — catches callers who sent offer before we subscribed
+  db.channel('inc_db_' + U.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'call_signals',filter:`callee_id=eq.${U.id}`}, e => {
+      const row=e.new; if(row.type!=='offer'||pc)return;
+      callPid=row.caller_id; callPname=row.caller_name||'Someone'; callType=row.call_type||'voice';
+      try { _showIncomingCall(callPname, callType, JSON.parse(row.payload)); } catch(_){}
+    })
+    .subscribe();
+  // Broadcast listener — fast path (no DB round-trip)
+  db.channel('inc_bcast_' + U.id)
+    .on('broadcast',{event:'offer'}, e => {
+      if (pc || !e.payload) return;
+      callPid=e.payload.from; callPname=e.payload.name||'Someone'; callType=e.payload.call_type||'voice';
+      _showIncomingCall(callPname, callType, e.payload.sdp);
+    })
+    .subscribe();
+}
+
 async function acceptCall() {
   $('inc-call').classList.remove('show');
-  const offer = window._pendingOffer;
-  if (!offer || !callPid) return;
-
+  const offer=window._pendingOffer; if(!offer||!callPid)return;
   try {
     lStream = await navigator.mediaDevices.getUserMedia(
       callType==='video' ? {audio:true,video:true} : {audio:true,video:false}
@@ -2090,7 +1952,6 @@ async function acceptCall() {
   pc = new RTCPeerConnection(ICE);
   lStream.getTracks().forEach(t => pc.addTrack(t, lStream));
   if (callType==='video') { const lv=$('local-vid'); if(lv) lv.srcObject=lStream; }
-
   pc.ontrack = e => { const rv=$('remote-vid'); if(rv && e.streams[0]) rv.srcObject=e.streams[0]; };
   pc.onconnectionstatechange = () => {
     if (pc && pc.connectionState==='connected') { $('call-st').textContent='Connected'; startCallTimer(); }
@@ -2101,13 +1962,12 @@ async function acceptCall() {
   pc.onicecandidate = e => {
     if (e.candidate && sigCh) sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
   };
-
   sigCh
     .on('broadcast',{event:'ice'}, async e => {
-      if (e.payload?.from!==callPid || !pc) return;
+      if (e.payload?.from!==callPid||!pc) return;
       try { await pc.addIceCandidate(new RTCIceCandidate(e.payload.c)); } catch(_){}
     })
-    .on('broadcast',{event:'end'}, () => endCall())
+    .on('broadcast',{event:'end'}, ()=>endCall())
     .subscribe(async status => {
       if (status !== 'SUBSCRIBED') return;
       try {
@@ -2115,7 +1975,7 @@ async function acceptCall() {
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         sigCh.send({type:'broadcast',event:'answer',payload:{from:U.id,sdp:answer}});
-      } catch(err) { console.error('acceptCall answer error:', err); endCall(); }
+      } catch(err) { console.error('acceptCall error:', err); endCall(); }
     });
 }
 function declineCall(){$('inc-call').classList.remove('show');window._pendingOffer=null;}
@@ -2190,24 +2050,39 @@ async function loadAchievements() {
 // ═══════════════════════════════════════════════════════════════
 // Patch presence dot in DOM without full reload
 function updateUserPresenceDOM(profileId, lastSeen, status) {
-  // Update status dot in friends list
+  const col = statusColor(lastSeen, status);
+  const lbl = statusLabel(lastSeen, status);
+  const s   = getStatus(lastSeen, status);
+
+  // 1. Friends list row (presence-dot / presence-lbl classes)
   const row = document.querySelector(`[data-uid="${profileId}"]`);
   if (row) {
     const dot = row.querySelector('.presence-dot');
-    const lbl = row.querySelector('.presence-lbl');
-    const s = getStatus(lastSeen, status);
-    const col = statusColor(lastSeen, status);
+    const lb  = row.querySelector('.presence-lbl');
     if (dot) dot.style.background = col;
-    if (lbl) { lbl.textContent = statusLabel(lastSeen, status); lbl.style.color = col; }
+    if (lb)  { lb.textContent = lbl; lb.style.color = col; }
+    // Feed row has feed-pres-dot / feed-pres-lbl
+    const fdot = row.querySelector('.feed-pres-dot');
+    const flb  = row.querySelector('.feed-pres-lbl');
+    if (fdot) fdot.style.background = col;
+    if (flb)  { flb.textContent = lbl; flb.style.color = col; }
   }
-  // Update DM sidebar dot
+
+  // 2. DM sidebar dot (ci_<uid>)
   const ci = document.getElementById('ci_' + profileId);
   if (ci) {
     const dot = ci.querySelector('.ci-pres-dot');
     const sub = ci.querySelector('.ci-sub');
-    const col = statusColor(lastSeen, status);
     if (dot) dot.style.background = col;
-    if (sub) sub.textContent = statusLabel(lastSeen, status);
+    if (sub) { sub.textContent = lbl; sub.style.color = col; }
+  }
+
+  // 3. Chat header peer-pres (if this conv is with that friend)
+  const pres = $('peer-pres');
+  if (pres && pres.dataset.fid === profileId) {
+    pres.textContent = s==='online' ? '● Online' : s==='ingame' ? '● In a game' : '● Offline';
+    pres.style.color = s !== 'offline' ? col : '';
+    pres.className = 'chat-hdr-sub' + (s !== 'offline' ? ' on' : '');
   }
 }
 
@@ -2221,7 +2096,8 @@ async function awardCoins(amount) {
   if(!U||!P)return;
   const nc=(P.coins||0)+amount;
   await db.from('profiles').update({coins:nc}).eq('id',U.id);
-  P.coins=nc; $('bl-coins').textContent=nc;
+  P.coins=nc;
+  const coinsEl=$('bl-coins'); if(coinsEl) coinsEl.textContent=nc;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2244,27 +2120,6 @@ async function startApp() {
   } finally {
     _appLoading = false;
   }
-}
-
-// ── Sidebar toggle ──────────────────────────────────────────────
-let _navExpanded = false;
-function toggleNav() {
-  _navExpanded = !_navExpanded;
-  const nav = document.querySelector('.nav');
-  if (nav) nav.classList.toggle('expanded', _navExpanded);
-  // Save pref
-  try { localStorage.setItem('bl_nav_exp', _navExpanded ? '1' : '0'); } catch(e) {}
-}
-function initNav() {
-  // Restore collapsed state (default collapsed)
-  try {
-    const saved = localStorage.getItem('bl_nav_exp');
-    if (saved === '1') {
-      _navExpanded = true;
-      const nav = document.querySelector('.nav');
-      if (nav) nav.classList.add('expanded');
-    }
-  } catch(e) {}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2370,23 +2225,10 @@ function statusLabel(statusOrLastSeen, fallback) {
 }
 
 window.onload = () => {
-  initNav();
   initAuth().catch(console.error);
   requestNotifPermission();
   initScrollWatcher();
 };
-
-// Refresh when user returns to tab (coming back from index.html etc.)
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && U) {
-    // Re-ping presence immediately
-    db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id).catch(()=>{});
-    // Refresh current tab data
-    refreshTab(activeTab);
-    countUnread();
-    checkReqBadge();
-  }
-});
 
 </script>
 

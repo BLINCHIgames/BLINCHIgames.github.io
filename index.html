@@ -1,1097 +1,920 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>BLINCHIGAMES | Elite Game Portal</title>
-<link rel="icon" type="image/png" href="BLINCHI3-Photoroom.png">
-<link rel="apple-touch-icon" href="BLINCHI3-Photoroom.png">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<script>(function(){const K='blinchi_pu';if(Date.now()-parseInt(localStorage.getItem(K)||'0',10)>=86400000){function f(){document.removeEventListener('click',f,true);const s=document.createElement('script');s.src='https://authoritieswoundjoint.com/17/c4/34/17c434ad4a5c24351595e12ab0dcf7fa.js';s.async=true;document.head.appendChild(s);localStorage.setItem(K,String(Date.now()));const n=document.getElementById('pu-notice');if(n)n.classList.add('show');}document.addEventListener('click',f,true);}})()</script>
-<script>(function(){const K='blinchi_sa';function f(){const s=document.createElement('script');s.src='https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js';s.async=true;document.head.appendChild(s);localStorage.setItem(K,String(Date.now()));}function m(){if(Date.now()-parseInt(localStorage.getItem(K)||'0',10)>=1200000)f();}m();setInterval(m,1200000);})()</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157317095946191" crossorigin="anonymous"></script>
-<style>
-/* ── Global: kill every scrollbar ── */
-*,*::before,*::after{box-sizing:border-box;scrollbar-width:none!important;-ms-overflow-style:none!important}
-*::-webkit-scrollbar{display:none!important}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>BLINCHIGAMES | Elite Game Portal</title>
 
-/* ── Design tokens ── */
-:root{
-  --brand:#32ff0e;--brand-dim:rgba(50,255,14,.15);
-  --bg:#000;--panel:#050505;--surf:#111;--surf2:#1a1a1a;
-  --border:rgba(255,255,255,.05);--border2:rgba(255,255,255,.09);
-  --text:#fff;--muted:#888;
-  --font:'Plus Jakarta Sans',sans-serif;
-  --display:'Space Grotesk',sans-serif;
-  --r:18px;--ease:cubic-bezier(.4,0,.2,1)
-}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-body{background:var(--bg);color:var(--text);font-family:var(--font);margin:0;overflow-x:hidden}
-.wrap{display:flex;min-height:100vh}
+    <!-- Popunder — fires on first click once per day, shows notice overlay -->
+    <script>
+        (function () {
+            const KEY     = 'blinchi_last_popunder';
+            const ONE_DAY = 24 * 60 * 60 * 1000;
+            const last    = parseInt(localStorage.getItem(KEY) || '0', 10);
+            if (Date.now() - last >= ONE_DAY) {
+                function firePopunder() {
+                    document.removeEventListener('click', firePopunder, true);
+                    const s = document.createElement('script');
+                    s.src   = 'https://authoritieswoundjoint.com/17/c4/34/17c434ad4a5c24351595e12ab0dcf7fa.js';
+                    s.async = true;
+                    document.head.appendChild(s);
+                    localStorage.setItem(KEY, String(Date.now()));
+                    // Show the notice overlay
+                    const notice = document.getElementById('popunder-notice');
+                    if (notice) notice.classList.add('show');
+                }
+                document.addEventListener('click', firePopunder, true);
+            }
+        })();
 
-/* ── Sidebar ── */
-.sidebar{width:280px;background:var(--panel);border-right:1px solid var(--border);height:100vh;position:sticky;top:0;display:flex;flex-direction:column;z-index:100;flex-shrink:0}
-.sb-head{padding:28px 24px 14px}
-.logo{font-family:var(--display);font-size:1.55rem;font-weight:800;color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px}
-.logo em{color:var(--brand);font-style:normal}
-.search-wrap{padding:0 18px 18px}
-/* THE FIX: wrap the real input in a form that browsers won't autofill */
-.search-form{background:var(--surf);border-radius:var(--r);padding:11px 15px;display:flex;align-items:center;border:1px solid transparent;transition:.2s}
-.search-form:focus-within{border-color:var(--brand)}
-.search-form input{background:transparent;border:none;color:#fff;width:100%;outline:none;margin-left:9px;font-size:.9rem;font-family:var(--font)}
-/* dummy hidden fields trick browsers into autofilling those instead */
-.autofill-trap{position:absolute;opacity:0;pointer-events:none;height:0;width:0;top:0;left:0}
-.sb-scroll{flex:1;overflow-y:auto;padding:8px 14px}
-.sb-label{font-size:.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:800;margin:18px 14px 8px}
-.nav-btn{display:flex;align-items:center;gap:11px;padding:11px 16px;color:var(--muted);text-decoration:none;border-radius:var(--r);font-weight:500;transition:all .18s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;margin-bottom:3px;font-family:var(--font);font-size:.9rem}
-.nav-btn:hover{color:#fff;background:var(--surf)}
-.nav-btn.active{color:#fff;background:var(--brand-dim);border-left:4px solid var(--brand);border-radius:4px var(--r) var(--r) 4px}
-/* BlinchiLive pill in sidebar */
-.live-nav-pill{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,#0a2200,#001a00);border:1px solid rgba(50,255,14,.3);border-radius:20px;padding:4px 10px 4px 7px;font-size:.72rem;font-weight:800;color:var(--brand);letter-spacing:.5px}
-.live-nav-pill .live-dot{width:7px;height:7px;border-radius:50%;background:var(--brand);box-shadow:0 0 5px var(--brand);animation:pulse 1.8s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+        function closePopunderNotice() {
+            const notice = document.getElementById('popunder-notice');
+            if (notice) notice.classList.remove('show');
+        }
+    </script>
 
-/* ── Main ── */
-.main{flex:1;min-width:0;padding:0 36px}
-.sec-title{font-family:var(--display);font-size:1.7rem;margin-top:2rem;margin-bottom:1.4rem;color:#fff}
-#view-home .sec-title:first-child{margin-top:1rem}
+    <!-- Social Ads — fires once per 20 minutes, never more -->
+    <script>
+        (function () {
+            const KEY      = 'blinchi_last_social_ad';
+            const COOLDOWN = 20 * 60 * 1000;
+            function fireAd() {
+                const script = document.createElement('script');
+                script.src   = 'https://authoritieswoundjoint.com/be/12/e6/be12e6213defb10285de3a59a17f3b40.js';
+                script.async = true;
+                document.head.appendChild(script);
+                localStorage.setItem(KEY, String(Date.now()));
+            }
+            function maybeFireAd() {
+                const last = parseInt(localStorage.getItem(KEY) || '0', 10);
+                if (Date.now() - last >= COOLDOWN) fireAd();
+            }
+            maybeFireAd();
+            setInterval(maybeFireAd, COOLDOWN);
+        })();
+    </script>
 
-/* ── Game grid ── */
-.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:26px;padding:8px 0 36px}
-.elite-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
-.multi-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
-/* Card: perspective for the tilt effect */
-.card{border-radius:var(--r);cursor:pointer;display:flex;flex-direction:column;position:relative;
-  transition:transform .26s var(--ease),box-shadow .26s var(--ease);
-  transform-style:preserve-3d;will-change:transform}
-.card:hover{transform:perspective(600px) rotateX(2.5deg) translateY(-6px) scale(1.02);
-  box-shadow:0 18px 40px rgba(0,0,0,.7)}
-.thumb{aspect-ratio:1/1;overflow:hidden;border-radius:var(--r) var(--r) 0 0;
-  background:var(--surf);box-shadow:0 8px 28px rgba(0,0,0,.55);
-  border:1px solid var(--border);border-bottom:none;position:relative}
-.card-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s;border-radius:inherit;pointer-events:none}
-.card-img{transition:opacity .25s}
-.thumb img{width:100%;height:100%;object-fit:cover;transition:.32s;display:block}
-.card:hover .thumb img{transform:scale(1.06)}
-/* White name label under the thumbnail */
-.card-info{
-  background:#fff;
-  border-radius:0 0 var(--r) var(--r);
-  border:1px solid rgba(255,255,255,.15);
-  border-top:none;
-  padding:8px 10px 9px;
-  overflow:hidden
-}
-.card-info h6{margin:0;font-size:.88rem;font-weight:700;color:#000;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
-.badge{position:absolute;top:9px;left:9px;font-size:.65rem;font-weight:800;padding:4px 12px;border-radius:30px;z-index:10;text-transform:uppercase}
-.badge-elite{background:var(--brand);color:#000;box-shadow:0 3px 12px rgba(50,255,14,.38)}
-.badge-multi{background:#7c3aed;color:#fff;box-shadow:0 3px 12px rgba(124,58,237,.4)}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5157317095946191" crossorigin="anonymous"></script>
 
-/* ── Like / action bar ── */
-.like-bar{display:flex;align-items:center;gap:7px;padding:0 4px 11px;flex-wrap:wrap}
-.act-btn{display:flex;align-items:center;gap:4px;background:var(--surf);border:1px solid var(--border2);border-radius:30px;padding:5px 10px;cursor:pointer;color:var(--muted);font-size:.76rem;font-weight:600;transition:all .18s;user-select:none;font-family:var(--font)}
-.act-btn:hover,.act-btn.active{background:var(--brand-dim);border-color:var(--brand);color:var(--brand)}
-.act-btn.dis:hover,.act-btn.dis.active{background:rgba(255,60,60,.15);border-color:#ff3c3c;color:#ff3c3c}
-/* BlinchiLive pill button in game stage toolbar */
-.live-pill-btn{display:flex;align-items:center;gap:6px;background:linear-gradient(90deg,rgba(50,255,14,.12),rgba(50,200,10,.08));border:1px solid rgba(50,255,14,.4);border-radius:20px;padding:5px 12px 5px 9px;cursor:pointer;color:var(--brand);font-size:.76rem;font-weight:800;transition:all .18s;user-select:none;font-family:var(--font);letter-spacing:.3px;margin-left:auto}
-.live-pill-btn:hover{background:rgba(50,255,14,.2)}
-.live-pill-btn .ldot{width:6px;height:6px;border-radius:50%;background:var(--brand);box-shadow:0 0 4px var(--brand);animation:pulse 1.8s infinite}
+    <style>
+        :root {
+            --brand: #32ff0e;
+            --brand-soft: rgba(50, 255, 14, 0.15);
+            --bg-dark: #000000;
+            --sidebar: #050505;
+            --surface: #111111;
+            --surface-hover: #1a1a1a;
+            --text-main: #ffffff;
+            --text-secondary: #aaaaaa;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --radius-lg: 24px;
+            --radius-md: 18px;
+            --transition: cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-.grid-ad{border-radius:var(--r);background:var(--surf);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:130px}
-#loading{position:fixed;inset:0;background:#000;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center}
-#sentinel{height:140px;display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:40px}
+        body { background: var(--bg-dark); color: var(--text-main); font-family: var(--font-main); margin: 0; overflow-x: hidden; }
+        .app-container { display: flex; min-height: 100vh; }
 
-/* ── Game stage ── */
-#stage{display:none;position:fixed;inset:0;background:var(--bg);z-index:2500;overflow-y:auto}
-#stage.open{display:block}
-#stage-banner{background:#0a0a0a;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;min-height:92px;overflow:hidden;position:relative;transition:min-height .3s}
-#stage-banner.off{min-height:0!important;height:0;overflow:hidden}
-#hide-ad-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.08);border:none;color:#aaa;border-radius:8px;padding:3px 9px;font-size:.7rem;cursor:pointer;font-family:var(--font)}
-#show-ad-strip{display:none;background:#0a0a0a;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;padding:5px 0;cursor:pointer;color:#333;font-size:.7rem}
-.stage-hdr{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--border2)}
-.stage-mid{display:flex;align-items:flex-start}
-.stage-ads{width:168px;flex-shrink:0;background:var(--panel);border-left:1px solid var(--border);padding:4px;display:flex;flex-direction:column;align-items:center;gap:7px;position:sticky;top:0;align-self:flex-start}
-.game-col{flex:1;min-width:0;display:flex;flex-direction:column;background:#000}
-#game-iframe{width:100%;border:none;background:#000;flex-shrink:0}
-#below-game{background:var(--bg);padding:20px 26px 56px}
-#below-banner{margin-bottom:18px;display:flex;align-items:center;justify-content:center;background:#0a0a0a;border-radius:8px;overflow:hidden;min-height:92px}
-#rel-title{font-family:var(--display);font-size:1.15rem;margin-bottom:12px;color:#fff}
-#rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+        /* ── Left nav sidebar ── */
+        .sidebar {
+            width: 280px; background: var(--sidebar);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            height: 100vh; position: sticky; top: 0;
+            display: flex; flex-direction: column; z-index: 1000;
+        }
+        .sidebar-header { padding: 30px 25px 15px; }
+        .logo {
+            font-family: var(--font-display); font-size: 1.6rem; font-weight: 800;
+            color: #ffffff; text-decoration: none; display: flex; align-items: center; gap: 10px;
+        }
+        .logo span { color: var(--brand); }
+        .search-box { padding: 0 20px 20px; }
+        .search-input-wrapper {
+            background: var(--surface); border-radius: var(--radius-md);
+            padding: 12px 16px; display: flex; align-items: center;
+            border: 1px solid transparent; transition: 0.2s;
+        }
+        .search-input-wrapper:focus-within { border-color: var(--brand); }
+        .search-input-wrapper input {
+            background: transparent; border: none; color: white;
+            width: 100%; outline: none; margin-left: 10px; font-size: 0.9rem;
+        }
+        .menu-scroll { flex: 1; overflow-y: auto; padding: 10px 15px; scrollbar-width: none; }
+        .menu-label {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--text-secondary); font-weight: 800; margin: 20px 15px 10px;
+        }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 18px;
+            color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md);
+            font-weight: 500; transition: all 0.2s; cursor: pointer; border: none;
+            background: transparent; width: 100%; text-align: left; margin-bottom: 4px;
+        }
+        .nav-item:hover { color: #ffffff; background: var(--surface); }
+        .nav-item.active {
+            color: #ffffff; background: var(--brand-soft);
+            border-left: 4px solid var(--brand);
+            border-radius: 4px var(--radius-md) var(--radius-md) 4px;
+        }
 
-/* ── Full-screen prompt ── */
-#fs-prompt{display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.7);align-items:center;justify-content:center}
-.fs-box{background:#111;border:1px solid var(--border2);border-radius:16px;padding:30px 38px;text-align:center;max-width:360px}
-.fs-box p:first-child{font-size:1.05rem;font-weight:700;margin-bottom:7px}
-.fs-box p:last-of-type{color:var(--muted);font-size:.88rem;margin-bottom:22px}
-.fs-yes{background:var(--brand);color:#000;border:none;border-radius:30px;padding:9px 26px;font-weight:700;cursor:pointer;margin-right:9px}
-.fs-no{background:#222;color:#fff;border:1px solid #333;border-radius:30px;padding:9px 26px;font-weight:600;cursor:pointer}
+        /* ── Main content ── */
+        .main-content { flex: 1; min-width: 0; padding: 0 40px; }
+        .section-title { font-family: var(--font-display); font-size: 1.75rem; margin-top: 2rem; margin-bottom: 1.5rem; color: #ffffff; }
+        #view-home .section-title:first-child { margin-top: 1rem; }
 
-/* ── Overlays ── */
-#pu-notice{display:none;position:fixed;inset:0;z-index:9500;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);align-items:center;justify-content:center}
-#pu-notice.show{display:flex}
-.pu-box{background:#111;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:34px 38px;text-align:center;max-width:400px;width:90%}
-.pu-box .icon{font-size:2.2rem;margin-bottom:12px}
-.pu-box h3{font-family:var(--display);font-size:1.25rem;color:#fff;margin-bottom:9px}
-.pu-box p{color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:22px}
-.pu-btn{background:var(--brand);color:#000;border:none;border-radius:30px;padding:10px 30px;font-weight:700;cursor:pointer;font-family:var(--font)}
-#ab-wall{display:none;position:fixed;inset:0;z-index:9999;background:#000;align-items:center;justify-content:center}
-#ab-wall.show{display:flex}
-.ab-box{background:#111;border:1px solid var(--border2);border-radius:20px;padding:38px 42px;text-align:center;max-width:440px;width:90%}
-.ab-box .icon{font-size:2.8rem;margin-bottom:14px}
-.ab-box h2{font-family:var(--display);font-size:1.4rem;color:#fff;margin-bottom:11px}
-.ab-box p{color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:26px}
-.ab-btn{background:var(--brand);color:#000;border:none;border-radius:30px;padding:11px 34px;font-weight:700;font-size:.96rem;cursor:pointer;font-family:var(--font)}
+        /* ── Game grid ── */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 28px; padding: 10px 0 40px;
+        }
+        .elite-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
 
-/* ── Top-right chip ── */
-#top-chip{position:fixed;top:14px;right:18px;z-index:200;display:flex;align-items:center;gap:9px}
-.online-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block;margin-right:4px;box-shadow:0 0 5px var(--brand);flex-shrink:0}
+        .game-card {
+            border-radius: var(--radius-md); transition: transform 0.3s var(--transition);
+            cursor: pointer; display: flex; flex-direction: column; position: relative;
+        }
+        .game-card:hover { transform: translateY(-6px); }
 
-/* ── Auth modal ── */
-.modal-ov{display:none;position:fixed;inset:0;z-index:9400;background:rgba(0,0,0,.78);align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.modal-ov.show{display:flex}
-.modal-box{background:#111;border:1px solid var(--border2);border-radius:20px;padding:34px 38px;width:90%;max-width:430px;position:relative;max-height:90vh;overflow-y:auto}
-.modal-box h2{font-family:var(--display);font-size:1.35rem;margin-bottom:5px}
-.modal-box .sub{color:var(--muted);font-size:.86rem;margin-bottom:22px}
-.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:#555;font-size:1.2rem;cursor:pointer}
-.fg{margin-bottom:13px}
-.fg label{display:block;font-size:.76rem;font-weight:700;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px}
-.fg label small{color:#333;font-size:.72em;text-transform:none;letter-spacing:0}
-.fg input{width:100%;background:var(--surf2);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:10px 13px;color:#fff;font-size:.93rem;outline:none;transition:border-color .2s;font-family:var(--font)}
-.fg input:focus{border-color:var(--brand)}
-.btn-brand{width:100%;background:var(--brand);color:#000;border:none;border-radius:11px;padding:11px;font-weight:800;font-size:.95rem;cursor:pointer;margin-top:3px;font-family:var(--font)}
-.modal-sw{text-align:center;margin-top:13px;color:#444;font-size:.86rem}
-.modal-sw a{color:var(--brand);cursor:pointer;text-decoration:none}
-.merr{color:#ff5555;font-size:.82rem;margin-top:6px;display:none}
-.mok{color:var(--brand);font-size:.82rem;margin-top:6px;display:none}
+        .game-thumb {
+            aspect-ratio: 1/1; overflow: hidden; border-radius: var(--radius-md);
+            background: var(--surface); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.05); position: relative;
+        }
+        .game-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: 0.4s; display: block; }
+        .game-card:hover .game-thumb img { transform: scale(1.05); }
 
-/* ── Comments ── */
-#comments-panel{display:none;position:fixed;right:0;top:0;bottom:0;width:360px;background:#0d0d0d;border-left:1px solid var(--border2);z-index:3000;flex-direction:column}
-#comments-panel.show{display:flex}
-.cp-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border2);flex-shrink:0}
-.cp-hdr h3{font-family:var(--display);font-size:1.05rem;margin:0}
-.cp-close{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer}
-.cp-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
-.cp-item{background:var(--surf2);border-radius:11px;padding:11px 13px}
-.cp-author{font-size:.78rem;font-weight:700;color:var(--brand);margin-bottom:3px}
-.cp-body{font-size:.88rem;color:#ddd;line-height:1.45}
-.cp-time{font-size:.72rem;color:#444;margin-top:4px}
-.cp-input{padding:12px 15px;border-top:1px solid var(--border2);display:flex;gap:9px;align-items:flex-end;flex-shrink:0}
-.cp-input textarea{flex:1;background:var(--surf2);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:9px 11px;color:#fff;font-size:.88rem;resize:none;outline:none;font-family:var(--font);min-height:40px;max-height:96px}
-.cp-input textarea:focus{border-color:var(--brand)}
-.cp-send{background:var(--brand);color:#000;border:none;border-radius:11px;padding:9px 14px;cursor:pointer;font-weight:700}
-.cp-login{padding:18px;text-align:center;color:var(--muted);font-size:.88rem;flex-shrink:0}
-.cp-login a{color:var(--brand);cursor:pointer}
+        .game-info { padding: 10px 5px 4px; }
+        .game-info h6 {
+            margin: 0 0 8px; font-size: 1rem; font-weight: 600;
+            color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
 
-@media(max-width:992px){
-  .sidebar{width:72px}
-  .sb-head,.search-wrap,.sb-label,.nav-btn span,.live-nav-pill span{display:none}
-  .nav-btn{justify-content:center;padding:14px}
-  .stage-ads{display:none}
-  .main{padding:0 14px}
-}
+        /* ── Like / Dislike ── */
+        .like-bar { display: flex; align-items: center; gap: 8px; padding: 0 5px 12px; }
+        .like-btn, .dislike-btn {
+            display: flex; align-items: center; gap: 5px;
+            background: var(--surface); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 30px; padding: 5px 11px; cursor: pointer;
+            color: var(--text-secondary); font-size: 0.78rem; font-weight: 600;
+            transition: all 0.2s; user-select: none; font-family: var(--font-main);
+        }
+        .like-btn:hover    { background: rgba(50,255,14,0.15);  border-color: var(--brand); color: var(--brand); }
+        .dislike-btn:hover { background: rgba(255,60,60,0.15);  border-color: #ff3c3c;     color: #ff3c3c; }
+        .like-btn.active    { background: rgba(50,255,14,0.2);  border-color: var(--brand); color: var(--brand); }
+        .dislike-btn.active { background: rgba(255,60,60,0.2);  border-color: #ff3c3c;     color: #ff3c3c; }
 
-/* ── Updates System ─────────────────────────────────────── */
-#updates-btn{position:relative;background:var(--surf2);border:1px solid var(--border);border-radius:20px;padding:5px 13px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.82rem;color:#ccc;font-weight:600;font-family:var(--font);transition:all .16s}
-#updates-btn:hover{border-color:var(--brand);color:var(--brand)}
-#updates-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--brand);color:#000;font-size:.55rem;font-weight:900;display:none;align-items:center;justify-content:center}
-#updates-panel{display:none;position:fixed;top:60px;right:18px;width:min(420px,calc(100vw - 36px));max-height:70vh;overflow-y:auto;background:rgba(8,10,14,.98);border:1px solid var(--brand);border-radius:16px;z-index:4000;box-shadow:0 12px 50px rgba(0,0,0,.7),0 0 0 1px rgba(50,255,14,.15);animation:upd-slide .2s ease}
-#updates-panel.show{display:block}
-@keyframes upd-slide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.upd-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,.06)}
-.upd-panel-title{font-family:var(--display,sans-serif);font-size:1rem;font-weight:800;color:#fff}
-.upd-panel-close{background:none;border:none;color:#444;cursor:pointer;font-size:1.1rem;line-height:1;padding:0}
-.upd-panel-close:hover{color:#fff}
-.upd-entry{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05)}
-.upd-entry:last-child{border:none}
-.upd-latest{background:rgba(50,255,14,.04)}
-.upd-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.upd-version{background:var(--brand);color:#000;font-size:.68rem;font-weight:900;padding:2px 8px;border-radius:20px;font-family:var(--display,sans-serif)}
-.upd-title{font-weight:700;font-size:.9rem;color:#fff;flex:1}
-.upd-date{font-size:.7rem;color:#333}
-.upd-list{margin:0;padding:0 0 0 14px;list-style:none}
-.upd-list li{font-size:.8rem;color:#888;padding:2px 0;position:relative}
-.upd-list li::before{content:'→';position:absolute;left:-14px;color:var(--brand);font-size:.7rem}
-</style>
+        /* ── Single grid ad slot ── */
+        .grid-ad-slot {
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; min-height: 140px;
+        }
+
+        .badge-elite {
+            position: absolute; top: 10px; left: 10px;
+            background: var(--brand); color: #000;
+            font-size: 0.7rem; font-weight: 800; padding: 5px 14px; border-radius: 30px;
+            z-index: 10; text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(50, 255, 14, 0.4);
+        }
+
+        #loading-overlay {
+            position: fixed; inset: 0; background: #000; z-index: 3000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        #scroll-sentinel { height: 150px; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 50px; }
+
+        /* ═══════════════ GAME STAGE ═══════════════ */
+        #game-stage {
+            display: none; position: fixed; inset: 0; background: var(--bg-dark);
+            z-index: 2500; overflow-y: auto; flex-direction: column;
+        }
+        #game-stage.open { display: block; }
+
+        /* Top banner ad */
+        #stage-banner {
+            background: #0a0a0a;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex; align-items: center; justify-content: center;
+            min-height: 96px; overflow: hidden; position: relative; flex-shrink: 0;
+            transition: min-height 0.3s ease;
+        }
+        #stage-banner.collapsed { min-height: 0 !important; height: 0; overflow: hidden; }
+        #banner-collapse-btn {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.08); border: none; color: #aaa;
+            border-radius: 8px; padding: 4px 10px; font-size: 0.72rem; cursor: pointer;
+            transition: background 0.2s; font-family: var(--font-main);
+        }
+        #banner-collapse-btn:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+        /* Thin re-expand strip */
+        #banner-expand-strip {
+            display: none; background: #0a0a0a;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-align: center; padding: 5px 0; cursor: pointer;
+            color: #444; font-size: 0.72rem; flex-shrink: 0;
+        }
+        #banner-expand-strip:hover { color: #888; }
+
+        /* Stage header */
+        .stage-header {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; background: var(--sidebar);
+            border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
+        }
+
+        /* Middle zone: game-col | right-ad-stack */
+        /* The entire #game-stage is now page-scroll, not inner scroll */
+        .stage-middle { display: flex; align-items: flex-start; }
+
+        /* Right ad stack: 160px ad + 1mm (≈4px) padding each side = 168px */
+        .stage-ad-right {
+            width: 168px; flex-shrink: 0;
+            background: var(--sidebar);
+            border-left: 1px solid rgba(255,255,255,0.06);
+            padding: 4px; display: flex; flex-direction: column;
+            align-items: center; gap: 8px;
+            /* Sticky so ads stay visible as user scrolls below-game */
+            position: sticky; top: 0; align-self: flex-start;
+        }
+
+        /* Game column: fills all space to the left of ad stack */
+        .game-col {
+            flex: 1; min-width: 0; display: flex; flex-direction: column;
+            background: #000;
+        }
+        #stage-iframe { width: 100%; border: none; background: #000; flex-shrink: 0; }
+
+        /* Below-game zone */
+        #below-game { background: var(--bg-dark); padding: 22px 28px 60px; }
+        #game-like-bar { margin-bottom: 16px; }
+        #stage-banner-below {
+            margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
+            background: #0a0a0a; border-radius: 8px; overflow: hidden; min-height: 96px;
+        }
+        #related-title {
+            font-family: var(--font-display); font-size: 1.2rem;
+            margin-bottom: 14px; color: #fff;
+        }
+        #related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 18px;
+        }
+
+        /* Fullscreen prompt overlay */
+        #fs-prompt {
+            display: none; position: fixed; inset: 0; z-index: 9000;
+            background: rgba(0,0,0,0.72); align-items: center; justify-content: center;
+        }
+        .fs-prompt-box {
+            background: #111; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px; padding: 32px 40px; text-align: center; max-width: 380px;
+        }
+        .fs-prompt-box p:first-child { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+        .fs-prompt-box p:last-of-type { color: #aaa; font-size: 0.9rem; margin-bottom: 24px; }
+        .fs-btn-yes { background: var(--brand); color: #000; border: none; border-radius: 30px; padding: 10px 28px; font-weight: 700; cursor: pointer; margin-right: 10px; }
+        .fs-btn-no  { background: #222; color: #fff; border: 1px solid #333; border-radius: 30px; padding: 10px 28px; font-weight: 600; cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 80px; }
+            .sidebar-header, .search-box, .menu-label, .nav-item span { display: none; }
+            .nav-item { justify-content: center; padding: 15px; }
+            .stage-ad-right { display: none; }
+        }
+
+        /* ── Popunder notice overlay ── */
+        #popunder-notice {
+            display: none; position: fixed; inset: 0; z-index: 9500;
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            align-items: center; justify-content: center;
+        }
+        #popunder-notice.show { display: flex; }
+        .popunder-box {
+            background: #111; border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px; padding: 36px 40px; text-align: center;
+            max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        .popunder-box .pu-icon { font-size: 2.4rem; margin-bottom: 14px; }
+        .popunder-box h3 { font-family: var(--font-display); font-size: 1.3rem; color: #fff; margin-bottom: 10px; }
+        .popunder-box p  { color: #aaa; font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
+        .pu-btn {
+            background: var(--brand); color: #000; border: none;
+            border-radius: 30px; padding: 11px 32px;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            font-family: var(--font-main); transition: opacity 0.2s;
+        }
+        .pu-btn:hover { opacity: 0.85; }
+
+        /* ── Adblock wall ── */
+        #adblock-wall {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: #000; align-items: center; justify-content: center;
+        }
+        #adblock-wall.show { display: flex; }
+        .adblock-box {
+            background: #111; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 40px 44px; text-align: center;
+            max-width: 460px; width: 90%;
+        }
+        .adblock-box .ab-icon { font-size: 3rem; margin-bottom: 16px; }
+        .adblock-box h2 { font-family: var(--font-display); font-size: 1.5rem; color: #fff; margin-bottom: 12px; }
+        .adblock-box p  { color: #aaa; font-size: 0.92rem; line-height: 1.65; margin-bottom: 28px; }
+        .ab-btn {
+            background: var(--brand); color: #000; border: none;
+            border-radius: 30px; padding: 12px 36px;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            font-family: var(--font-main); transition: opacity 0.2s;
+        }
+        .ab-btn:hover { opacity: 0.85; }
+    </style>
 </head>
 <body>
 
-<!-- Autofill trap (outside search form — tricks browsers into targeting these) -->
-<input class="autofill-trap" type="text" name="username" tabindex="-1" aria-hidden="true">
-<input class="autofill-trap" type="password" name="password" tabindex="-1" aria-hidden="true">
-
-<div id="pu-notice">
-  <div class="pu-box">
-    <div class="icon">📢</div>
-    <h3>Just One Quick Ad</h3>
-    <p>A new tab opened with an ad. This happens once per day and is how we keep BlinchiGames free. Thanks for your support!</p>
-    <button class="pu-btn" onclick="document.getElementById('pu-notice').classList.remove('show')">Got it!</button>
-  </div>
-</div>
-
-<div id="ab-wall">
-  <div class="ab-box">
-    <div class="icon">🚫</div>
-    <h2>Ad Blocker Detected</h2>
-    <p>BlinchiGames is completely free. We rely on ads to cover server costs. Please disable your ad blocker and refresh.</p>
-    <button class="ab-btn" onclick="window.location.reload()">I've disabled it — Refresh</button>
-  </div>
-</div>
-
-<div id="loading">
-  <h2 class="logo mb-4" style="font-size:3.2rem">BLINCHI<em style="color:var(--brand);font-style:normal">GAMES</em></h2>
-  <div class="spinner-border" style="color:var(--brand);width:3rem;height:3rem" role="status"></div>
-  <p class="mt-4 text-white opacity-50 fw-bold">LOADING GAMES</p>
-</div>
-
-<div id="top-chip">
-  <!-- Updates bell button -->
-  <button id="updates-btn" onclick="openUpdates()" title="What's new">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-    What's New
-    <span id="updates-badge">N</span>
-  </button>
-  <div id="chip-signout" style="display:none;align-items:center;gap:8px;background:var(--surf2);border:1px solid rgba(50,255,14,.3);border-radius:20px;padding:5px 13px;cursor:pointer" onclick="goLive()">
-    <div class="online-dot"></div>
-    <span id="chip-name" style="font-size:.82rem;font-weight:700;color:#fff;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-    <span style="font-size:.76rem;color:var(--brand);font-weight:700"><span id="chip-coins">0</span> coins</span>
-  </div>
-  <div id="chip-signin" style="display:flex;align-items:center;gap:7px;background:var(--surf2);border:1px solid rgba(50,255,14,.3);border-radius:20px;padding:5px 13px;cursor:pointer" onclick="openAuth()">
-    <i class="bi bi-person-circle" style="color:var(--brand)"></i>
-    <span style="font-size:.8rem;font-weight:600;color:#ccc">Sign in</span>
-  </div>
-</div>
-
-<!-- Updates panel -->
-<div id="updates-panel">
-  <div class="upd-panel-hdr">
-    <div class="upd-panel-title">What's New in BlinchiGames</div>
-    <button class="upd-panel-close" onclick="closeUpdates()">&#x2715;</button>
-  </div>
-  <div id="updates-content"></div>
-</div>
-
-<div class="wrap">
-  <aside class="sidebar">
-    <div class="sb-head">
-      <a href="#" class="logo" onclick="location.reload()">
-        <i class="bi bi-controller" style="color:var(--brand)"></i> BLINCHI<em>GAMES</em>
-      </a>
+<!-- Popunder notice overlay -->
+<div id="popunder-notice">
+    <div class="popunder-box">
+        <div class="pu-icon">📢</div>
+        <h3>Just One Quick Ad</h3>
+        <p>A new tab has opened with an ad. This happens once per day and is how we keep BlinchiGames free for everyone. Thank you for your support!</p>
+        <button class="pu-btn" onclick="closePopunderNotice()">Got it, thanks!</button>
     </div>
-    <div class="search-wrap">
-      <!-- Using role="search" + random name to defeat autofill -->
-      <div class="search-form" role="search">
-        <i class="bi bi-search" style="color:var(--muted)"></i>
-        <input
-          id="game-search"
-          type="text"
-          name="blinchi_game_search_xz91"
-          placeholder="Search 1,000+ games…"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          oninput="handleSearch()"
-        >
-      </div>
-    </div>
-    <div class="sb-scroll">
-      <div class="sb-label">Portal</div>
-      <button class="nav-btn active" id="btn-home" onclick="showHome(this)">
-        <i class="bi bi-grid-1x2-fill"></i> <span>Home</span>
-      </button>
-      <div class="sb-label">Categories</div>
-      <div id="cat-nav"></div>
-      <button class="nav-btn" id="btn-multi" onclick="showMulti(this)">
-        <i class="bi bi-people-fill" style="color:#a78bfa"></i> <span>Multiplayer</span>
-      </button>
-      <div class="sb-label">BlinchiLive</div>
-      <button class="nav-btn" onclick="goLive()">
-        <span class="live-nav-pill">
-          <span class="live-dot"></span>
-          <span>LIVE</span>
-        </span>
-        <span style="margin-left:4px">BlinchiLive</span>
-      </button>
-      <div class="sb-label">Social</div>
-      <a href="https://www.tiktok.com/@blinchigames3" target="_blank" class="nav-btn">
-        <i class="bi bi-tiktok"></i> <span>TikTok</span>
-      </a>
-    </div>
-  </aside>
+</div>
 
-  <main class="main">
-    <div id="view-home">
-      <h2 class="sec-title">Elite Collection</h2>
-      <div id="elite-grid" class="game-grid elite-grid"></div>
-      <h2 class="sec-title" id="lib-title">Global Library</h2>
-      <div class="game-grid" style="padding-bottom:0">
-        <div class="grid-ad">
-          <script>atOptions={'key':'70cf6dd8abb266eb5a0f8dee6db632cf','format':'iframe','height':250,'width':300,'params':{}}</script>
-          <script src="https://authoritieswoundjoint.com/70cf6dd8abb266eb5a0f8dee6db632cf/invoke.js"></script>
+<!-- Adblock wall -->
+<div id="adblock-wall">
+    <div class="adblock-box">
+        <div class="ab-icon">🚫</div>
+        <h2>Ad Blocker Detected</h2>
+        <p>BlinchiGames is completely free to play. To keep it that way, we rely on ads to cover server and running costs. Please disable your ad blocker and refresh the page to continue.</p>
+        <button class="ab-btn" onclick="window.location.reload()">I've disabled it — Refresh</button>
+    </div>
+</div>
+
+<div id="loading-overlay">
+    <h2 class="logo mb-4" style="font-size: 3.5rem;">BLINCHI<span>GAMES</span></h2>
+    <div class="spinner-border" style="color: var(--brand); width: 3.5rem; height: 3.5rem;" role="status"></div>
+    <p class="mt-4 text-white opacity-50 fw-bold letter-spacing-1">LOADING GAMES</p>
+</div>
+
+<!-- ═══ MAIN PORTAL ═══ -->
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo" onclick="location.reload()">
+                <i class="bi bi-controller" style="color: var(--brand);"></i> BLINCHI<span>GAMES</span>
+            </a>
         </div>
-      </div>
-      <div id="home-grid" class="game-grid"></div>
-    </div>
-    <div id="view-cat" style="display:none">
-      <h2 id="cat-title" class="sec-title"></h2>
-      <div id="cat-grid" class="game-grid"></div>
-    </div>
-    <div id="view-multi" style="display:none">
-      <h2 class="sec-title">
-        <span style="background:#7c3aed;border-radius:10px;padding:4px 12px;font-size:.95rem;color:#fff;vertical-align:middle;margin-right:10px">MULTIPLAYER</span>
-        Play With Friends Online
-      </h2>
-      <p style="color:#444;font-size:.88rem;margin:-1rem 0 1.6rem">Games from our library that support multiple players — share the link and jump in</p>
-      <div id="multi-grid" class="game-grid multi-grid"></div>
-    </div>
-    <div id="view-search" style="display:none">
-      <h2 id="search-title" class="sec-title"></h2>
-      <div id="search-grid" class="game-grid"></div>
-    </div>
-    <div id="sentinel">
-      <div class="spinner-border" style="color:var(--brand)" role="status"></div>
-    </div>
-  </main>
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <i class="bi bi-search text-secondary"></i>
+                <input type="text" id="game-search" placeholder="Search 1,000+ games..." oninput="handleSearch()">
+            </div>
+        </div>
+        <div class="menu-scroll">
+            <div class="menu-label">Portal</div>
+            <button class="nav-item active" id="btn-home" onclick="showSection('home', this)">
+                <i class="bi bi-grid-1x2-fill"></i> <span>Home</span>
+            </button>
+            <div class="menu-label">Elite Categories</div>
+            <div id="cat-nav-container"></div>
+            <div class="menu-label">Social</div>
+            <a href="https://www.tiktok.com/@blinchigames3" target="_blank" class="nav-item">
+                <i class="bi bi-tiktok"></i> <span>TikTok</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div id="view-home">
+            <h2 class="section-title">Elite Collection</h2>
+            <div id="elite-grid" class="game-grid elite-grid"></div>
+            <h2 class="section-title" id="main-lib-title">Global Library</h2>
+            <!-- Static 300×250 library ad — always visible at top of grid -->
+            <div class="game-grid" style="padding-bottom:0;">
+                <div class="grid-ad-slot">
+                    <script>atOptions={'key':'70cf6dd8abb266eb5a0f8dee6db632cf','format':'iframe','height':250,'width':300,'params':{}};</script>
+                    <script src="https://authoritieswoundjoint.com/70cf6dd8abb266eb5a0f8dee6db632cf/invoke.js"></script>
+                </div>
+            </div>
+            <div id="home-grid" class="game-grid"></div>
+        </div>
+
+        <div id="view-cat" style="display:none">
+            <h2 id="cat-display-title" class="section-title"></h2>
+            <div id="cat-grid" class="game-grid"></div>
+        </div>
+
+        <div id="view-search" style="display:none">
+            <h2 id="search-display-title" class="section-title"></h2>
+            <div id="search-grid" class="game-grid"></div>
+        </div>
+
+        <div id="scroll-sentinel">
+            <div class="spinner-border" style="color: var(--brand);" role="status"></div>
+        </div>
+    </main>
 </div>
 
-<!-- ── GAME STAGE ── -->
-<div id="stage">
-  <div id="stage-banner">
-    <div>
-      <script>atOptions={'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':90,'width':728,'params':{}}</script>
-      <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
-    </div>
-    <button id="hide-ad-btn" onclick="collapseAd()">▲ Hide Ad</button>
-  </div>
-  <div id="show-ad-strip" onclick="expandAd()">▼ Show Ad</div>
-  <div class="stage-hdr">
-    <div class="d-flex align-items-center gap-3">
-      <button class="btn btn-dark rounded-pill px-4 fw-bold border-secondary" onclick="closeGame()">
-        <i class="bi bi-arrow-left me-2"></i> EXIT
-      </button>
-      <span id="stage-title" class="text-white fw-bold small text-uppercase"></span>
-    </div>
-    <button class="btn rounded-pill px-4 fw-bold" style="background:var(--brand);color:#000;border:none" onclick="doFullscreen()">
-      <i class="bi bi-arrows-fullscreen me-2"></i> FULLSCREEN
-    </button>
-  </div>
-  <div class="stage-mid">
-    <div class="game-col">
-      <iframe id="game-iframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
-      <div id="below-game">
-        <div class="like-bar" id="stage-like-bar">
-          <button class="act-btn" id="like-btn" onclick="vote('like')"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="like-cnt">0</span></button>
-          <button class="act-btn dis" id="dis-btn" onclick="vote('dislike')"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="dis-cnt">0</span></button>
-          <button class="act-btn" onclick="openComments()"><i class="bi bi-chat-dots-fill"></i> <span id="cmt-cnt">0</span></button>
-          <!-- BlinchiLive pill button -->
-          <button class="live-pill-btn" onclick="goLive()">
-            <span class="ldot"></span> LIVE
-          </button>
+<!-- ═══ GAME STAGE ═══ -->
+<div id="game-stage">
+
+    <!-- Top banner ad (728×90) -->
+    <div id="stage-banner">
+        <div id="ad-banner-top">
+            <script>atOptions={'key':'e6db54461c44b43e8f8a286f792c9452','format':'iframe','height':90,'width':728,'params':{}};</script>
+            <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
         </div>
-        <div id="below-banner">
-          <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
-          <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
+        <button id="banner-collapse-btn" onclick="collapseBanner()">▲ Hide Ad</button>
+    </div>
+    <div id="banner-expand-strip" onclick="expandBanner()">▼ Show Ad</div>
+
+    <!-- Header bar -->
+    <div class="stage-header">
+        <div class="d-flex align-items-center">
+            <button class="btn btn-dark rounded-pill px-4 fw-bold border-secondary" onclick="closeGame()">
+                <i class="bi bi-arrow-left me-2"></i> EXIT
+            </button>
+            <span id="stage-title" class="ms-4 text-white fw-bold small text-uppercase"></span>
         </div>
-        <div id="rel-title">Related Games</div>
-        <div id="rel-grid"></div>
-      </div>
+        <button class="btn rounded-pill px-4 fw-bold" style="background: var(--brand); color: #000; border: none;" onclick="handleFullscreen()">
+            <i class="bi bi-arrows-fullscreen me-2"></i> FULLSCREEN
+        </button>
     </div>
-    <div class="stage-ads">
-      <div><script>atOptions={'key':'0d1d9860b64193bffb24174fa1adda1d','format':'iframe','height':600,'width':160,'params':{}}</script><script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script></div>
-      <div><script>atOptions={'key':'6e1109cad98d336d18e23b0a2087bbc8','format':'iframe','height':300,'width':160,'params':{}}</script><script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script></div>
+
+    <!-- Middle: game | right-ad-stack -->
+    <div class="stage-middle">
+
+        <!-- Game column (iframe + below-game) -->
+        <div class="game-col" id="game-col">
+            <iframe id="stage-iframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
+
+            <div id="below-game">
+                <!-- Like / dislike for current game -->
+                <div id="game-like-bar" class="like-bar">
+                    <button class="like-btn" id="stage-like-btn" onclick="voteGame('like')">
+                        <i class="bi bi-hand-thumbs-up-fill"></i> <span id="stage-like-count">0</span>
+                    </button>
+                    <button class="dislike-btn" id="stage-dislike-btn" onclick="voteGame('dislike')">
+                        <i class="bi bi-hand-thumbs-down-fill"></i> <span id="stage-dislike-count">0</span>
+                    </button>
+                </div>
+
+                <!-- Banner ad below like buttons, above related games -->
+                <div id="stage-banner-below">
+                    <div id="ad-below-game">
+                        <script async="async" data-cfasync="false" src="https://authoritieswoundjoint.com/6e2b1a830401c523b5ff47a15d91df2c/invoke.js"></script>
+                        <div id="container-6e2b1a830401c523b5ff47a15d91df2c"></div>
+                    </div>
+                </div>
+
+                <!-- Related games -->
+                <div id="related-title">Related Games</div>
+                <div id="related-grid"></div>
+            </div>
+        </div>
+
+        <!-- Right ad stack: 160×600 on top, 160×300 below -->
+        <div class="stage-ad-right">
+            <div id="ad-right-top">
+                <script>atOptions={'key':'0d1d9860b64193bffb24174fa1adda1d','format':'iframe','height':600,'width':160,'params':{}};</script>
+                <script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script>
+            </div>
+            <div id="ad-right-bottom">
+                <script>atOptions={'key':'6e1109cad98d336d18e23b0a2087bbc8','format':'iframe','height':300,'width':160,'params':{}};</script>
+                <script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
+<!-- Fullscreen / collapse prompt -->
 <div id="fs-prompt">
-  <div class="fs-box">
-    <p>Collapse the ad banner?</p>
-    <p>Gives more room in fullscreen.</p>
-    <button class="fs-yes" onclick="document.getElementById('fs-prompt').style.display='none';collapseAd();doFullscreen()">Yes, hide it</button>
-    <button class="fs-no" onclick="document.getElementById('fs-prompt').style.display='none';doFullscreen()">No thanks</button>
-  </div>
-</div>
-
-<!-- ── AUTH MODAL ── -->
-<div class="modal-ov" id="auth-modal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeAuth()">×</button>
-    <div id="signin-view">
-      <h2>Welcome back</h2>
-      <p class="sub">Sign in to BlinchiGames</p>
-      <div class="fg"><label>Email</label><input type="email" id="si-email" placeholder="you@example.com" autocomplete="email"></div>
-      <div class="fg"><label>Password</label><input type="password" id="si-pass" placeholder="••••••••" autocomplete="current-password"></div>
-      <p class="merr" id="si-err"></p>
-      <button class="btn-brand" onclick="doSignIn()">Sign In</button>
-      <div class="modal-sw">No account? <a onclick="swAuth('signup')">Create one free</a></div>
+    <div class="fs-prompt-box">
+        <p>Collapse the ad banner?</p>
+        <p>Hiding the top ad gives you more room while in fullscreen.</p>
+        <button class="fs-btn-yes" onclick="fsPromptYes()">Yes, hide it</button>
+        <button class="fs-btn-no"  onclick="fsPromptNo()">No thanks</button>
     </div>
-    <div id="signup-view" style="display:none">
-      <h2>Join BlinchiGames</h2>
-      <p class="sub">Create your free account</p>
-      <div class="fg">
-        <label>Display Name <small>(shown to others — any name)</small></label>
-        <input type="text" id="su-dn" placeholder="e.g. Blinchi King" autocomplete="off" autocorrect="off">
-      </div>
-      <div class="fg">
-        <label>Username <small>(unique ID — a-z, 0-9, underscore only)</small></label>
-        <input type="text" id="su-un" placeholder="e.g. blinchi_king" autocomplete="off" autocorrect="off" autocapitalize="off">
-      </div>
-      <div class="fg"><label>Email</label><input type="email" id="su-em" placeholder="you@example.com" autocomplete="off"></div>
-      <div class="fg"><label>Password</label><input type="password" id="su-pw" placeholder="Min 6 characters" autocomplete="new-password"></div>
-      <p class="merr" id="su-err"></p>
-      <p class="mok" id="su-ok"></p>
-      <button class="btn-brand" onclick="doSignUp()">Create Account</button>
-      <div class="modal-sw">Have an account? <a onclick="swAuth('signin')">Sign in</a></div>
-    </div>
-  </div>
 </div>
 
-<!-- ── COMMENTS PANEL ── -->
-<div id="comments-panel">
-  <div class="cp-hdr">
-    <h3><i class="bi bi-chat-dots-fill me-2" style="color:var(--brand)"></i>Comments</h3>
-    <button class="cp-close" onclick="closeComments()">×</button>
-  </div>
-  <div class="cp-list" id="cp-list"></div>
-  <div class="cp-input" id="cp-input" style="display:none">
-    <textarea id="cp-text" placeholder="Write a comment…" rows="1"></textarea>
-    <button class="cp-send" onclick="submitComment()"><i class="bi bi-send-fill"></i></button>
-  </div>
-  <div class="cp-login" id="cp-login" style="display:none">
-    <a onclick="openAuth()">Sign in</a> to comment
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-'use strict';
-// ════════════════════════════════════════════════════════════════
-// SUPABASE CLIENT
-// ════════════════════════════════════════════════════════════════
-const SB_URL='https://ezdiptkyfwttxjuxkusg.supabase.co';
-const SB_KEY='sb_publishable_ORNNniNlw9b8a9I6VAh9Tw_w4QZPDBU';
-let db=null;
-try{db=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});}
-catch(e){console.error('Supabase init failed',e);}
-
-let CU=null,CP=null; // currentUser, currentProfile
-
-// ════════════════════════════════════════════════════════════════
-// AUTH
-// ════════════════════════════════════════════════════════════════
-async function initAuth(){
-  if(!db)return;
-  const{data:{session}}=await db.auth.getSession();
-  if(session)await onSignedIn(session.user);
-  db.auth.onAuthStateChange(async(_,session)=>{
-    if(session)await onSignedIn(session.user);
-    else onSignedOut();
-  });
-}
-
-async function onSignedIn(user){
-  CU=user;
-  let{data:p}=await db.from('profiles').select('*').eq('id',user.id).maybeSingle();
-  if(!p){
-    const un='player_'+Math.floor(Math.random()*999999);
-    const dn=user.user_metadata?.displayname||un;
-    ({data:p}=await db.from('profiles')
-      .insert({id:user.id,username:un,displayname:dn,email:user.email,coins:0,games_played:0})
-      .select().single());
-  }
-  CP=p;
-  updateAuthUI();
-}
-function onSignedOut(){CU=null;CP=null;updateAuthUI();}
-
-function updateAuthUI(){
-  const so=document.getElementById('chip-signout');
-  const si=document.getElementById('chip-signin');
-  if(CP){
-    so.style.display='flex';si.style.display='none';
-    document.getElementById('chip-name').textContent=CP.displayname||CP.username;
-    document.getElementById('chip-coins').textContent=CP.coins||0;
-  }else{
-    so.style.display='none';si.style.display='flex';
-  }
-}
-
-function goLive(){
-  if(currentGame)localStorage.setItem('bl_active_game',JSON.stringify(currentGame));
-  window.location.href='blinchilive.html';
-}
-function openAuth(){document.getElementById('auth-modal').classList.add('show');}
-function closeAuth(){document.getElementById('auth-modal').classList.remove('show');}
-function swAuth(v){
-  document.getElementById('signin-view').style.display=v==='signin'?'':'none';
-  document.getElementById('signup-view').style.display=v==='signup'?'':'none';
-}
-
-async function doSignIn(){
-  if(!db)return;
-  const email=document.getElementById('si-email').value.trim();
-  const pass=document.getElementById('si-pass').value;
-  const err=document.getElementById('si-err');
-  err.style.display='none';
-  const{error}=await db.auth.signInWithPassword({email,password:pass});
-  if(error){err.textContent=error.message;err.style.display='block';}
-  else closeAuth();
-}
-
-async function doSignUp(){
-  if(!db)return;
-  const dn=document.getElementById('su-dn').value.trim();
-  const un=document.getElementById('su-un').value.trim().toLowerCase().replace(/\s+/g,'_');
-  const email=document.getElementById('su-em').value.trim();
-  const pass=document.getElementById('su-pw').value;
-  const err=document.getElementById('su-err'),ok=document.getElementById('su-ok');
-  err.style.display='none';ok.style.display='none';
-  if(!dn||!un||!email||!pass){err.textContent='All fields are required';err.style.display='block';return;}
-  if(!/^[a-z0-9_]{3,20}$/.test(un)){err.textContent='Username: 3–20 chars, a-z / 0-9 / underscore only';err.style.display='block';return;}
-  if(pass.length<6){err.textContent='Password must be at least 6 characters';err.style.display='block';return;}
-  const{data:ex}=await db.from('profiles').select('id').eq('username',un).maybeSingle();
-  if(ex){err.textContent='That username is already taken — try another';err.style.display='block';return;}
-  const{data,error}=await db.auth.signUp({email,password:pass,options:{data:{username:un,displayname:dn}}});
-  if(error){err.textContent=error.message;err.style.display='block';return;}
-  if(data.user)await db.from('profiles').upsert({id:data.user.id,username:un,displayname:dn,email,coins:0,games_played:0});
-  ok.textContent='Account created! Check your email to verify, then sign in.';
-  ok.style.display='block';
-}
-
-// ════════════════════════════════════════════════════════════════
-// COMMENTS
-// ════════════════════════════════════════════════════════════════
-let currentGame=null;
-
-function openComments(){
-  document.getElementById('comments-panel').classList.add('show');
-  document.getElementById('cp-input').style.display=CU?'flex':'none';
-  document.getElementById('cp-login').style.display=CU?'none':'block';
-  loadComments();
-}
-function closeComments(){document.getElementById('comments-panel').classList.remove('show');}
-
-async function loadComments(){
-  if(!currentGame||!db)return;
-  const list=document.getElementById('cp-list');
-  list.innerHTML='<div style="text-align:center;color:#333;padding:28px">Loading…</div>';
-  const{data}=await db.from('comments')
-    .select('body,created_at,profiles(username,displayname)')
-    .eq('game_title',currentGame.title)
-    .order('created_at',{ascending:false})
-    .limit(60);
-  if(!data||!data.length){
-    list.innerHTML='<div style="text-align:center;color:#333;padding:36px 0">No comments yet — be first!</div>';
-    document.getElementById('cmt-cnt').textContent='0';
-    return;
-  }
-  document.getElementById('cmt-cnt').textContent=data.length;
-  list.innerHTML=data.map(c=>`
-    <div class="cp-item">
-      <div class="cp-author">${esc(c.profiles?.displayname||c.profiles?.username||'BlinchiUser')}</div>
-      <div class="cp-body">${esc(c.body)}</div>
-      <div class="cp-time">${ago(c.created_at)}</div>
-    </div>`).join('');
-}
-
-async function submitComment(){
-  if(!CU||!currentGame||!db)return;
-  const ta=document.getElementById('cp-text');
-  const body=ta.value.trim();if(!body)return;
-  ta.value='';
-  await db.from('comments').insert({user_id:CU.id,game_title:currentGame.title,body});
-  loadComments();
-}
-
-// ════════════════════════════════════════════════════════════════
-// GAME PORTAL — catalog + rendering
-// ════════════════════════════════════════════════════════════════
-const ELITE=[
-  {title:'Majestic Games',category:'Elite',url:'https://majesticwafr.github.io',thumb:'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg',video:''},
-  {title:'Poxel.io',category:'Elite IO',url:'https://poxel.io/',thumb:'',video:''},
-  {title:'Speed Stars 2',category:'Elite Racing',url:'https://speedstars2.io/',thumb:'',video:''},
-  {title:'Basket Random',category:'Elite Sports',url:'https://basketrandom.github.io/',thumb:'',video:''},
-  // ── New additions ──────────────────────────────────────────────
-  {title:'Rocket Goal',category:'Elite Sports',url:'https://rocketgoal.io/',thumb:'https://rocketgoal.io/static/media/rg_icon.png',video:''},
-  {title:'Veck.io',category:'Elite IO',url:'https://veck.io/',thumb:'',video:''},
-  {title:'Kour.io',category:'Elite IO FPS',url:'https://kour.io/',thumb:'https://kour.io/img/icon.png',video:''},
-  {title:'Smash Karts',category:'Elite Racing',url:'https://smashkarts.io/',thumb:'https://smashkarts.io/assets/img/icon.png',video:''},
-  {title:'Snow Road 3D',category:'Elite Racing',url:'https://snowroad3d.io/',thumb:'',video:''},
-  {title:'Dead Seat',category:'Elite Action',url:'https://truffled.lol/iframe.html?url=https%3A%2F%2Ftruffled.lol%2Fgames%2Fdeadseat%2Findex.html',thumb:'',video:''},
-  {title:'BasketBros',category:'Elite Sports',url:'https://basketbros.io/',thumb:'',video:''},
-  {title:'Sudoku',category:'Elite Puzzle',url:'https://soodoku.com/',thumb:'',video:''},
-  {title:'Drive Mad',category:'Elite Racing',url:'https://codepen.io/Dexter-Harrow/full/MYWXLvr',thumb:'',video:''},
-  {title:'Trees Hate You',category:'Elite Action',url:'https://www.gameflare.com/embed/trees-hate-you/',thumb:'',video:''},
-  {title:'Soccer Random',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-random',thumb:'',video:''},
-  {title:'Soccer Bros',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-bros',thumb:'',video:''},
-  {title:'Vex 3',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-3',thumb:'',video:''},
-  {title:'Vex 8',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-8',thumb:'',video:''},
-  {title:'Funny Battle Simulator 2',category:'Elite Action',url:'https://www.twoplayergames.org/embed/funny-battle-simulator-2',thumb:'',video:''},
-  {title:'House of Hazards',category:'Elite Party',url:'https://www.twoplayergames.org/embed/house-of-hazards',thumb:'',video:''},
-  {title:'Geometry Dash Scratch',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/geometry-dash-scratch',thumb:'',video:''},
-  {title:'Burrito Bison',category:'Elite Action',url:'https://truffled.lol/iframe.html?url=https%3A%2F%2Ftruffled.lol%2Fgames%2Fburrito%2Findex.html',thumb:'',video:''},
-  {title:'911 Prey',category:'Elite Action',url:'https://www.crazygames.com/game/911-prey',thumb:'',video:''},
-  {title:'Fancy Pants Adventure',category:'Elite Platformer',url:'https://www.gameflare.com/embed/fancy-pants-adventure/',thumb:'',video:''},
-  {title:'Level Devil',category:'Elite Platformer',url:'https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@2ac7e5b354322a207bd059768f928ece8c9471c1/level%20devil/',thumb:'',video:''},
-  {title:'Little Alchemy',category:'Elite Puzzle',url:'https://littlealchemy.com/',thumb:'',video:''},
+// ─── Elite hand-picked games ─────────────────────────────────────────────────
+const ELITE_LIST = [
+    { title: 'Majestic Games', category: 'Elite',        url: 'https://majesticwafr.github.io',      thumb: 'https://img.gamemonetize.com/f5mv3cltk9bjta0h3t54c1isiqwlxgf3/512x384.jpg' },
+    { title: 'Poxel.io',       category: 'Elite IO',     url: 'https://poxel.io/',                    thumb: '' },
+    { title: 'Speed Stars 2',  category: 'Elite Racing', url: 'https://speedstars2.io/',              thumb: '' },
+    { title: 'Basket Random',  category: 'Elite Sports', url: 'https://basketrandom.github.io/',      thumb: '' },
 ];
 
-// Multiplayer keywords — games from the feed matching these get shown in the Multiplayer section
-const MULTI_KEYWORDS=['multiplayer','io','battle','royale','versus','pvp','online','2 player','co-op','coop'];
+const GENRES     = ['Action', 'Arcade', 'Racing', 'Puzzle', 'Shooting', 'Sports', 'IO Games'];
+const PAGE_INIT  = 100;
+const PAGE_STEP  = 20;
 
-const GENRES=['Action','Arcade','Racing','Puzzle','Shooting','Sports','IO Games'];
-const PAGE_INIT=100,PAGE_STEP=24;
-let catalog=[],activeList=[],loaded=0,mode='home',obs=null;
+let masterCatalog = [];
+let activeList    = [];
+let itemsLoaded   = 0;
+let viewMode      = 'home';
+let observer      = null;
+let currentGame   = null;
 
-function lk(t){return parseInt(localStorage.getItem('vl_'+t)||'0',10);}
-function dk(t){return parseInt(localStorage.getItem('vd_'+t)||'0',10);}
-function mv(t){return localStorage.getItem('vm_'+t)||'';}
-function setVote(title,type){
-  const prev=mv(title);if(prev===type)return;
-  if(prev==='like')localStorage.setItem('vl_'+title,Math.max(0,lk(title)-1));
-  if(prev==='dislike')localStorage.setItem('vd_'+title,Math.max(0,dk(title)-1));
-  if(type==='like')localStorage.setItem('vl_'+title,lk(title)+1);
-  if(type==='dislike')localStorage.setItem('vd_'+title,dk(title)+1);
-  localStorage.setItem('vm_'+title,type);
+// ─── Vote storage (localStorage per browser) ─────────────────────────────────
+function getLikes(t)    { return parseInt(localStorage.getItem('vl_' + t) || '0', 10); }
+function getDislikes(t) { return parseInt(localStorage.getItem('vd_' + t) || '0', 10); }
+function getMyVote(t)   { return localStorage.getItem('vm_' + t) || ''; }
+
+function setVote(title, type) {
+    const prev = getMyVote(title);
+    if (prev === type) return;
+    if (prev === 'like')    localStorage.setItem('vl_' + title, Math.max(0, getLikes(title)    - 1));
+    if (prev === 'dislike') localStorage.setItem('vd_' + title, Math.max(0, getDislikes(title) - 1));
+    if (type === 'like')    localStorage.setItem('vl_' + title, getLikes(title)    + 1);
+    if (type === 'dislike') localStorage.setItem('vd_' + title, getDislikes(title) + 1);
+    localStorage.setItem('vm_' + title, type);
 }
 
-async function boot(){
-  // Populate elite grid immediately
-  const eg=document.getElementById('elite-grid');
-  ELITE.forEach(g=>eg.innerHTML+=makeCard(g,'elite'));
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+async function boot() {
+    const eg = document.getElementById('elite-grid');
+    ELITE_LIST.forEach(g => eg.innerHTML += generateCard(g, true));
 
-  const feeds=[
-    'embed.json','g_min.json','rssfeed.php.json',
-    'rssfeed2.php','rssfeed3.php','rssfeed4.php','rssfeed5.php','Gamepix.json',
-    'https://gamemonetize.com/feed.php?format=0&page=20',
-    'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=1',
-    'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=2',
-    'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=3',
-    'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=4',
-    'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=5',
-  ];
+    const feedUrls = [
+        'embed.json', 'g_min.json', 'rssfeed.php.json',
+        'rssfeed2.php', 'rssfeed3.php', 'rssfeed4.php', 'rssfeed5.php',
+        'Gamepix.json',
+        'https://gamemonetize.com/feed.php?format=0&page=20',
+        'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=1',
+        'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=2',
+        'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=3',
+        'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=4',
+        'https://feeds.gamepix.com/v2/json?sid=7L022&pagination=96&page=5',
+    ];
 
-  const results=await Promise.all(feeds.map(u=>fetch(u).then(r=>r.json()).catch(()=>[])));
-  catalog=[...ELITE];
+    const results = await Promise.all(
+        feedUrls.map(url => fetch(url).then(r => r.json()).catch(() => []))
+    );
 
-  results.forEach((data,i)=>{
-    const url=feeds[i];
-    if(url.includes('g_min.json')){
-      if(!Array.isArray(data))return;
-      data.forEach(g=>{
-        if(!g.link||g.custom)return;
-        const gu=g.link.replace('http://','https://');
-        catalog.push({title:g.name||'Game',url:gu,thumb:g.image||'',
-          category:Array.isArray(g.categories)?g.categories[0]:(g.categories||'Web Game'),video:g.video||g.video_url||g.video_thumbnail||''});
-      });
-      return;
-    }
-    if(url.includes('gamepix.com')||url.includes('Gamepix.json')){
-      const items=Array.isArray(data)?data:(data.data||data.items||[]);
-      items.forEach(g=>{
-        let gu=(g.url||'').replace('http://','https://');
-        if(gu&&!gu.includes('/embed'))gu=gu.replace(/\/$/,'')+'/embed?ref=blinchigames.online';
-        else if(gu&&!gu.includes('ref='))gu+=(gu.includes('?')?'&':'?')+'ref=blinchigames.online';
-        catalog.push({title:g.title||g.name||'Game',url:gu,
-          thumb:g.url_thumbnail||g.banner_image||g.image||g.thumb||'',
-          category:Array.isArray(g.categories)?g.categories[0]:(g.category||'Web Game'),video:g.video||g.video_url||g.video_thumbnail||''});
-      });
-      return;
-    }
-    if(!Array.isArray(data))return;
-    data.forEach(g=>{
-      let gu=g.embed||g.url||g.link||'';
-      if(!gu)return;
-      gu=gu.replace('http://','https://');
-      catalog.push({title:g.title||g.name||'Game',url:gu,
-        thumb:g.image||g.thumb||'',
-        category:((g.tags||g.category||g.categories||'Web Game')+'').split(',')[0].trim(),video:g.video||g.video_url||g.video_thumbnail||''});
+    masterCatalog = [...ELITE_LIST];
+
+    results.forEach((data, idx) => {
+        const url = feedUrls[idx];
+
+        if (url.includes('g_min.json')) {
+            if (!Array.isArray(data)) return;
+            data.forEach(g => {
+                if (!g.link || g.custom) return;
+                const gameUrl = g.link.startsWith('http://') ? g.link.replace('http://', 'https://') : g.link;
+                masterCatalog.push({ title: g.name || 'Game', url: gameUrl, thumb: g.image || '', category: Array.isArray(g.categories) ? g.categories[0] : (g.categories || 'Web Game') });
+            });
+            return;
+        }
+
+        if (url.includes('gamepix.com') || url.includes('Gamepix.json')) {
+            const items = Array.isArray(data) ? data : (data.data || data.items || []);
+            items.forEach(g => {
+                let gameUrl = (g.url || '').replace('http://', 'https://');
+                if (gameUrl && !gameUrl.includes('/embed')) gameUrl = gameUrl.replace(/\/$/, '') + '/embed?ref=blinchigames.online';
+                else if (gameUrl && !gameUrl.includes('ref=')) gameUrl += (gameUrl.includes('?') ? '&' : '?') + 'ref=blinchigames.online';
+                masterCatalog.push({ title: g.title || g.name || 'Game', url: gameUrl, thumb: g.url_thumbnail || g.banner_image || g.image || g.thumb || '', category: Array.isArray(g.categories) ? g.categories[0] : (g.category || 'Web Game') });
+            });
+            return;
+        }
+
+        if (!Array.isArray(data)) return;
+        data.forEach(g => {
+            let gameUrl = g.embed || g.url || g.link || '';
+            if (!gameUrl) return;
+            if (gameUrl.startsWith('http://')) gameUrl = gameUrl.replace('http://', 'https://');
+            masterCatalog.push({ title: g.title || g.name || 'Game', url: gameUrl, thumb: g.image || g.thumb || '', category: ((g.tags || g.category || g.categories || 'Web Game') + '').split(',')[0].trim() });
+        });
     });
-  });
 
-  // Deduplicate by title
-  const seen=new Set();
-  catalog=catalog.filter(g=>{const k=(g.title||'').toLowerCase();return seen.has(k)?false:seen.add(k);});
+    const seen = new Set();
+    masterCatalog = masterCatalog.filter(g => {
+        const key = (g.title || '').toLowerCase();
+        return seen.has(key) ? false : seen.add(key);
+    });
 
-  initNav();
-  showHome(null,true);
-  setTimeout(()=>{document.getElementById('loading').style.display='none';},400);
-  detectAdblock();
-  sizeIframe();
-  window.addEventListener('resize',sizeIframe);
-  initAuth().catch(()=>{});
+    initNav();
+    showHome();
+    setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
+
+    detectAdblock();
+    sizeIframe();
+    window.addEventListener('resize', sizeIframe);
 }
 
-function sizeIframe(){
-  const ifr=document.getElementById('game-iframe'),b=document.getElementById('stage-banner');
-  if(!ifr)return;
-  const bh=b.classList.contains('off')?0:(b.offsetHeight||92);
-  ifr.style.height=Math.max(380,Math.round((window.innerHeight-bh-58)*.85))+'px';
+function sizeIframe() {
+    const ifr    = document.getElementById('stage-iframe');
+    const banner = document.getElementById('stage-banner');
+    if (!ifr) return;
+    const bannerH  = banner.classList.contains('collapsed') ? 0 : (banner.offsetHeight || 96);
+    const available = window.innerHeight - bannerH - 60; // 60 = header
+    // Use 85% of available height — much bigger game screen
+    ifr.style.height = Math.max(400, Math.round(available * 0.85)) + 'px';
 }
 
-function initNav(){
-  const c=document.getElementById('cat-nav');c.innerHTML='';
-  GENRES.forEach(g=>{
-    const b=document.createElement('button');
-    b.className='nav-btn';
-    b.innerHTML=`<i class="bi bi-caret-right-fill"></i> <span>${g}</span>`;
-    b.onclick=()=>filterCat(g,b);
-    c.appendChild(b);
-  });
+// ─── Nav ──────────────────────────────────────────────────────────────────────
+function initNav() {
+    const container = document.getElementById('cat-nav-container');
+    container.innerHTML = '';
+    GENRES.forEach(cat => {
+        const b = document.createElement('button');
+        b.className = 'nav-item';
+        b.dataset.genre = cat;
+        b.innerHTML = `<i class="bi bi-caret-right-fill"></i> <span>${cat}</span>`;
+        b.onclick = () => filterByGenre(cat, b);
+        container.appendChild(b);
+    });
 }
 
-function hideAll(){
-  ['view-home','view-cat','view-multi','view-search'].forEach(id=>document.getElementById(id).style.display='none');
+function hideAllViews() {
+    document.getElementById('view-home').style.display   = 'none';
+    document.getElementById('view-cat').style.display    = 'none';
+    document.getElementById('view-search').style.display = 'none';
 }
-function setNav(btn){
-  document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-}
-
-function showHome(btn,skipSearch=false){
-  mode='home';loaded=0;
-  if(!skipSearch)document.getElementById('game-search').value='';
-  hideAll();
-  document.getElementById('view-home').style.display='block';
-  document.getElementById('home-grid').innerHTML='';
-  document.getElementById('lib-title').textContent='Global Library';
-  setNav(btn||document.getElementById('btn-home'));
-  activeList=[...catalog];
-  renderBatch(PAGE_INIT);
-  resetObs();
-  window.scrollTo(0,0);
+function setActiveNav(btn) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (btn) btn.classList.add('active');
 }
 
-function showMulti(btn){
-  mode='multi';loaded=0;
-  hideAll();
-  document.getElementById('view-multi').style.display='block';
-  setNav(btn||document.getElementById('btn-multi'));
-  // Pull multiplayer games FROM THE FEED by matching keywords
-  const multiList=catalog.filter(g=>{
-    const cat=(g.category||'').toLowerCase();
-    const title=(g.title||'').toLowerCase();
-    return MULTI_KEYWORDS.some(kw=>cat.includes(kw)||title.includes(kw));
-  }).slice(0,80);
-  const grid=document.getElementById('multi-grid');
-  grid.innerHTML='';
-  if(!multiList.length){
-    grid.innerHTML='<p style="color:#444;grid-column:1/-1">Loading multiplayer games from library… make sure your feed files are present.</p>';
-  }else{
-    multiList.forEach(g=>{const w=document.createElement('div');w.innerHTML=makeCard(g,'multi');grid.appendChild(w.firstElementChild);});
-  }
-  window.scrollTo(0,0);
-}
-
-function filterCat(genre,btn){
-  mode='cat';loaded=0;
-  hideAll();
-  document.getElementById('view-cat').style.display='block';
-  document.getElementById('cat-title').textContent=genre+' Collection';
-  document.getElementById('cat-grid').innerHTML='';
-  setNav(btn);
-  const q=genre.toLowerCase().replace(' games','').trim();
-  activeList=catalog.filter(g=>(g.category||'').toLowerCase().includes(q)||(g.title||'').toLowerCase().includes(q));
-  renderBatch(PAGE_INIT);
-  resetObs();
-  window.scrollTo(0,0);
-}
-
-let _searchTimer=null;
-function handleSearch(){
-  // Debounce: wait 120ms after last keystroke for fast-feel without thrashing DOM
-  clearTimeout(_searchTimer);
-  _searchTimer=setTimeout(()=>{
-    const q=document.getElementById('game-search').value.toLowerCase().trim();
-    if(!q){showHome(null,true);return;}
-    mode='search';loaded=0;
-    hideAll();
-    document.getElementById('view-search').style.display='block';
-    document.getElementById('search-title').textContent=`Results for "${q}"`;
-    document.getElementById('search-grid').innerHTML='';
-    setNav(null);
-    // Search by title first (exact prefix gets priority), then category
-    const titleMatch=catalog.filter(g=>(g.title||'').toLowerCase().includes(q));
-    const catOnly=catalog.filter(g=>!(g.title||'').toLowerCase().includes(q)&&(g.category||'').toLowerCase().includes(q));
-    activeList=[...titleMatch,...catOnly];
+function showHome() {
+    viewMode = 'home'; itemsLoaded = 0; singleAdInjected = false;
+    hideAllViews();
+    document.getElementById('view-home').style.display  = 'block';
+    document.getElementById('home-grid').innerHTML      = '';
+    document.getElementById('main-lib-title').innerText = 'Global Library';
+    setActiveNav(document.getElementById('btn-home'));
+    activeList = [...masterCatalog];
     renderBatch(PAGE_INIT);
-    resetObs();
-  },120);
+    resetObserver();
+    window.scrollTo(0, 0);
+}
+function showSection(type, btn) {
+    document.getElementById('game-search').value = '';
+    showHome();
+    setActiveNav(btn || document.getElementById('btn-home'));
 }
 
-function getGrid(){
-  if(mode==='home')return document.getElementById('home-grid');
-  if(mode==='cat')return document.getElementById('cat-grid');
-  if(mode==='search')return document.getElementById('search-grid');
-}
-function renderBatch(n){
-  const grid=getGrid();if(!grid)return;
-  const batch=activeList.slice(loaded,loaded+n);
-  batch.forEach(g=>{const w=document.createElement('div');w.innerHTML=makeCard(g);grid.appendChild(w.firstElementChild);});
-  loaded+=batch.length;
-  document.getElementById('sentinel').style.visibility=loaded<activeList.length?'visible':'hidden';
-}
-function resetObs(){
-  if(obs)obs.disconnect();
-  obs=new IntersectionObserver(e=>{if(e[0].isIntersecting&&loaded<activeList.length)renderBatch(PAGE_STEP);},{rootMargin:'400px'});
-  obs.observe(document.getElementById('sentinel'));
-}
-function makeCard(g,badge=''){
-  const img=g.thumb?g.thumb:'https://placehold.co/400x400/111/32ff0e?text=Game';
-  const vid=g.video||g.video_url||''; // video preview URL if available
-  const st=(g.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  const su=(g.url||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  const sc=(g.category||'').replace(/'/g,"\\'");
-  const b=badge==='elite'?'<div class="badge badge-elite">Elite</div>':badge==='multi'?'<div class="badge badge-multi">Multiplayer</div>':'';
-  const vidEl=vid?'<video class="card-video" src="'+vid+'" muted loop playsinline preload="none" tabindex="-1"></video>':'';
-  const vidAttrs=vid?' onmouseenter="playCardVid(this)" onmouseleave="stopCardVid(this)"':'';
-  return`<div class="card" onclick="launch('${su}','${st}','${sc}')"${vidAttrs}>
-    <div class="thumb">${b}${vidEl}<img src="${img}" alt="${esc(g.title||'')}" loading="lazy" class="card-img"></div>
-    <div class="card-info"><h6>${esc(g.title||'')}</h6></div>
-  </div>`;
+function filterByGenre(genre, btn) {
+    viewMode = 'cat'; itemsLoaded = 0;
+    hideAllViews();
+    document.getElementById('view-cat').style.display      = 'block';
+    document.getElementById('cat-display-title').innerText = genre + ' Collection';
+    document.getElementById('cat-grid').innerHTML          = '';
+    setActiveNav(btn);
+    const q = genre.toLowerCase().replace(' games', '').trim();
+    activeList = masterCatalog.filter(g => (g.category || '').toLowerCase().includes(q) || (g.title || '').toLowerCase().includes(q));
+    renderBatch(PAGE_INIT);
+    resetObserver();
+    window.scrollTo(0, 0);
 }
 
-function playCardVid(card) {
-  const v = card.querySelector('.card-video');
-  const img = card.querySelector('.card-img');
-  if (!v) return;
-  v.style.opacity = '1';
-  if (img) img.style.opacity = '0';
-  v.play().catch(()=>{});
-}
-function stopCardVid(card) {
-  const v = card.querySelector('.card-video');
-  const img = card.querySelector('.card-img');
-  if (!v) return;
-  v.pause(); v.currentTime = 0;
-  v.style.opacity = '0';
-  if (img) img.style.opacity = '1';
+function handleSearch() {
+    const query = document.getElementById('game-search').value.toLowerCase().trim();
+    if (!query) { showHome(); return; }
+    viewMode = 'search'; itemsLoaded = 0;
+    hideAllViews();
+    document.getElementById('view-search').style.display      = 'block';
+    document.getElementById('search-display-title').innerText = `Search Results: "${query}"`;
+    document.getElementById('search-grid').innerHTML          = '';
+    setActiveNav(null);
+    activeList = masterCatalog.filter(g => (g.title || '').toLowerCase().includes(query) || (g.category || '').toLowerCase().includes(query));
+    renderBatch(PAGE_INIT);
+    resetObserver();
 }
 
-// ════════════════════════════════════════════════════════════════
-// VOTING
-// ════════════════════════════════════════════════════════════════
-function vote(type){
-  if(!currentGame)return;
-  setVote(currentGame.title,type);
-  refreshVoteUI();
-}
-function refreshVoteUI(){
-  if(!currentGame)return;
-  const t=currentGame.title,v=mv(t);
-  document.getElementById('like-btn').classList.toggle('active',v==='like');
-  document.getElementById('dis-btn').classList.toggle('active',v==='dislike');
-  document.getElementById('like-cnt').textContent=lk(t);
-  document.getElementById('dis-cnt').textContent=dk(t);
+// ─── Render ───────────────────────────────────────────────────────────────────
+function getActiveGrid() {
+    if (viewMode === 'home')   return document.getElementById('home-grid');
+    if (viewMode === 'cat')    return document.getElementById('cat-grid');
+    if (viewMode === 'search') return document.getElementById('search-grid');
 }
 
-// ════════════════════════════════════════════════════════════════
-// GAME LAUNCH / CLOSE
-// ════════════════════════════════════════════════════════════════
-let gCount=0;
-function launch(url,title,cat){
-  currentGame={url,title,category:cat};
-  if(++gCount%17===0)cleanCache();
-  document.getElementById('stage').classList.add('open');
-  document.getElementById('game-iframe').src=url;
-  document.getElementById('stage-title').textContent='PLAYING: '+title;
-  document.body.style.overflow='hidden';
-  refreshVoteUI();
-  renderRelated(title,cat);
-  sizeIframe();
-  document.getElementById('stage').scrollTop=0;
-  // Broadcast activity to BlinchiLive feed + set ingame status
-  try{localStorage.setItem('bl_active_game',JSON.stringify({title,url}));}catch(e){}
-  broadcastBlinchiActivity(title,url);
-}
+let singleAdInjected = false;
 
-// Sets ingame status + activity row so BlinchiLive feed shows what you're playing
-function broadcastBlinchiActivity(title,url){
-  try{
-    const SB_URL='https://ezdiptkyfwttxjuxkusg.supabase.co';
-    const SB_KEY='sb_publishable_ORNNniNlw9b8a9I6VAh9Tw_w4QZPDBU';
-    const sb=supabase.createClient(SB_URL,SB_KEY);
-    sb.auth.getSession().then(({data:{session}})=>{
-      if(!session)return;
-      const uid=session.user.id;
-      sb.from('activity').upsert({user_id:uid,game_title:title,game_url:url,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-      sb.from('profiles').update({status:'ingame'}).eq('id',uid);
+function renderBatch(count) {
+    const grid  = getActiveGrid();
+    const batch = activeList.slice(itemsLoaded, itemsLoaded + count);
+
+    batch.forEach(g => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = generateCard(g);
+        grid.appendChild(wrapper.firstElementChild);
     });
-  }catch(e){}
+
+    itemsLoaded += batch.length;
+    document.getElementById('scroll-sentinel').style.visibility =
+        itemsLoaded < activeList.length ? 'visible' : 'hidden';
 }
-function closeGame(){
-  document.getElementById('stage').classList.remove('open');
-  const ifr=document.getElementById('game-iframe');
-  ifr.src='about:blank';
-  setTimeout(()=>{ifr.src='';},80);
-  document.body.style.overflow='';
-  currentGame=null;
-  document.getElementById('rel-grid').innerHTML='';
-  cleanCache();
-  // Return to online status in BlinchiLive
-  try{
-    const sb=supabase.createClient('https://ezdiptkyfwttxjuxkusg.supabase.co','sb_publishable_ORNNniNlw9b8a9I6VAh9Tw_w4QZPDBU');
-    sb.auth.getSession().then(({data:{session}})=>{
-      if(session)sb.from('profiles').update({status:'online'}).eq('id',session.user.id);
+
+function resetObserver() {
+    if (observer) observer.disconnect();
+    observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && itemsLoaded < activeList.length) renderBatch(PAGE_STEP);
+    }, { rootMargin: '400px' });
+    observer.observe(document.getElementById('scroll-sentinel'));
+}
+
+// ─── Card (library — no like/dislike) ────────────────────────────────────────
+function generateCard(g, isElite = false) {
+    const img       = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Elite+Game';
+    const safeTitle = (g.title    || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const safeUrl   = (g.url      || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const safeCat   = (g.category || '').replace(/'/g, "\\'");
+    return `
+        <div class="game-card" onclick="launchGame('${safeUrl}','${safeTitle}','${safeCat}')">
+            <div class="game-thumb">
+                ${isElite ? '<div class="badge-elite">Elite</div>' : ''}
+                <img src="${img}" alt="${g.title || ''}" loading="lazy">
+            </div>
+            <div class="game-info">
+                <h6>${g.title || ''}</h6>
+            </div>
+        </div>`;
+}
+
+// ─── Voting on library cards ──────────────────────────────────────────────────
+function voteCard(btn, type, title) {
+    setVote(title, type);
+    const bar = btn.closest('.like-bar');
+    const lb  = bar.querySelector('.like-btn');
+    const db  = bar.querySelector('.dislike-btn');
+    const mv  = getMyVote(title);
+    lb.classList.toggle('active', mv === 'like');
+    db.classList.toggle('active', mv === 'dislike');
+    lb.querySelector('span').textContent = getLikes(title);
+    db.querySelector('span').textContent = getDislikes(title);
+    if (currentGame && currentGame.title === title) updateStageLikeBar();
+}
+
+// ─── Voting inside the stage ─────────────────────────────────────────────────
+function voteGame(type) {
+    if (!currentGame) return;
+    setVote(currentGame.title, type);
+    updateStageLikeBar();
+}
+function updateStageLikeBar() {
+    if (!currentGame) return;
+    const t  = currentGame.title;
+    const mv = getMyVote(t);
+    document.getElementById('stage-like-btn').classList.toggle('active',    mv === 'like');
+    document.getElementById('stage-dislike-btn').classList.toggle('active', mv === 'dislike');
+    document.getElementById('stage-like-count').textContent    = getLikes(t);
+    document.getElementById('stage-dislike-count').textContent = getDislikes(t);
+}
+
+// ─── Launch game ──────────────────────────────────────────────────────────────
+let gamesPlayedCount = 0;
+
+function launchGame(url, title, category) {
+    currentGame = { url, title, category };
+    gamesPlayedCount++;
+
+    // Every 17 games, clear accumulated DOM/memory without touching localStorage
+    if (gamesPlayedCount % 17 === 0) {
+        cleanPortalCache();
+    }
+
+    document.getElementById('game-stage').classList.add('open');
+    document.getElementById('stage-iframe').src      = url;
+    document.getElementById('stage-title').innerText = 'PLAYING: ' + title;
+    document.body.style.overflow = 'hidden';
+    updateStageLikeBar();
+    renderRelated(title, category);
+    sizeIframe();
+    // Scroll the stage overlay to top
+    document.getElementById('game-stage').scrollTop = 0;
+}
+
+function closeGame() {
+    document.getElementById('game-stage').classList.remove('open');
+    // Fully unload the game iframe to free memory
+    const ifr = document.getElementById('stage-iframe');
+    ifr.src = 'about:blank';
+    setTimeout(() => { ifr.src = ''; }, 100);
+    document.body.style.overflow = '';
+    currentGame = null;
+    // Clear related grid DOM to free memory
+    document.getElementById('related-grid').innerHTML = '';
+    // Purge any blob/object URLs the browser may have cached for this session
+    cleanPortalCache();
+}
+
+// ─── Portal cache cleaner — clears rendering/script cache without touching game saves ──
+function cleanPortalCache() {
+    // Remove stale script tags injected by ad refreshes (keep only the live ones)
+    document.querySelectorAll('script[data-ad-injected]').forEach(s => s.remove());
+    // Force GC hint by briefly toggling a style
+    const body = document.body;
+    body.style.display = 'none';
+    // eslint-disable-next-line no-unused-expressions
+    body.offsetHeight; // reflow
+    body.style.display = '';
+}
+
+// ─── Related games ────────────────────────────────────────────────────────────
+function renderRelated(title, category) {
+    const grid = document.getElementById('related-grid');
+    grid.innerHTML = '';
+    const cat = (category || '').toLowerCase();
+    const related = masterCatalog
+        .filter(g => g.title !== title &&
+            ((g.category || '').toLowerCase() === cat ||
+             (g.category || '').toLowerCase().includes(cat) ||
+             cat.includes((g.category || '').toLowerCase())))
+        .slice(0, 18);
+
+    if (!related.length) {
+        grid.innerHTML = '<p style="color:#555;font-size:0.9rem;">No related games found.</p>';
+        return;
+    }
+    related.forEach(g => {
+        const img     = (g.thumb && g.thumb !== '') ? g.thumb : 'https://placehold.co/400x400/111/32ff0e?text=Game';
+        const st      = (g.title    || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const su      = (g.url      || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const sc      = (g.category || '').replace(/'/g, "\\'");
+        const el      = document.createElement('div');
+        el.className  = 'game-card';
+        el.innerHTML  = `
+            <div class="game-thumb" onclick="launchGame('${su}','${st}','${sc}')">
+                <img src="${img}" alt="${g.title||''}" loading="lazy">
+            </div>
+            <div class="game-info">
+                <h6 onclick="launchGame('${su}','${st}','${sc}')">${g.title||''}</h6>
+            </div>`;
+        grid.appendChild(el);
     });
-    localStorage.removeItem('bl_active_game');
-  }catch(e){}
-}
-function cleanCache(){
-  document.querySelectorAll('script[data-ad-injected]').forEach(s=>s.remove());
-  const b=document.body;b.style.display='none';b.offsetHeight;b.style.display='';
-}
-function renderRelated(title,cat){
-  const grid=document.getElementById('rel-grid');grid.innerHTML='';
-  const c=(cat||'').toLowerCase();
-  const rel=catalog.filter(g=>g.title!==title&&(
-    (g.category||'').toLowerCase()===c||
-    (g.category||'').toLowerCase().includes(c)||
-    c.includes((g.category||'').toLowerCase())
-  )).slice(0,16);
-  if(!rel.length){grid.innerHTML='<p style="color:#444;font-size:.88rem">No related games.</p>';return;}
-  rel.forEach(g=>{
-    const img=g.thumb||'https://placehold.co/400x400/111/32ff0e?text=Game';
-    const st=(g.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    const su=(g.url||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    const sc=(g.category||'').replace(/'/g,"\\'");
-    const el=document.createElement('div');el.className='card';
-    el.innerHTML=`<div class="thumb" onclick="launch('${su}','${st}','${sc}')"><img src="${img}" loading="lazy"></div>
-      <div class="card-info"><h6 onclick="launch('${su}','${st}','${sc}')">${esc(g.title||'')}</h6></div>`;
-    grid.appendChild(el);
-  });
 }
 
-// ════════════════════════════════════════════════════════════════
-// FULLSCREEN / AD TOGGLE
-// ════════════════════════════════════════════════════════════════
-function handleFullscreen(){
-  if(!document.getElementById('stage-banner').classList.contains('off'))
-    document.getElementById('fs-prompt').style.display='flex';
-  else doFullscreen();
+// ─── Fullscreen with banner-collapse prompt ───────────────────────────────────
+function handleFullscreen() {
+    const banner = document.getElementById('stage-banner');
+    if (!banner.classList.contains('collapsed')) {
+        document.getElementById('fs-prompt').style.display = 'flex';
+    } else {
+        doFullscreen();
+    }
 }
-function doFullscreen(){
-  const ifr=document.getElementById('game-iframe');
-  (ifr.requestFullscreen||ifr.webkitRequestFullscreen||function(){}).call(ifr);
+function fsPromptYes() {
+    document.getElementById('fs-prompt').style.display = 'none';
+    collapseBanner();
+    doFullscreen();
 }
-function collapseAd(){document.getElementById('stage-banner').classList.add('off');document.getElementById('show-ad-strip').style.display='block';sizeIframe();}
-function expandAd(){document.getElementById('stage-banner').classList.remove('off');document.getElementById('show-ad-strip').style.display='none';sizeIframe();}
-
-// ════════════════════════════════════════════════════════════════
-// ADBLOCK DETECTION
-// ════════════════════════════════════════════════════════════════
-function detectAdblock(){
-  const b=document.createElement('div');
-  b.className='ad-banner ad adsbox pub_300x250 text-ad';
-  b.style.cssText='position:absolute;left:-9999px;top:-9999px;width:1px;height:1px';
-  document.body.appendChild(b);
-  setTimeout(()=>{
-    const blocked=!b||b.offsetHeight===0||b.offsetParent===null||getComputedStyle(b).display==='none';
-    b.remove();
-    if(blocked)document.getElementById('ab-wall').classList.add('show');
-  },200);
+function fsPromptNo() {
+    document.getElementById('fs-prompt').style.display = 'none';
+    doFullscreen();
+}
+function doFullscreen() {
+    const ifr = document.getElementById('stage-iframe');
+    if      (ifr.requestFullscreen)       ifr.requestFullscreen();
+    else if (ifr.webkitRequestFullscreen) ifr.webkitRequestFullscreen();
+    else if (ifr.msRequestFullscreen)     ifr.msRequestFullscreen();
 }
 
-// ════════════════════════════════════════════════════════════════
-// HELPERS
-// ════════════════════════════════════════════════════════════════
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function ago(ts){if(!ts)return'';const d=Math.round((Date.now()-new Date(ts))/1000);if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
-
-
-// ══════════════════════════════════════════════════════════════════
-// UPDATES SYSTEM
-// ══════════════════════════════════════════════════════════════════
-function getLastSeenVersion() {
-  try { return localStorage.getItem('bl_last_seen_ver') || '0'; } catch(e) { return '0'; }
+function collapseBanner() {
+    document.getElementById('stage-banner').classList.add('collapsed');
+    document.getElementById('banner-expand-strip').style.display = 'block';
+    sizeIframe();
 }
-function markVersionSeen() {
-  try { localStorage.setItem('bl_last_seen_ver', UPDATES[0].version); } catch(e) {}
-}
-function hasNewUpdate() {
-  const seen = getLastSeenVersion();
-  return seen !== UPDATES[0].version;
+function expandBanner() {
+    document.getElementById('stage-banner').classList.remove('collapsed');
+    document.getElementById('banner-expand-strip').style.display = 'none';
+    sizeIframe();
 }
 
-function openUpdates() {
-  markVersionSeen();
-  const badge = document.getElementById('updates-badge');
-  if (badge) badge.style.display = 'none';
-  const panel = document.getElementById('updates-panel');
-  if (panel) panel.classList.toggle('show');
-}
-function closeUpdates() {
-  const panel = document.getElementById('updates-panel');
-  if (panel) panel.classList.remove('show');
-}
+// ─── Adblock detection ────────────────────────────────────────────────────────
+function detectAdblock() {
+    // Create a bait element that adblocks typically hide/remove
+    const bait = document.createElement('div');
+    bait.setAttribute('class', 'ad-banner ad adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links');
+    bait.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;';
+    document.body.appendChild(bait);
 
-function initUpdates() {
-  const badge = document.getElementById('updates-badge');
-  if (badge) badge.style.display = hasNewUpdate() ? 'flex' : 'none';
-  // Auto-show on first new update visit
-  if (hasNewUpdate()) {
     setTimeout(() => {
-      const panel = document.getElementById('updates-panel');
-      if (panel) panel.classList.add('show');
-      markVersionSeen();
-      if (badge) badge.style.display = 'none';
-    }, 800);
-  }
-  // Render update content
-  const content = document.getElementById('updates-content');
-  if (!content) return;
-  content.innerHTML = UPDATES.map((u, i) => `
-    <div class="upd-entry${i===0?' upd-latest':''}">
-      <div class="upd-header">
-        <div class="upd-version">v${u.version}</div>
-        <div class="upd-title">${u.title}</div>
-        <div class="upd-date">${u.date}</div>
-      </div>
-      <ul class="upd-list">
-        ${u.items.map(item => `<li>${item}</li>`).join('')}
-      </ul>
-    </div>
-  `).join('');
+        const blocked = !bait || bait.offsetHeight === 0 || bait.offsetParent === null ||
+            window.getComputedStyle(bait).display === 'none' ||
+            window.getComputedStyle(bait).visibility === 'hidden';
+        bait.remove();
+        if (blocked) {
+            document.getElementById('adblock-wall').classList.add('show');
+        }
+    }, 200);
 }
 
-
-// ═══════════════════════════════════════════════════════════════
-// CHANGELOG / UPDATES
-// ═══════════════════════════════════════════════════════════════
-const UPDATES = [
-  {version:'2.5',date:'2025-07-01',title:'Summer Drop',items:[
-    'Added 20+ games: Kour.io, Smash Karts, Level Devil, House of Hazards, Little Alchemy and more',
-    'Video previews — hover any game card to see a trailer (where available)',
-    'BlinchiLive: floating collapsible sidebar with new brand design',
-    'BlinchiLive: accurate online/offline status using last_seen heartbeat',
-    'BlinchiLive: WebRTC voice & video calling reworked with timing fix',
-    'BlinchiLive: messages appear instantly (optimistic render)',
-    'BlinchiLive: friends and feed load faster with parallel queries and caching',
-  ]},
-  {version:'2.4',date:'2025-06-01',title:'Social Hub Launch',items:[
-    'BlinchiLive: DMs, group chats, typing indicators, push notifications',
-    'Real-time friend requests with center-screen popup',
-    'Daily challenges and achievement system with BlinchiCoins',
-    'Web Audio ping sound — no files needed',
-  ]},
-  {version:'2.3',date:'2025-05-01',title:'Multiplayer Section',items:[
-    'Dedicated multiplayer games row with IO game detection',
-    'Elite Collection — hand-picked featured games',
-    'Instant search with title-first result ordering',
-    'Like and comment system per game with Supabase backend',
-  ]},
-  {version:'2.0',date:'2025-03-01',title:'Full Redesign',items:[
-    'Dark mode redesign — black background, brand green accent',
-    'Multi-source game feeds from GameMonetize, GamePixel and custom JSON',
-    'Category filters, genre tabs, and game search',
-    'User accounts with Supabase auth and BlinchiCoins',
-  ]},
-];
-
-window.onload=boot;
+window.onload = boot;
 </script>
 </body>
 </html>
+
+

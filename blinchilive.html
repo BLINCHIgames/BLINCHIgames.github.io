@@ -235,6 +235,8 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 #msg-content{padding:0 24px 0}
 
 
+
+
 /* ── Typing indicator ── */
 .typing-indicator{display:none;align-items:center;gap:6px;padding:6px 14px;flex-shrink:0}
 .typing-indicator.show{display:flex}
@@ -245,70 +247,88 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 .typing-dots span:nth-child(3){animation-delay:.36s}
 @keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
 
+
 /* ── Message pop-in ── */
 @keyframes msgPop{from{transform:scale(.94) translateY(4px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+
 
 /* ── Page slide-in ── */
 @keyframes slideIn{from{transform:translateX(-8px);opacity:0}to{transform:translateX(0);opacity:1}}
 .tab.active{animation:slideIn .18s var(--ease) both}
+
 
 /* ── Loading spinner ── */
 .loader{width:18px;height:18px;border:2px solid rgba(50,255,14,.2);border-top:2px solid var(--brand);border-radius:50%;animation:spin .7s linear infinite;margin:auto;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-row{display:flex;align-items:center;justify-content:center;gap:9px;padding:20px;color:var(--muted);font-size:.82rem}
 
+
 /* ── Hover lift for list items ── */
 .ci{transition:background .12s,transform .12s}
 .ci:hover{background:rgba(255,255,255,.05);transform:translateX(2px)}
 .ci.active{background:rgba(50,255,14,.08)!important;border-left:2px solid var(--brand)}
 
+
 /* ── fr-row hover ── */
 .fr-row:hover{background:rgba(50,255,14,.04);transform:translateX(2px)}
+
 
 /* ── gr-card enhanced ── */
 .gr-card:hover{border-color:rgba(50,255,14,.28);transform:translateX(3px);background:rgba(50,255,14,.04)}
 
+
 /* ── Convo sidebar tabs enhanced ── */
 .csb-tab{transition:color .15s,border-color .15s}
+
 
 /* ── Input enhanced ── */
 .chat-inp-row input{transition:border-color .18s,box-shadow .18s}
 .chat-inp-row input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(50,255,14,.1)}
 
+
 /* ── Button press feedback ── */
 .btn:active,.send-btn:active,.ibt:active{transform:scale(.93)}
+
 
 /* ── Status dot colors ── */
 .status-dot.online{background:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.25)}
 .status-dot.ingame{background:var(--brand);box-shadow:0 0 0 2px rgba(50,255,14,.25)}
 .status-dot.offline{background:#2d3748}
 
+
 /* ── Nav enhanced ── */
 .nav-btn{transition:background .12s,color .12s,transform .1s}
 .nav-btn:hover{transform:translateX(2px)}
 .nav-btn.active{box-shadow:inset 0 0 20px rgba(50,255,14,.06)}
 
+
 /* ── Avatar glow on hover ── */
 .av{transition:box-shadow .18s,transform .18s}
 .fr-row:hover .av,.ci:hover .av{box-shadow:0 0 0 2px rgba(50,255,14,.3)}
 
+
 /* ── Auth modal glass ── */
 .modal-box{background:rgba(6,6,8,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+
 
 /* ── req-card glass ── */
 .req-card{background:rgba(14,20,30,.8);backdrop-filter:blur(12px)}
 
+
 /* ── fr-popup glass ── */
 .fr-popup-box{background:rgba(6,6,8,.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(50,255,14,.18)}
+
 
 /* ── Notification badge pulse ── */
 .nbadge{animation:badgePulse 2s ease-in-out infinite}
 @keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,60,60,.4)}50%{box-shadow:0 0 0 4px rgba(255,60,60,0)}}
 
+
 /* ── Scroll to bottom button ── */
 #scroll-btn{display:none;position:absolute;bottom:70px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(50,255,14,.15);border:1px solid rgba(50,255,14,.3);color:var(--brand);cursor:pointer;font-size:.75rem;align-items:center;justify-content:center;transition:all .15s;z-index:10}
 #scroll-btn.show{display:flex}
 #scroll-btn:hover{background:rgba(50,255,14,.25)}
+
 
 /* ── Push notification toast ── */
 .push-toast{position:fixed;top:70px;right:18px;z-index:9800;background:rgba(14,20,30,.95);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:14px;padding:12px 16px;min-width:240px;max-width:320px;display:none;animation:slideIn .22s var(--ease);box-shadow:0 8px 32px rgba(0,0,0,.4)}
@@ -316,10 +336,12 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 .push-toast-title{font-weight:700;font-size:.84rem;margin-bottom:2px}
 .push-toast-body{font-size:.78rem;color:var(--muted)}
 
+
 /* ── Collapsible nav ── */
 @media(min-width:601px){
   .nav{transition:width .2s var(--ease)}
 }
+
 
 @keyframes rhombPulse{0%,100%{filter:drop-shadow(0 0 3px rgba(50,255,14,.4))}50%{filter:drop-shadow(0 0 8px rgba(50,255,14,.7))}}
 @media(max-width:900px){.ad-sidebar{display:none}}
@@ -337,6 +359,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 <input style="position:absolute;opacity:0;pointer-events:none;height:0;width:0" type="text" name="bl_ut" tabindex="-1" aria-hidden="true">
 <input style="position:absolute;opacity:0;pointer-events:none;height:0;width:0" type="password" name="bl_pt" tabindex="-1" aria-hidden="true">
 
+
 <div class="shell">
   <!-- Contextual ad — shown only in messages/groups/calls -->
   <div class="ctx-ad-bar" id="ctx-ad-bar" style="display:none">
@@ -344,8 +367,10 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
     <script src="https://authoritieswoundjoint.com/e6db54461c44b43e8f8a286f792c9452/invoke.js"></script>
   </div>
 
+
   <div class="body">
     <nav class="nav">
+
 
       <!-- ── LOGO at top ── -->
       <div class="nav-top">
@@ -364,6 +389,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         <!-- Back button -->
         <a href="index.html" class="btn-back" style="margin-top:12px"><i class="bi bi-arrow-left"></i> <span>Back to Games</span></a>
       </div>
+
 
       <!-- ── NAV ITEMS ── -->
       <div class="nav-inner">
@@ -385,6 +411,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         <button class="nav-btn" data-tab="groups" onclick="blTab('groups')"><i class="bi bi-collection-fill"></i> <span>Groups</span></button>
       </div>
 
+
       <!-- ── USER / SIGN-IN at bottom ── -->
       <div class="nav-bottom">
         <!-- Signed in state -->
@@ -404,7 +431,9 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         </div>
       </div>
 
+
     </nav>
+
 
     <div class="main">
       <!-- FEED -->
@@ -415,10 +444,12 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         <div class="ad-mid"><script>atOptions={'key':'1e3e91cd06644324483015b483316475','format':'iframe','height':60,'width':468,'params':{}}</script><script src="https://authoritieswoundjoint.com/1e3e91cd06644324483015b483316475/invoke.js"></script></div>
       </div>
 
+
       <!-- PROFILE -->
       <div class="tab" id="tab-profile">
         <div id="profile-content"><div class="locked"><i class="bi bi-person-circle"></i><p>Sign in to view your profile</p><button class="btn" onclick="openAuth()">Sign In</button></div></div>
       </div>
+
 
       <!-- CHALLENGES -->
       <div class="tab" id="tab-challenges">
@@ -428,6 +459,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         <div id="ch-list" style="display:none"></div>
       </div>
 
+
       <!-- ACHIEVEMENTS -->
       <div class="tab" id="tab-achievements">
         <div class="pg-title">Achievements</div>
@@ -435,6 +467,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         <div id="ach-locked" class="locked"><i class="bi bi-trophy"></i><p>Sign in to track achievements</p><button class="btn" onclick="openAuth()">Sign In</button></div>
         <div id="ach-list" style="display:none"></div>
       </div>
+
 
       <!-- ADD FRIENDS -->
       <div class="tab" id="tab-addfriends">
@@ -455,6 +488,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         </div>
       </div>
 
+
       <!-- FRIENDS -->
       <div class="tab" id="tab-friends">
         <div class="pg-title">Friends</div>
@@ -463,6 +497,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         <div id="friends-content" style="display:none"><div id="friends-list"></div></div>
         <div class="ad-mid"><script>atOptions={'key':'1e3e91cd06644324483015b483316475','format':'iframe','height':60,'width':468,'params':{}}</script><script src="https://authoritieswoundjoint.com/1e3e91cd06644324483015b483316475/invoke.js"></script></div>
       </div>
+
 
       <!-- MESSAGES -->
       <div class="tab" id="tab-messages">
@@ -520,6 +555,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
         </div>
       </div>
 
+
       <!-- GROUPS -->
       <div class="tab" id="tab-groups">
         <div class="pg-title">Groups</div>
@@ -535,12 +571,14 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
       </div>
     </div><!-- /main -->
 
+
     <div class="ad-sidebar">
       <div><script>atOptions={'key':'0d1d9860b64193bffb24174fa1adda1d','format':'iframe','height':600,'width':160,'params':{}}</script><script src="https://authoritieswoundjoint.com/0d1d9860b64193bffb24174fa1adda1d/invoke.js"></script></div>
       <div><script>atOptions={'key':'6e1109cad98d336d18e23b0a2087bbc8','format':'iframe','height':300,'width':160,'params':{}}</script><script src="https://authoritieswoundjoint.com/6e1109cad98d336d18e23b0a2087bbc8/invoke.js"></script></div>
     </div>
   </div>
 </div>
+
 
 <!-- FRIEND REQUEST POPUP (center screen) -->
 <div id="fr-popup">
@@ -555,6 +593,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
     </div>
   </div>
 </div>
+
 
 <!-- CALL OVERLAY -->
 <div id="call-overlay">
@@ -583,6 +622,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
   </div>
 </div>
 
+
 <!-- AUTH MODAL -->
 <div class="modal-ov" id="auth-modal">
   <div class="modal-box">
@@ -608,6 +648,7 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
   </div>
 </div>
 
+
 <div id="toast"></div>
 <div class="push-toast" id="push-toast">
   <div class="push-toast-title" id="push-toast-title">New Message</div>
@@ -625,17 +666,22 @@ const db = supabase.createClient(SB_URL, SB_KEY, {
   auth: { persistSession: true, autoRefreshToken: true }
 });
 
+
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
 let U = null, P = null;
-let activeTab = 'feed';
+const _validTabs = ['feed','profile','addfriends','friends','messages','groups','challenges','achievements'];
+let activeTab = (_validTabs.includes(window.location.hash.slice(1)) ? window.location.hash.slice(1) : null)
+              || localStorage.getItem('bl_tab')
+              || 'feed';
 let activeConversation = null;
 let activeConvName = '';
 let activeConvType = '';
 let csbMode = 'friends';
 let pendingRequest = null;
 let rtAll = null, rtMsg = null, rtPres = null, presTimer = null;
+
 
 // ── Load locks — prevent concurrent collisions ──
 const _loading = {
@@ -647,6 +693,7 @@ function _lock(key, fn) {
   _loading[key] = true;
   return Promise.resolve(fn()).finally(() => { _loading[key] = false; });
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
@@ -668,6 +715,7 @@ function toast(msg, dur=3000) {
   clearTimeout(_toastT); _toastT = setTimeout(() => t.classList.remove('show'), dur);
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════════
@@ -678,6 +726,7 @@ async function initAuth() {
     if (s) await onIn(s.user); else onOut();
   });
 }
+
 
 async function onIn(user) {
   U = user;
@@ -699,11 +748,13 @@ async function onIn(user) {
   updateStatus('online');
   window.addEventListener('beforeunload', () => updateStatus('offline'), { once: true });
 
+
   // Heartbeat: update last_seen every 30 seconds
   if (window._presenceInterval) clearInterval(window._presenceInterval);
   window._presenceInterval = setInterval(() => {
     if (U) db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id);
   }, 30000);
+
 
   // Instant update on any activity
   const _pingPresence = () => {
@@ -736,11 +787,13 @@ async function onIn(user) {
   } catch(e) {}
 }
 
+
 function onOut() {
   U = null; P = null;
   if (rtAll) { rtAll.unsubscribe(); rtAll = null; }
   applyAuth();
 }
+
 
 function applyAuth() {
   const on = !!P;
@@ -775,6 +828,7 @@ function applyAuth() {
   }
 }
 
+
 function openAuth() { $('auth-modal').classList.add('show'); }
 function closeAuth() { $('auth-modal').classList.remove('show'); }
 function swAuth(v) {
@@ -806,6 +860,7 @@ async function doSignUp() {
   ok.textContent = 'Account created! Check your email then sign in.'; ok.style.display = 'block';
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // TABS
 // ═══════════════════════════════════════════════════════════════
@@ -817,6 +872,8 @@ function blTab(tab) {
   const el = $('tab-'+tab); if (el) el.classList.add('active');
   document.querySelectorAll(`.nav-btn[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
   activeTab = tab;
+  window.location.hash = tab;
+  try { localStorage.setItem('bl_tab', tab); } catch(e) {}
   const ctxAd = $('ctx-ad-bar');
   if (ctxAd) ctxAd.style.display = ['messages','groups'].includes(tab) ? 'flex' : 'none';
   if (U) refreshTab(tab);
@@ -834,12 +891,14 @@ function refreshTab(tab) {
   return Promise.resolve();
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // REALTIME — single channel for all social events
 // ═══════════════════════════════════════════════════════════════
 function subscribeRealtime() {
   if (!U || !db) return;
   if (rtAll) rtAll.unsubscribe();
+
 
   rtAll = db.channel('bl_rt_' + U.id)
     // ── New friendship row where I am user2 (someone added me)
@@ -904,6 +963,7 @@ function subscribeRealtime() {
     })
     .subscribe();
 
+
   // ── Friends realtime — any change to friendships table ──────
   if (window._friendsCh) { try{db.removeChannel(window._friendsCh);}catch(e){} }
   window._friendsCh = db.channel('rt_friends_' + U.id)
@@ -918,6 +978,7 @@ function subscribeRealtime() {
     })
     .subscribe();
 
+
   // ── Profile status realtime — online/offline/ingame ─────────
   if (window._profilesCh) { try{db.removeChannel(window._profilesCh);}catch(e){} }
   window._profilesCh = db.channel('rt_profiles')
@@ -931,6 +992,7 @@ function subscribeRealtime() {
     })
     .subscribe();
 
+
   // ── Challenges realtime ──────────────────────────────────────
   if (window._challengesCh) { try{db.removeChannel(window._challengesCh);}catch(e){} }
   window._challengesCh = db.channel('rt_challenges_' + U.id)
@@ -942,6 +1004,7 @@ function subscribeRealtime() {
     })
     .subscribe();
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // FRIEND REQUEST POPUP
@@ -975,6 +1038,7 @@ function declineFriendPopup() {
   checkReqBadge();
 }
 
+
 async function checkReqBadge() {
   if (!U) return;
   const { count } = await db.from('friendships').select('id', { count: 'exact', head: true })
@@ -993,6 +1057,7 @@ async function checkReqBadge() {
     }
   }
 }
+
 
 async function countUnread() {
   if (!U) return;
@@ -1019,6 +1084,7 @@ async function countUnread() {
     b.style.display = 'none'; ub.style.display = 'none';
   }
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // FEED
@@ -1047,6 +1113,7 @@ async function loadFeed() {
     const { data: fprofs } = await db.from('profiles')
       .select('id,username,displayname,status,last_seen').in('id', ids);
     const fpMap = {}; (fprofs||[]).forEach(p => fpMap[p.id] = p);
+
 
     if (!acts || !acts.length) {
       // Show all friends sorted: online first, then ingame, then offline
@@ -1103,6 +1170,7 @@ async function broadcastActivity(title, url) {
   await db.from('activity').upsert({ user_id: U.id, game_title: title, game_url: url, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // PROFILE
 // ═══════════════════════════════════════════════════════════════
@@ -1152,7 +1220,9 @@ function renderProfile() {
       <span style="font-size:.68rem;background:#111;color:#444;border:1px solid #1a1a1a;border-radius:20px;padding:3px 9px">Soon™</span>
     </div>`;
 
+
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // ADD FRIENDS
@@ -1165,6 +1235,7 @@ async function getRelatedIds() {
   return ids;
 }
 
+
 async function loadSuggested() {
   if (!U) return;
   try {
@@ -1175,6 +1246,7 @@ async function loadSuggested() {
     el.innerHTML = sug.length ? sug.map(frRow).join('') : '<div style="color:#1a1a1a;font-size:.82rem">No suggestions right now.</div>';
   } catch(e) { console.error('suggestions', e); }
 }
+
 
 let _frT;
 function frLive() { clearTimeout(_frT); _frT = setTimeout(frSearch, 220); }
@@ -1188,6 +1260,7 @@ async function frSearch() {
   res.innerHTML = (data && data.length) ? data.map(frRow).join('') : '<div style="color:#2a2a2a;font-size:.82rem;padding:8px 0">No users found.</div>';
 }
 
+
 function frRow(u) {
   return `<div class="fr-row" style="cursor:default">
     <div class="av">${nameOf(u)[0].toUpperCase()}</div>
@@ -1196,6 +1269,7 @@ function frRow(u) {
       onclick="sendRequest('${u.id}','${esc(nameOf(u))}')">Add</button>
   </div>`;
 }
+
 
 async function sendRequest(toId, toName) {
   if (!U) return;
@@ -1215,6 +1289,7 @@ async function sendRequest(toId, toName) {
   loadSuggested();
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // FRIENDS LIST
 // ═══════════════════════════════════════════════════════════════
@@ -1227,13 +1302,16 @@ async function loadFriends() {
       .or(`user1.eq.${U.id},user2.eq.${U.id}`).eq('status', 'accepted');
     if (error) { $('friends-list').innerHTML='<div style="color:#444;padding:13px;font-size:.82rem">Could not load friends</div>'; return; }
 
+
     const friendIds = (fs||[]).map(f => f.user1===U.id ? f.user2 : f.user1);
     const el = $('friends-list');
+
 
     if (!friendIds.length) {
       el.innerHTML = `<div style="color:#1a1a1a;font-size:.86rem;padding:13px 0">No friends yet — <a style="color:var(--brand);cursor:pointer" onclick="blTab('addfriends')">find some!</a></div>`;
       return;
     }
+
 
     const { data: profiles } = await db.from('profiles').select('id,username,displayname,status,last_seen').in('id', friendIds);
     el.innerHTML = (profiles||[]).map(fp => {
@@ -1265,6 +1343,7 @@ async function loadFriends() {
   }
 }
 
+
 async function unfriend(friendId) {
   if (!U) return;
   await db.from('friendships').delete()
@@ -1273,6 +1352,7 @@ async function unfriend(friendId) {
   if (activeTab==='messages') loadSidebar();
   toast('Removed from friends');
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // MESSAGES SIDEBAR
@@ -1284,11 +1364,13 @@ function csbSwitch(mode) {
   loadSidebar();
 }
 
+
 async function loadSidebar() {
   if (!U) return;
   if (csbMode === 'friends') await loadDMList();
   else await loadGroupList();
 }
+
 
 async function loadDMList() {
   const el = $('convo-list');
@@ -1311,6 +1393,7 @@ async function loadDMList() {
   }).join('');
 }
 
+
 async function loadGroupList() {
   const el = $('convo-list');
   const { data } = await db.from('conversation_members')
@@ -1327,6 +1410,7 @@ async function loadGroupList() {
     </div>`;
   }).join('');
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // OPEN DM  — find or create a DM conversation, then open it
@@ -1374,6 +1458,7 @@ async function openDM(friendId, friendName) {
   }
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // OPEN GROUP CONV
 // ═══════════════════════════════════════════════════════════════
@@ -1382,6 +1467,7 @@ function openGroupConv(convId, name, emoji) {
   loadGroupList();
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // OPEN CONVERSATION (shared for DM + group)
 // ═══════════════════════════════════════════════════════════════
@@ -1389,6 +1475,7 @@ function openConversation(convId, name, type) {
   activeConversation = convId;
   activeConvName = name;
   activeConvType = type;
+
 
   // Header
   const hdr = $('chat-hdr');
@@ -1410,27 +1497,34 @@ function openConversation(convId, name, type) {
       `}
     </div>`;
 
+
   // Reset chat UI
   const drawer = $('grp-drawer');
   if (drawer) drawer.classList.remove('open');
+
 
   // Clear old messages immediately so there's no stale content
   const msgsEl = $('chat-msgs');
   if (msgsEl) msgsEl.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">Loading…</div>';
 
+
   // Animate chat window in
   const chatWin = document.querySelector('.chat-win');
   if (chatWin) { chatWin.style.opacity='0'; chatWin.style.transform='translateY(6px)'; requestAnimationFrame(()=>{ chatWin.style.transition='opacity .2s ease,transform .2s ease'; chatWin.style.opacity='1'; chatWin.style.transform='translateY(0)'; }); }
+
 
   // Show input bar
   const inpRow = $('chat-inp-row');
   if (inpRow) inpRow.style.display = 'flex';
 
+
   const ephEl = $('eph-bar');
   if (ephEl) ephEl.style.display = isDM ? 'block' : 'none';
 
+
   const inpEl = $('chat-input');
   if (inpEl) { inpEl.placeholder = isDM ? 'Message ' + name + '…' : 'Message group…'; inpEl.focus(); }
+
 
   // Mark messages as read when opening conversation
   if (U) {
@@ -1441,8 +1535,10 @@ function openConversation(convId, name, type) {
     // For now just re-count after loading
   }
 
+
   loadMessages(convId);
   countUnread();
+
 
   // Realtime for this conversation
   if (rtMsg) { try { rtMsg.unsubscribe(); } catch(e){} }
@@ -1458,6 +1554,7 @@ function openConversation(convId, name, type) {
       if (status === 'SUBSCRIBED') console.log('RT ready for conv:', convId);
     });
 
+
   // Typing indicator
   listenTyping(convId);
   // Hide typing indicator when opening new conv
@@ -1465,6 +1562,7 @@ function openConversation(convId, name, type) {
   // Presence for DMs
   if (isDM) startPresence(convId);
 }
+
 
 // Get friend ID from DM conversation for calls
 async function callFromDM(type) {
@@ -1475,6 +1573,7 @@ async function callFromDM(type) {
   const { data: prof } = await db.from('profiles').select('*').eq('id', otherId).maybeSingle();
   if (prof) startCall(otherId, nameOf(prof), type);
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // GROUP DRAWER (members panel inside chat window)
@@ -1501,21 +1600,26 @@ async function toggleGrpDrawer(convId) {
     }).join('');
 }
 
+
 async function addToGroupPrompt(convId) {
   // Get current members and friends, show inline in drawer
   const drawer = $('grp-drawer');
   drawer.innerHTML = '<div style="color:#333;font-size:.82rem">Loading friends…</div>';
   drawer.classList.add('open');
 
+
   const { data: mems } = await db.from('conversation_members').select('user_id').eq('conversation_id', convId);
   const memberIds = new Set((mems||[]).map(m => m.user_id));
+
 
   const { data: fs } = await db.from('friendships').select('user1,user2')
     .or(`user1.eq.${U.id},user2.eq.${U.id}`).eq('status', 'accepted');
   const friendIds = (fs||[]).map(f => f.user1===U.id ? f.user2 : f.user1).filter(id => !memberIds.has(id));
 
+
   if (!friendIds.length) { drawer.innerHTML='<div style="color:#333;font-size:.82rem">All friends already in group</div>'; return; }
   const { data: profiles } = await db.from('profiles').select('id,username,displayname,status,last_seen').in('id', friendIds);
+
 
   drawer.innerHTML = `<div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Add to group</div>` +
     (profiles||[]).map(fp => {
@@ -1529,6 +1633,7 @@ async function addToGroupPrompt(convId) {
     }).join('');
 }
 
+
 async function addMemberToGroup(convId, userId, name) {
   const { error } = await db.rpc('add_to_group', { convo_id: convId, member_id: userId });
   if (error) { toast('Error adding member: '+error.message); return; }
@@ -1537,6 +1642,7 @@ async function addMemberToGroup(convId, userId, name) {
   toast(name + ' added to group');
   // Update member_count in conversations if you track it
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // PRESENCE (DM only)
@@ -1572,6 +1678,7 @@ async function checkPeerPres(convId) {
     pres.dataset.fid = fid;
   } catch(e) {}
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // LOAD + SEND MESSAGES
@@ -1631,12 +1738,15 @@ async function loadMessages(convId) {
   if (atBottom || el.scrollTop === 0) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
 }
 
+
 let _sending = false; // double-send lock
+
 
 // ── Append a single message without full reload ─────────────────
 async function appendMessage(msg) {
   const el = $('chat-msgs');
   if (!el) return;
+
 
   // Fetch sender profile if not cached
   if (!window._profCache) window._profCache = {};
@@ -1645,6 +1755,7 @@ async function appendMessage(msg) {
     if (p) window._profCache[p.id] = p;
   }
   const prof = window._profCache[msg.sender_id] || null;
+
 
   const isMe = msg.sender_id === U.id;
   const senderName = activeConvType === 'group' && !isMe
@@ -1655,18 +1766,22 @@ async function appendMessage(msg) {
     ? `<div class="msg-media"><video src="${esc(msg.media_url)}" controls></video></div>`
     : `<div class="msg-media"><img src="${esc(msg.media_url)}" loading="lazy" style="cursor:zoom-in" onclick="window.open('${esc(msg.media_url)}','_blank')"></div>`;
 
+
   const saveBtn = !msg.saved && msg.body
     ? `<button class="save-btn" onclick="saveMsg('${msg.id}')" title="Keep">Keep</button>` : '';
+
 
   const div = document.createElement('div');
   div.className = `msg ${isMe ? 'me' : 'them'}`;
   div.innerHTML = `${senderName}${media}${body}<div class="msg-meta">${ago(msg.created_at)} ${saveBtn}</div>`;
   el.appendChild(div);
 
+
   // Smart scroll — only jump to bottom if user was already there
   const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
   if (atBottom || isMe) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
 }
+
 
 async function sendMsg() {
   if (_sending) return;
@@ -1674,9 +1789,11 @@ async function sendMsg() {
   const text = input.value.trim();
   if (!text || !activeConversation) return;
 
+
   _sending = true;
   input.value = '';
   stopTyping();
+
 
   // Ensure we are still a member (handles edge case after refresh)
   const { data: _membership } = await db.from('conversation_members')
@@ -1686,13 +1803,16 @@ async function sendMsg() {
     await db.rpc('add_to_group', { convo_id: activeConversation, member_id: U.id }).catch(()=>{});
   }
 
+
   const { error } = await db.from('messages').insert({
     sender_id: U.id,
     conversation_id: activeConversation,
     body: text
   });
 
+
   _sending = false;
+
 
   if (error) {
     console.error('SEND ERROR:', error);
@@ -1703,8 +1823,10 @@ async function sendMsg() {
   // Realtime handles the append — NO loadMessages() call here
 }
 
+
 // ── TYPING INDICATOR ────────────────────────────────────────
 let typingTimer = null, typingCh = null, isTyping = false;
+
 
 function onInputTyping() {
   if (!activeConversation || !U) return;
@@ -1716,11 +1838,13 @@ function onInputTyping() {
   typingTimer = setTimeout(stopTyping, 2500);
 }
 
+
 function stopTyping() {
   if (!isTyping) return;
   isTyping = false;
   if (typingCh) typingCh.send({ type: 'broadcast', event: 'stopped', payload: { uid: U.id } });
 }
+
 
 function listenTyping(convId) {
   if (typingCh) typingCh.unsubscribe();
@@ -1736,6 +1860,7 @@ function listenTyping(convId) {
     })
     .subscribe();
 }
+
 
 async function sendMedia(input) {
   if (!input.files||!input.files[0]||!U||!activeConversation) return;
@@ -1756,12 +1881,14 @@ async function sendMedia(input) {
   } catch(e) { toast('Upload failed — check Storage configuration'); }
 }
 
+
 async function saveMsg(id) {
   const { error } = await db.from('messages').update({ saved: true }).eq('id', id);
   if (error) { toast('Save failed — ensure database migration is applied'); return; }
   toast('Message saved');
   loadMessages(activeConversation);
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // GROUPS TAB
@@ -1791,11 +1918,13 @@ async function loadGroupsTab() {
   }).join('');
 }
 
+
 function openGroupViaTab(id, name, emoji) {
   // Switch to messages tab, groups sidebar, open this group
   blTab('messages');
   setTimeout(() => { csbSwitch('groups'); setTimeout(() => openGroupConv(id, name, ''), 80); }, 80);
 }
+
 
 async function createGroup() {
   if (!U) return;
@@ -1816,12 +1945,14 @@ async function createGroup() {
   openGroupViaTab(conv.id, name, emoji);
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // CALLS
 // ═══════════════════════════════════════════════════════════════
 const ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
 let lStream=null, pc=null, callTimer=null, callSecs=0, isMuted=false, isCamOff=false;
 let callType='voice', callPid=null, callPname=null, sigCh=null;
+
 
 async function startCall(fid, fname, type) {
   if (!U || pc) { if(pc) toast('Already in a call'); return; }
@@ -1832,6 +1963,7 @@ async function startCall(fid, fname, type) {
     );
   } catch(e) { toast('Microphone' + (type==='video'?' / camera':'') + ' access denied'); return; }
 
+
   showCallUI(fname, 'Calling…', type);
   pc = new RTCPeerConnection(ICE);
   lStream.getTracks().forEach(t => pc.addTrack(t, lStream));
@@ -1840,6 +1972,7 @@ async function startCall(fid, fname, type) {
   pc.onconnectionstatechange = () => {
     if (pc && (pc.connectionState==='failed'||pc.connectionState==='disconnected')) endCall();
   };
+
 
   sigCh = db.channel('call_' + [U.id,fid].sort().join('_'));
   pc.onicecandidate = e => {
@@ -1872,6 +2005,7 @@ async function startCall(fid, fname, type) {
       } catch(err) { console.error('offer error:', err); endCall(); }
     });
 }
+
 
 function showCallUI(name,status,type) {
   $('call-nm').textContent=name; $('call-st').textContent=status; $('call-tm').textContent='';
@@ -1908,6 +2042,7 @@ function toggleCam() {
   b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i>':'<i class="bi bi-camera-video-fill"></i>';
 }
 
+
 function _showIncomingCall(name, type, offer) {
   if (pc) return; // already in a call
   window._pendingOffer = offer;
@@ -1916,6 +2051,7 @@ function _showIncomingCall(name, type, offer) {
   $('inc-call').classList.add('show');
   playMsgSound();
 }
+
 
 function listenCalls() {
   if (!U) return;
@@ -1937,6 +2073,7 @@ function listenCalls() {
     .subscribe();
 }
 
+
 async function acceptCall() {
   $('inc-call').classList.remove('show');
   const offer=window._pendingOffer; if(!offer||!callPid)return;
@@ -1945,6 +2082,7 @@ async function acceptCall() {
       callType==='video' ? {audio:true,video:true} : {audio:true,video:false}
     );
   } catch(e) { toast('Microphone' + (callType==='video'?' / camera':'') + ' access denied'); return; }
+
 
   showCallUI(callPname, 'Connecting…', callType);
   pc = new RTCPeerConnection(ICE);
@@ -1955,6 +2093,7 @@ async function acceptCall() {
     if (pc && pc.connectionState==='connected') { $('call-st').textContent='Connected'; startCallTimer(); }
     if (pc && (pc.connectionState==='failed'||pc.connectionState==='disconnected')) endCall();
   };
+
 
   sigCh = db.channel('call_' + [U.id,callPid].sort().join('_'));
   pc.onicecandidate = e => {
@@ -1977,6 +2116,7 @@ async function acceptCall() {
     });
 }
 function declineCall(){$('inc-call').classList.remove('show');window._pendingOffer=null;}
+
 
 // ═══════════════════════════════════════════════════════════════
 // CHALLENGES
@@ -2018,6 +2158,7 @@ async function loadChallenges() {
   } catch(e) { console.error('loadChallenges:', e); } finally { _loading.challenges=false; }
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // ACHIEVEMENTS
 // ═══════════════════════════════════════════════════════════════
@@ -2044,6 +2185,7 @@ async function loadAchievements() {
   </div>`).join('')}</div>`;
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // COINS
 // ═══════════════════════════════════════════════════════════════
@@ -2052,6 +2194,7 @@ function updateUserPresenceDOM(profileId, lastSeen, status) {
   const col = statusColor(lastSeen, status);
   const lbl = statusLabel(lastSeen, status);
   const s   = getStatus(lastSeen, status);
+
 
   // 1. Friends list row (presence-dot / presence-lbl classes)
   const row = document.querySelector(`[data-uid="${profileId}"]`);
@@ -2067,6 +2210,7 @@ function updateUserPresenceDOM(profileId, lastSeen, status) {
     if (flb)  { flb.textContent = lbl; flb.style.color = col; }
   }
 
+
   // 2. DM sidebar dot (ci_<uid>)
   const ci = document.getElementById('ci_' + profileId);
   if (ci) {
@@ -2075,6 +2219,7 @@ function updateUserPresenceDOM(profileId, lastSeen, status) {
     if (dot) dot.style.background = col;
     if (sub) { sub.textContent = lbl; sub.style.color = col; }
   }
+
 
   // 3. Chat header peer-pres (if this conv is with that friend)
   const pres = $('peer-pres');
@@ -2085,11 +2230,13 @@ function updateUserPresenceDOM(profileId, lastSeen, status) {
   }
 }
 
+
 // ── STATUS ──────────────────────────────────────────────────────
 async function updateStatus(status) {
   if (!U) return;
   try { await db.from('profiles').update({ status }).eq('id', U.id); } catch(e) {}
 }
+
 
 async function awardCoins(amount) {
   if(!U||!P)return;
@@ -2099,10 +2246,12 @@ async function awardCoins(amount) {
   const coinsEl=$('bl-coins'); if(coinsEl) coinsEl.textContent=nc;
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // STARTUP — safe, guarded, no double-loads
 // ═══════════════════════════════════════════════════════════════
 let _appLoading = false;
+
 
 async function startApp() {
   if (_appLoading) return;
@@ -2121,9 +2270,12 @@ async function startApp() {
   }
 }
 
+
 // ═══════════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════════
+
+
 
 
 // ══════════════════════════════════════════════════════════════
@@ -2134,6 +2286,7 @@ function requestNotifPermission() {
     Notification.requestPermission();
   }
 }
+
 
 function showPushNotif(title, body) {
   // Browser notification (if tab hidden)
@@ -2150,6 +2303,7 @@ function showPushNotif(title, body) {
     window._pushT = setTimeout(() => pt.classList.remove('show'), 4000);
   }
 }
+
 
 // Web Audio API — no file needed, generates a soft ping
 function playMsgSound() {
@@ -2168,6 +2322,7 @@ function playMsgSound() {
   } catch(e) {}
 }
 
+
 // ══════════════════════════════════════════════════════════════
 // SCROLL TO BOTTOM
 // ══════════════════════════════════════════════════════════════
@@ -2175,6 +2330,7 @@ function scrollToBottom() {
   const el = $('chat-msgs');
   if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
 }
+
 
 function initScrollWatcher() {
   const el = $('chat-msgs');
@@ -2186,6 +2342,7 @@ function initScrollWatcher() {
   });
 }
 
+
 // ══════════════════════════════════════════════════════════════
 // LOADING STATE HELPERS
 // ══════════════════════════════════════════════════════════════
@@ -2193,6 +2350,7 @@ function showLoader(elId) {
   const el = $(elId);
   if (el) el.innerHTML = '<div class="loading-row"><div class="loader"></div><span>Loading…</span></div>';
 }
+
 
 // ══════════════════════════════════════════════════════════════
 // FRIEND STATUS COLOR HELPER
@@ -2223,13 +2381,26 @@ function statusLabel(statusOrLastSeen, fallback) {
   return 'Offline';
 }
 
+
 window.onload = () => {
+  // Activate the correct tab visually (from hash / localStorage / default)
+  blTab(activeTab);
   initAuth().catch(console.error);
   requestNotifPermission();
   initScrollWatcher();
+  // Reload page when user switches back to this browser tab, so data is fresh
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      window.location.reload();
+    }
+  });
 };
 
+
 </script>
+
+
+
 
 
 

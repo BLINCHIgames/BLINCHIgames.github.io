@@ -426,8 +426,8 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
           <svg class="nav-brand-svg" width="38" height="38" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="30" cy="42" r="5" fill="#32ff0e"/>
             <path d="M19 32 a15.6 15.6 0 0 1 22 0" stroke="#32ff0e" stroke-width="3.4" stroke-linecap="round"/>
-            <path d="M10 23 a28 28 0 0 1 40 0" stroke="#32ff0e" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>
-            <path d="M2 14 a40 40 0 0 1 56 0" stroke="#32ff0e" stroke-width="1.8" stroke-linecap="round" opacity=".28"/>
+            <path d="M10 23 a28 28 0 0 1 40 0" stroke="#32ff0e" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M2 14 a40 40 0 0 1 56 0" stroke="#32ff0e" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
             <span style="font-family:var(--display);font-size:1.32rem;font-weight:800;color:#fff;white-space:nowrap;line-height:1">Blinchi</span>
@@ -1582,7 +1582,7 @@ async function loadDMList() {
         <div class="av" style="width:30px;height:30px;font-size:.76rem">${fn[0].toUpperCase()}</div>
         <span class="ci-pres-dot" style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${statusColor(fp.last_seen,fp.status)};border:2px solid rgba(6,6,8,.9)"></span>
       </div>
-      <div style="min-width:0"><div class="ci-name">${fn}</div><div class="ci-sub">${statusLabel(fp.last_seen,fp.status)}</div></div>
+      <div style="min-width:0"><div class="ci-name">${fn}</div><div class="ci-sub" style="color:${statusColor(fp.last_seen,fp.status)}">${statusLabel(fp.last_seen,fp.status)}</div></div>
     </div>`;
   }).join('');
 }
@@ -1819,12 +1819,32 @@ async function toggleGrpDrawer(convId) {
   const { data: mprofs } = await db.from('profiles').select('id,username,displayname,status,last_seen').in('id', mIds);
   const mpMap = {}; (mprofs||[]).forEach(p => mpMap[p.id]=p);
   const data = mdata.map(m => ({ ...m, profiles: mpMap[m.user_id]||{} }));
-  drawer.innerHTML = `<div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Members (${data.length})</div>` +
+  // Sort: online first, then ingame, then offline
+  data.sort((a,b) => {
+    const order = {online:0,ingame:1,offline:2};
+    const sa = getStatus((a.profiles||{}).last_seen, (a.profiles||{}).status);
+    const sb = getStatus((b.profiles||{}).last_seen, (b.profiles||{}).status);
+    return (order[sa]||2) - (order[sb]||2);
+  });
+  const onlineCount = data.filter(m => {
+    const s = getStatus((m.profiles||{}).last_seen, (m.profiles||{}).status);
+    return s === 'online' || s === 'ingame';
+  }).length;
+  drawer.innerHTML = `<div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Members (${data.length}) · <span style="color:#22c55e">${onlineCount} online</span></div>` +
     data.map(m => {
       const fp = m.profiles||{}, fn = esc(nameOf(fp)), isMe = m.user_id===U.id;
-      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <div class="av" style="width:26px;height:26px;font-size:.7rem">${fn[0].toUpperCase()}</div>
-        <div style="font-size:.82rem;font-weight:600">${fn}${isMe?' <span style="color:var(--brand);font-size:.7rem">(you)</span>':''}</div>
+      const s = getStatus(fp.last_seen, fp.status);
+      const col = s==='online' ? '#22c55e' : s==='ingame' ? 'var(--brand)' : '#2d3748';
+      const lbl = s==='online' ? 'Online' : s==='ingame' ? 'In a game' : 'Offline';
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <div style="position:relative;flex-shrink:0">
+          <div class="av" style="width:26px;height:26px;font-size:.7rem">${fn[0].toUpperCase()}</div>
+          <span style="position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;border-radius:50%;background:${col};border:2px solid #090909;display:block"></span>
+        </div>
+        <div style="min-width:0">
+          <div style="font-size:.82rem;font-weight:600">${fn}${isMe?' <span style="color:var(--brand);font-size:.7rem">(you)</span>':''}</div>
+          <div style="font-size:.68rem;color:${col};margin-top:1px">${lbl}</div>
+        </div>
       </div>`;
     }).join('');
 }
@@ -2594,7 +2614,7 @@ function updateUserPresenceDOM(profileId, lastSeen, status) {
     const dot = ci.querySelector('.ci-pres-dot');
     const sub = ci.querySelector('.ci-sub');
     if (dot) dot.style.background = col;
-    if (sub) { sub.textContent = lbl; sub.style.color = col; }
+    if (sub) { sub.textContent = lbl; sub.style.color = col; }  // col is already green/brand/grey
   }
 
 

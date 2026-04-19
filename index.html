@@ -641,7 +641,13 @@ function showPreroll(gameObj){
     const w=wrap.offsetWidth||820;
     const player=videojs('preroll-vid',{controls:false,autoplay:true,muted:false,width:w,height:Math.round(w*9/16)});
     _vjPlayer=player;
-    player.ima({adTagUrl:PREROLL_TAG,disableCustomPlaybackForIOS10Plus:true});
+    player.ima({id:'preroll-vid', adTagUrl:PREROLL_TAG, disableCustomPlaybackForIOS10Plus:true});
+    
+    // Explicitly initialize and play inside the user click context
+    player.ima.initializeAdDisplayContainer();
+    player.ima.requestAds();
+    player.play();
+    
     player.on('adserror',()=>proceedToGame());
     player.on('ads-allAdsCompleted',()=>proceedToGame());
     player.on('ads-ad-ended',()=>proceedToGame());
@@ -686,14 +692,14 @@ async function boot(){
     const url=feeds[i];
     if(url.includes('g_min.json')){
       if(!Array.isArray(data))return;
-      data.forEach(g=>{if(!g.link||g.custom)return;const gu=g.link.replace('http://','https://');catalog.push({title:g.name||'Game',url:gu,thumb:g.image||'',category:Array.isArray(g.categories)?g.categories[0]:(g.categories||'Web Game'),video:''});});return;
+      data.forEach(g=>{if(!g.link||g.custom)return;const gu=g.link.replace('http://','https://');catalog.push({title:g.name||'Game',url:gu,thumb:g.image||'',category:Array.isArray(g.categories)?g.categories[0]:(g.categories||'Web Game'),video:'',isFeed:true});});return;
     }
     if(url.includes('gamepix.com')||url.includes('Gamepix.json')){
       const items=Array.isArray(data)?data:(data.data||data.items||[]);
-      items.forEach(g=>{let gu=(g.url||'').replace('http://','https://');if(gu&&!gu.includes('/embed'))gu=gu.replace(/\/$/,'')+'/embed?ref=blinchigames.online';else if(gu&&!gu.includes('ref='))gu+=(gu.includes('?')?'&':'?')+'ref=blinchigames.online';catalog.push({title:g.title||g.name||'Game',url:gu,thumb:g.url_thumbnail||g.banner_image||g.image||g.thumb||'',category:Array.isArray(g.categories)?g.categories[0]:(g.category||'Web Game'),video:''});});return;
+      items.forEach(g=>{let gu=(g.url||'').replace('http://','https://');if(gu&&!gu.includes('/embed'))gu=gu.replace(/\/$/,'')+'/embed?ref=blinchigames.online';else if(gu&&!gu.includes('ref='))gu+=(gu.includes('?')?'&':'?')+'ref=blinchigames.online';catalog.push({title:g.title||g.name||'Game',url:gu,thumb:g.url_thumbnail||g.banner_image||g.image||g.thumb||'',category:Array.isArray(g.categories)?g.categories[0]:(g.category||'Web Game'),video:'',isFeed:true});});return;
     }
     if(!Array.isArray(data))return;
-    data.forEach(g=>{let gu=g.embed||g.url||g.link||'';if(!gu)return;gu=gu.replace('http://','https://');catalog.push({title:g.title||g.name||'Game',url:gu,thumb:g.image||g.thumb||'',category:((g.tags||g.category||g.categories||'Web Game')+'').split(',')[0].trim(),video:''});});
+    data.forEach(g=>{let gu=g.embed||g.url||g.link||'';if(!gu)return;gu=gu.replace('http://','https://');catalog.push({title:g.title||g.name||'Game',url:gu,thumb:g.image||g.thumb||'',category:((g.tags||g.category||g.categories||'Web Game')+'').split(',')[0].trim(),video:'',isFeed:true});});
   });
   const seen=new Set();
   catalog=catalog.filter(g=>{const k=(g.title||'').toLowerCase();return seen.has(k)?false:seen.add(k);});
@@ -796,8 +802,8 @@ let _eliteUrlSet=null;
 function getEliteUrlSet(){if(!_eliteUrlSet)_eliteUrlSet=new Set(ELITE.map(g=>g.url));return _eliteUrlSet;}
 
 function makeCard(g,badge=''){
-  // Auto-promote: any game in the ELITE list is always Elite regardless of caller
-  if(getEliteUrlSet().has(g.url))badge='elite';
+  // Auto-promote: any game in the ELITE list, or manually added games (!g.isFeed)
+  if(getEliteUrlSet().has(g.url) || g.isFeed !== true || g.url.includes('iframe.html')) badge='elite';
   // Distinct dark-green placeholder for elite games with no thumb
   const img=g.thumb?g.thumb:(badge==='elite'?'https://placehold.co/400x400/0a1a00/32ff0e?text=Elite':'https://placehold.co/400x400/111/32ff0e?text=Game');
   const vid=g.video||'';

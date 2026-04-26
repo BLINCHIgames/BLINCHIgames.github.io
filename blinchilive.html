@@ -1514,10 +1514,13 @@ async function loadFriends() {
 
 
     const { data: profiles } = await db.from('profiles').select('id,username,displayname,status,last_seen').in('id', friendIds);
+    const { data: acts } = await db.from('activity').select('user_id,game_title').in('user_id', friendIds);
+    const actMap = {}; (acts||[]).forEach(a => actMap[a.user_id] = a.game_title);
     el.innerHTML = (profiles||[]).map(fp => {
       const fn = esc(nameOf(fp)), init = fn[0].toUpperCase();
       const col = statusColor(fp.last_seen, fp.status);
-      const lbl = statusLabel(fp.last_seen, fp.status);
+      let lbl = statusLabel(fp.last_seen, fp.status);
+      if (lbl === 'In a game' && actMap[fp.id]) lbl = 'Playing ' + esc(actMap[fp.id]);
       return `<div class="fr-row" data-uid="${fp.id}" onclick="openDM('${fp.id}','${fn}')">
         <div class="av">${init}</div>
         <div class="fr-info">
@@ -2599,47 +2602,52 @@ async function loadAchievements() {
 // Patch presence dot in DOM without full reload
 function updateUserPresenceDOM(profileId, lastSeen, status) {
   const col = statusColor(lastSeen, status);
-  const lbl = statusLabel(lastSeen, status);
+  let lbl = statusLabel(lastSeen, status);
   const s   = getStatus(lastSeen, status);
 
-
-
-
-  // 1. Friends list row (presence-dot / presence-lbl classes)
-  const row = document.querySelector(`[data-uid="${profileId}"]`);
-  if (row) {
-    const dot = row.querySelector('.presence-dot');
-    const lb  = row.querySelector('.presence-lbl');
-    if (dot) dot.style.background = col;
-    if (lb)  { lb.textContent = lbl; lb.style.color = col; }
-    // Feed row has feed-pres-dot / feed-pres-lbl
-    const fdot = row.querySelector('.feed-pres-dot');
-    const flb  = row.querySelector('.feed-pres-lbl');
-    if (fdot) fdot.style.background = col;
-    if (flb)  { flb.textContent = lbl; flb.style.color = col; }
-  }
-
-
-
-
-  // 2. DM sidebar dot (ci_<uid>)
-  const ci = document.getElementById('ci_' + profileId);
-  if (ci) {
-    const dot = ci.querySelector('.ci-pres-dot');
-    const sub = ci.querySelector('.ci-sub');
-    if (dot) dot.style.background = col;
-    if (sub) { sub.textContent = lbl; sub.style.color = col; }  // col is already green/brand/grey
-  }
+  const applyUpdates = (finalLbl) => {
+    // 1. Friends list row (presence-dot / presence-lbl classes)
+    const row = document.querySelector(`[data-uid="${profileId}"]`);
+    if (row) {
+      const dot = row.querySelector('.presence-dot');
+      const lb  = row.querySelector('.presence-lbl');
+      if (dot) dot.style.background = col;
+      if (lb)  { lb.textContent = finalLbl; lb.style.color = col; }
+      // Feed row has feed-pres-dot / feed-pres-lbl
+      const fdot = row.querySelector('.feed-pres-dot');
+      const flb  = row.querySelector('.feed-pres-lbl');
+      if (fdot) fdot.style.background = col;
+      if (flb)  { flb.textContent = finalLbl; flb.style.color = col; }
+    }
 
 
 
 
-  // 3. Chat header peer-pres (if this conv is with that friend)
-  const pres = $('peer-pres');
-  if (pres && pres.dataset.fid === profileId) {
-    pres.textContent = s==='online' ? '● Online' : s==='ingame' ? '● In a game' : '● Offline';
-    pres.style.color = s !== 'offline' ? col : '';
-    pres.className = 'chat-hdr-sub' + (s !== 'offline' ? ' on' : '');
+    // 2. DM sidebar dot (ci_<uid>)
+    const ci = document.getElementById('ci_' + profileId);
+    if (ci) {
+      const dot = ci.querySelector('.ci-pres-dot');
+      const sub = ci.querySelector('.ci-sub');
+      if (dot) dot.style.background = col;
+      if (sub) { sub.textContent = finalLbl; sub.style.color = col; }  // col is already green/brand/grey
+    }
+
+    // 3. Chat header peer-pres (if this conv is with that friend)
+    const pres = $('peer-pres');
+    if (pres && pres.dataset.fid === profileId) {
+      pres.textContent = s==='online' ? '● Online' : s==='ingame' ? '● ' + finalLbl : '● Offline';
+      pres.style.color = s !== 'offline' ? col : '';
+      pres.className = 'chat-hdr-sub' + (s !== 'offline' ? ' on' : '');
+    }
+  };
+
+  if (s === 'ingame') {
+    db.from('activity').select('game_title').eq('user_id', profileId).maybeSingle().then(({data}) => {
+      if (data && data.game_title) lbl = 'Playing ' + data.game_title;
+      applyUpdates(lbl);
+    });
+  } else {
+    applyUpdates(lbl);
   }
 }
 
@@ -2680,10 +2688,37 @@ async function startApp() {
   try {
     checkReqBadge();
     countUnread();
-    // Load the active tab immediately, others on demand
-    await refreshTab(activeTab);
-    // Pre-load sidebar since messages tab is commonly opened
-    if (activeTab !== 'messages') loadSidebar().catch(()=>{});
+    
+    const openConvId = localStorage.getItem('bl_open_conv');
+    if (openConvId) {
+       localStorage.removeItem('bl_open_conv');
+       blTab('messages');
+       await refreshTab('messages');
+       db.from('conversations').select('name,type').eq('id', openConvId).maybeSingle().then(({data}) => {
+           if (data) {
+               if (data.type === 'dm') {
+                   db.from('conversation_members').select('user_id').eq('conversation_id', openConvId).then(({data:mems}) => {
+                       const otherId = (mems||[]).find(m => m.user_id !== U.id)?.user_id;
+                       if (otherId) {
+                           db.from('profiles').select('displayname,username').eq('id', otherId).maybeSingle().then(({data:p}) => {
+                               const name = p ? (p.displayname || p.username) : 'Chat';
+                               openConversation(openConvId, name, 'dm');
+                           });
+                       } else {
+                           openConversation(openConvId, 'Chat', 'dm');
+                       }
+                   });
+               } else {
+                   openConversation(openConvId, data.name || 'Group', 'group');
+               }
+           }
+       });
+    } else {
+      // Load the active tab immediately, others on demand
+      await refreshTab(activeTab);
+      // Pre-load sidebar since messages tab is commonly opened
+      if (activeTab !== 'messages') loadSidebar().catch(()=>{});
+    }
   } catch(e) {
     console.error('startApp error:', e);
   } finally {

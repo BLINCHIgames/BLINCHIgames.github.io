@@ -84,17 +84,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);margin:0;ove
 #rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
 
 /* ── PREROLL ── */
-#preroll-overlay{display:none;position:fixed;inset:0;z-index:4000;background:#000;flex-direction:column;align-items:center;justify-content:center}
+#preroll-overlay{display:none;position:absolute;inset:0;z-index:4000;background:#000;flex-direction:column;align-items:center;justify-content:center}
 #preroll-overlay.show{display:flex}
-#preroll-top-label{position:absolute;top:22px;left:50%;transform:translateX(-50%);white-space:nowrap}
-#preroll-top-label span{font-size:.72rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#444;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px;padding:5px 16px}
-#preroll-video-wrap{width:min(820px,90vw);aspect-ratio:16/9;background:#0a0a0a;border-radius:12px;overflow:hidden;position:relative}
+#preroll-top-label{position:absolute;top:22px;left:50%;transform:translateX(-50%);white-space:nowrap;z-index:10}
+#preroll-top-label span{font-size:.72rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#aaa;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 16px;backdrop-filter:blur(4px)}
+#preroll-video-wrap{width:100%;flex:1;min-height:0;background:#0a0a0a;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
 #preroll-video-wrap .video-js{width:100%!important;height:100%!important}
-#preroll-bottom{margin-top:16px;display:flex;align-items:center;gap:14px;min-height:38px}
+#preroll-bottom{margin-top:0;display:flex;align-items:center;justify-content:center;gap:14px;min-height:54px;background:#050505;width:100%;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0}
 #preroll-skip-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:8px;padding:8px 20px;cursor:pointer;font-size:.85rem;font-family:var(--font);font-weight:700;display:none;transition:background .18s}
 #preroll-skip-btn:hover{background:rgba(255,255,255,.2)}
-#preroll-countdown{color:#555;font-size:.8rem;font-weight:600}
-#preroll-game-name{color:#333;font-size:.78rem;font-weight:600;letter-spacing:.5px}
+#preroll-countdown{color:#888;font-size:.85rem;font-weight:600}
+#preroll-game-name{color:#666;font-size:.8rem;font-weight:600;letter-spacing:.5px}
 
 #fs-prompt{display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.7);align-items:center;justify-content:center}
 .fs-box{background:#111;border:1px solid var(--border2);border-radius:16px;padding:30px 38px;text-align:center;max-width:360px}
@@ -211,16 +211,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);margin:0;ove
   <p class="mt-4 text-white opacity-50 fw-bold">LOADING GAMES</p>
 </div>
 
-<!-- PREROLL OVERLAY -->
-<div id="preroll-overlay">
-  <div id="preroll-top-label"><span>Ad — your game is loading</span></div>
-  <div id="preroll-video-wrap"></div>
-  <div id="preroll-bottom">
-    <button id="preroll-skip-btn" onclick="skipPreroll()">Skip Ad →</button>
-    <span id="preroll-countdown"></span>
-    <span id="preroll-game-name"></span>
-  </div>
-</div>
+
 
 <div id="top-chip">
   <button id="updates-btn" onclick="openUpdates()" title="What's new">
@@ -391,7 +382,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);margin:0;ove
   </div>
   <div class="stage-mid">
     <div class="game-col">
-      <iframe id="game-iframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
+      <div id="iframe-wrap" style="position:relative; width:100%; flex-shrink:0;">
+        <!-- PREROLL OVERLAY -->
+        <div id="preroll-overlay">
+          <div id="preroll-top-label"><span>Ad — your game is loading</span></div>
+          <div id="preroll-video-wrap"></div>
+          <div id="preroll-bottom">
+            <button id="preroll-skip-btn" onclick="skipPreroll()">Skip Ad →</button>
+            <span id="preroll-countdown"></span>
+            <span id="preroll-game-name"></span>
+          </div>
+        </div>
+        <iframe id="game-iframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *" style="width:100%; height:100%; border:none; background:#000; display:block;"></iframe>
+      </div>
       <div id="below-game">
         <div class="like-bar" id="stage-like-bar">
           <button class="act-btn" id="like-btn" onclick="vote('like')"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="like-cnt">0</span></button>
@@ -460,6 +463,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);margin:0;ove
   <div class="cp-login" id="cp-login" style="display:none"><a onclick="openAuth()">Sign in</a> to comment</div>
 </div>
 
+<div id="index-toast" style="display:none;position:fixed;bottom:20px;right:20px;background:#111;border:1px solid var(--brand);border-left:4px solid var(--brand);color:#fff;padding:16px 20px;border-radius:8px;z-index:9999;cursor:pointer;box-shadow:0 10px 25px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all 0.3s ease;">
+  <div style="font-weight:bold;font-size:14px;margin-bottom:4px;" id="index-toast-title">New Message</div>
+  <div style="font-size:12px;color:#aaa;" id="index-toast-body">You have a new message</div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 'use strict';
@@ -516,6 +524,36 @@ async function onSignedIn(user){
     try { navigator.sendBeacon(SB_URL + '/rest/v1/profiles?id=eq.' + CU.id, new Blob([payload], { type: 'application/json' })); } catch(_) {}
     if(CU) db.from('profiles').update({ status:'offline' }).eq('id', CU.id);
   }, { once: true });
+
+  if(window._msgListener) { db.removeChannel(window._msgListener); window._msgListener = null; }
+  window._msgListener = db.channel('index_msgs_' + CU.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async payload => {
+      if(payload.new && payload.new.sender_id !== CU.id) {
+         const {data:p} = await db.from('profiles').select('displayname,username').eq('id',payload.new.sender_id).maybeSingle();
+         const senderName = p ? (p.displayname||p.username) : 'Someone';
+         showIndexPushNotif('New Message from ' + senderName, payload.new.body ? payload.new.body.substring(0, 50) : 'You have a new message', payload.new.conversation_id);
+      }
+    })
+    .subscribe();
+}
+
+function showIndexPushNotif(title, body, convId) {
+  const t = document.getElementById('index-toast');
+  if(!t) return;
+  document.getElementById('index-toast-title').textContent = title;
+  document.getElementById('index-toast-body').textContent = body;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 10);
+  t.onclick = () => {
+    localStorage.setItem('bl_open_conv', convId);
+    window.location.href = 'blinchilive.html';
+  };
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.style.transform = 'translateY(20px)';
+    t.style.opacity = '0';
+    setTimeout(() => { t.style.display = 'none'; }, 300);
+  }, 6000);
 }
 function onSignedOut(){CU=null;CP=null;updateAuthUI(); if(window._presenceIntervalIndex) clearInterval(window._presenceIntervalIndex);}
 function updateAuthUI(){
@@ -585,15 +623,24 @@ const ELITE=[
   {title:'Sudoku',category:'Elite Puzzle',url:'https://soodoku.com/',thumb:'',video:''},
   {title:'Drive Mad',category:'Elite Racing',url:'https://codepen.io/Dexter-Harrow/full/MYWXLvr',thumb:'',video:''},
   {title:'Trees Hate You',category:'Elite Action',url:'https://www.gameflare.com/embed/trees-hate-you/',thumb:'',video:''},
-  {title:'Soccer Random',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-random',thumb:'',video:''},
-  {title:'Soccer Bros',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-bros',thumb:'',video:''},
-  {title:'Vex 3',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-3',thumb:'',video:''},
-  {title:'Vex 8',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-8',thumb:'',video:''},
-  {title:'Funny Battle Simulator 2',category:'Elite Action',url:'https://www.twoplayergames.org/embed/funny-battle-simulator-2',thumb:'',video:''},
-  {title:'House of Hazards',category:'Elite Party',url:'https://www.twoplayergames.org/embed/house-of-hazards',thumb:'',video:''},
-  {title:'Geometry Dash Scratch',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/geometry-dash-scratch',thumb:'',video:''},
+  {title:'Soccer Random',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-random',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Soccer Bros',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-bros',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Vex 3',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-3',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Vex 8',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-8',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Funny Battle Simulator 2',category:'Elite Action',url:'https://www.twoplayergames.org/embed/funny-battle-simulator-2',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'House of Hazards',category:'Elite Party',url:'https://www.twoplayergames.org/embed/house-of-hazards',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Geometry Dash Scratch',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/geometry-dash-scratch',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
   {title:'Fancy Pants Adventure',category:'Elite Platformer',url:'https://www.gameflare.com/embed/fancy-pants-adventure/',thumb:'',video:''},
   {title:'Little Alchemy',category:'Elite Puzzle',url:'https://littlealchemy.com/',thumb:'',video:''},
+  {title:'Granny',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Granny 2',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-2',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Granny 3',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-3',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Granny 4',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-4',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Ragdoll Playground',category:'Elite Sandbox',url:'https://www.twoplayergames.org/embed/ragdoll-playground',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Dude Theft Auto',category:'Elite Action',url:'https://www.twoplayergames.org/embed/dude-theft-auto',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Gun Mayhem Redux',category:'Elite Action',url:'https://www.twoplayergames.org/embed/gun-mayhem-redux',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Castel Wars New Era',category:'Elite Action',url:'https://www.twoplayergames.org/embed/castel-wars-new-era',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
+  {title:'Fireboy and Watergirl in the Forest Temple',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/fireboy-and-watergirl-in-the-forest-temple',thumb:'https://www.google.com/s2/favicons?domain=twoplayergames.org&sz=256',video:''},
 ];
 const MULTI_KEYWORDS=['multiplayer','io','battle','royale','versus','pvp','online','2 player','co-op','coop'];
 const GENRES=['Action','Arcade','Racing','Puzzle','Shooting','Sports','IO Games'];
@@ -732,7 +779,8 @@ async function boot(){
       items.forEach(g=>{let gu=(g.url||'').replace('http://','https://');if(gu&&!gu.includes('/embed'))gu=gu.replace(/\/$/,'')+'/embed?ref=blinchigames.online';else if(gu&&!gu.includes('ref='))gu+=(gu.includes('?')?'&':'?')+'ref=blinchigames.online';catalog.push({title:g.title||g.name||'Game',url:gu,thumb:g.url_thumbnail||g.banner_image||g.image||g.thumb||'',category:Array.isArray(g.categories)?g.categories[0]:(g.category||'Web Game'),video:'',isFeed:true});});return;
     }
     if(!Array.isArray(data))return;
-    const isSkipSrc = url.includes('gamemonetize') || url.includes('rssfeed');
+    const skipSrcs = ['embed.json','g_min.json','rssfeed.php.json','rssfeed2.php','rssfeed3.php','rssfeed4.php','rssfeed5.php','gamemonetize'];
+    const isSkipSrc = skipSrcs.some(s => url.includes(s));
     data.forEach(g=>{let gu=g.embed||g.url||g.link||'';if(!gu)return;gu=gu.replace('http://','https://');catalog.push({title:g.title||g.name||'Game',url:gu,thumb:g.image||g.thumb||'',category:((g.tags||g.category||g.categories||'Web Game')+'').split(',')[0].trim(),video:'',isFeed:true,skipAd:isSkipSrc});});
   });
   const seen=new Set();
@@ -742,12 +790,21 @@ async function boot(){
   detectAdblock();initUpdates();sizeIframe();
   window.addEventListener('resize',sizeIframe);
   initAuth().catch(()=>{});
+  try {
+    const jg = localStorage.getItem('bl_join_game');
+    if (jg) {
+      localStorage.removeItem('bl_join_game');
+      const decUrl = decodeURIComponent(jg);
+      const match = catalog.find(g => g.url === decUrl) || {url: decUrl, title: 'Game', category: 'Game'};
+      setTimeout(() => launch(match.url, match.title, match.category), 500);
+    }
+  } catch(e){}
 }
 
 function sizeIframe(){
-  const ifr=document.getElementById('game-iframe'),b=document.getElementById('stage-banner');if(!ifr)return;
+  const wrap=document.getElementById('iframe-wrap'),b=document.getElementById('stage-banner');if(!wrap)return;
   const bh=b.classList.contains('off')?0:(b.offsetHeight||92);
-  ifr.style.height=Math.max(380,Math.round((window.innerHeight-bh-58)*.85))+'px';
+  wrap.style.height=Math.max(380,Math.round((window.innerHeight-bh-58)*.85))+'px';
 }
 function initNav(){
   const c=document.getElementById('cat-nav');c.innerHTML='';
@@ -762,8 +819,17 @@ function showHome(btn,skipSearch=false){
   hideAll();document.getElementById('view-home').style.display='block';
   document.getElementById('home-grid').innerHTML='';
   setNav(btn||document.getElementById('btn-home'));
-  // 10 random elite picks for "of the week"
-  const picks=[...ELITE].sort(()=>Math.random()-.5).slice(0,10);
+  
+  const weekNum = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+  let seed = weekNum;
+  function rng() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  const shuffledElite = [...ELITE];
+  for (let i = shuffledElite.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffledElite[i], shuffledElite[j]] = [shuffledElite[j], shuffledElite[i]];
+  }
+  const picks = shuffledElite.slice(0, 5);
+  
   document.getElementById('home-elite-grid').innerHTML=picks.map(g=>makeCard(g,'elite')).join('');
   renderRecentSection();renderPopularSection();renderNewSection();renderRequestedSection();
   const eliteUrls=new Set(ELITE.map(g=>g.url));
@@ -941,9 +1007,11 @@ function ago(ts){if(!ts)return'';const d=Math.round((Date.now()-new Date(ts))/10
 
 // ── Updates ───────────────────────────────────────────────────────────────────
 const UPDATES=[
-  {version:'2.1',date:'24 April 2026',title:'Bug fixes 🛠️',items:[
-    'Bug fixes',
-    '🚀 The next major update is coming soon — stay tuned!',
+  {version:'2.2',date:'26 April 2026',title:'New Games & Notifications 🔔',items:[
+    'Added 9+ new games including the Granny series, Dude Theft Auto, Ragdoll Playground, Gun Mayhem Redux, Castel Wars New Era, and Fireboy & Watergirl!',
+    'In-game message notifications: get a popup when friends message you while browsing, and click to instantly jump to the chat.',
+    'Fixed UI styling for games and better support for twoplayergames.org favicons.',
+    '🚀 A MAJOR update is coming soon this May! Stay tuned.',
   ]},
   {version:'2.0',date:'April 2026',title:'BlinchiGames is officially here 🔥',items:[
     '🟢 GRAND OPENING — BlinchiLive just launched, our very own social platform built for gamers',
@@ -1010,17 +1078,25 @@ function renderRecentSection(){
   if(!r.length){wrap.style.display='none';return;}
   wrap.style.display='block';grid.innerHTML=r.map(g=>makeCard(g,'')).join('');
 }
-const POPULAR_FEATURED=[
-  {title:'Kour.io',category:'IO FPS',url:'https://kour.io/',thumb:'',video:''},
-  {title:'Smash Karts',category:'Racing',url:'https://smashkarts.io/',thumb:'',video:''},
-  {title:'House of Hazards',category:'Party',url:'https://www.twoplayergames.org/embed/house-of-hazards',thumb:'',video:''},
-  {title:'Vex 3',category:'Platformer',url:'https://www.twoplayergames.org/embed/vex-3',thumb:'',video:''},
-  {title:'Trees Hate You',category:'Action',url:'https://www.gameflare.com/embed/trees-hate-you/',thumb:'',video:''},
-];
 function renderPopularSection(){
   const grid=document.getElementById('popular-grid');if(!grid)return;
-  const counts=getPlayCounts(),played=Object.keys(counts).filter(k=>counts[k]>0);
-  let games=played.length>=10?catalog.filter(g=>counts[g.url]).sort((a,b)=>(counts[b.url]||0)-(counts[a.url]||0)).slice(0,5):POPULAR_FEATURED;
+  const counts=getPlayCounts();
+  let sortedPlayed = catalog.filter(g=>counts[g.url]).sort((a,b)=>(counts[b.url]||0)-(counts[a.url]||0));
+  let games = [];
+  let seenP = new Set();
+  for(let g of sortedPlayed){ if(!seenP.has(g.url)){ games.push(g); seenP.add(g.url); } }
+  games = games.slice(0,5);
+  
+  const header = grid.previousElementSibling;
+  if(games.length === 0) {
+    grid.style.display = 'none';
+    if(header && header.classList.contains('sec-header')) header.style.display = 'none';
+    return;
+  }
+  
+  grid.style.display = 'grid';
+  if(header && header.classList.contains('sec-header')) header.style.display = 'flex';
+  
   grid.innerHTML=games.map((g,i)=>{const c=makeCard(g,'');const noEliteBadge=c.replace('<div class="badge badge-elite">Elite</div>','');return noEliteBadge.replace('<div class="thumb">','<div class="thumb"><div class="rank-badge">#'+(i+1)+'</div>');}).join('');
 }
 function renderNewSection(){

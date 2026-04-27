@@ -374,10 +374,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);margin:0;ove
       <button class="btn btn-dark rounded-pill px-4 fw-bold border-secondary" onclick="closeGame()">
         <i class="bi bi-arrow-left me-2"></i> EXIT
       </button>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <img id="stage-icon" src="" style="width:32px;height:32px;border-radius:4px;display:none" alt="Game Icon">
-        <h3 id="stage-title" style="margin:0;font-size:1rem;" class="text-white fw-bold text-uppercase"></h3>
-      </div>
+      <span id="stage-title" class="text-white fw-bold small text-uppercase"></span>
     </div>
     <button class="btn rounded-pill px-4 fw-bold" style="background:var(--brand);color:#000;border:none" onclick="doFullscreen()">
       <i class="bi bi-arrows-fullscreen me-2"></i> FULLSCREEN
@@ -482,11 +479,15 @@ const REQUESTED_GAMES=[
   {title:'Drive Mad',category:'Racing',url:'https://codepen.io/Dexter-Harrow/full/MYWXLvr',thumb:'',video:''},
 ];
 const NEW_THIS_WEEK=[
-  'Trees Hate You','Snow Road 3D','Drive Mad',
-  'Rocket Goal','Veck.io','Kour.io','Smash Karts','BasketBros','Sudoku',
-  'Soccer Random','Soccer Bros','Vex 3','Vex 8','Funny Battle Simulator 2',
-  'House of Hazards','Geometry Dash Scratch',
-  'Fancy Pants Adventure','Little Alchemy',
+  {title:'Granny',added:'2026-04-26'},
+  {title:'Granny 2',added:'2026-04-26'},
+  {title:'Granny 3',added:'2026-04-26'},
+  {title:'Granny 4',added:'2026-04-26'},
+  {title:'Gun Mayhem Redux',added:'2026-04-26'},
+  {title:'Castel Wars New Era',added:'2026-04-26'},
+  {title:'Fireboy and Watergirl in the Forest Temple',added:'2026-04-26'},
+  {title:'Dude Theft Auto',added:'2026-04-26'},
+  {title:'Ragdoll Playground',added:'2026-04-26'},
 ];
 
 // ── Supabase ──────────────────────────────────────────────────────────────────
@@ -626,24 +627,24 @@ const ELITE=[
   {title:'Sudoku',category:'Elite Puzzle',url:'https://soodoku.com/',thumb:'',video:''},
   {title:'Drive Mad',category:'Elite Racing',url:'https://codepen.io/Dexter-Harrow/full/MYWXLvr',thumb:'',video:''},
   {title:'Trees Hate You',category:'Elite Action',url:'https://www.gameflare.com/embed/trees-hate-you/',thumb:'',video:''},
-  {title:'Soccer Random',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-random',thumb:'https://www.google.com/s2/favicons?domain=soccerrandom.com&sz=256',video:''},
-  {title:'Soccer Bros',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-bros',thumb:'https://www.google.com/s2/favicons?domain=soccerbros.com&sz=256',video:''},
-  {title:'Vex 3',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-3',thumb:'https://www.google.com/s2/favicons?domain=vex3.com&sz=256',video:''},
-  {title:'Vex 8',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-8',thumb:'https://www.google.com/s2/favicons?domain=vex8.com&sz=256',video:''},
-  {title:'Funny Battle Simulator 2',category:'Elite Action',url:'https://www.twoplayergames.org/embed/funny-battle-simulator-2',thumb:'https://www.google.com/s2/favicons?domain=funnybattlesimulator2.com&sz=256',video:''},
-  {title:'House of Hazards',category:'Elite Party',url:'https://www.twoplayergames.org/embed/house-of-hazards',thumb:'https://www.google.com/s2/favicons?domain=houseofhazards.com&sz=256',video:''},
-  {title:'Geometry Dash Scratch',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/geometry-dash-scratch',thumb:'https://www.google.com/s2/favicons?domain=geometrydashscratch.com&sz=256',video:''},
+  {title:'Soccer Random',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-random',thumb:'',video:''},
+  {title:'Soccer Bros',category:'Elite Sports',url:'https://www.twoplayergames.org/embed/soccer-bros',thumb:'',video:''},
+  {title:'Vex 3',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-3',thumb:'',video:''},
+  {title:'Vex 8',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/vex-8',thumb:'',video:''},
+  {title:'Funny Battle Simulator 2',category:'Elite Action',url:'https://www.twoplayergames.org/embed/funny-battle-simulator-2',thumb:'',video:''},
+  {title:'House of Hazards',category:'Elite Party',url:'https://www.twoplayergames.org/embed/house-of-hazards',thumb:'',video:''},
+  {title:'Geometry Dash Scratch',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/geometry-dash-scratch',thumb:'',video:''},
   {title:'Fancy Pants Adventure',category:'Elite Platformer',url:'https://www.gameflare.com/embed/fancy-pants-adventure/',thumb:'',video:''},
   {title:'Little Alchemy',category:'Elite Puzzle',url:'https://littlealchemy.com/',thumb:'',video:''},
-  {title:'Granny',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny',thumb:'https://www.google.com/s2/favicons?domain=granny.com&sz=256',video:''},
-  {title:'Granny 2',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-2',thumb:'https://www.google.com/s2/favicons?domain=granny2.com&sz=256',video:''},
-  {title:'Granny 3',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-3',thumb:'https://www.google.com/s2/favicons?domain=granny3.com&sz=256',video:''},
-  {title:'Granny 4',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-4',thumb:'https://www.google.com/s2/favicons?domain=granny4.com&sz=256',video:''},
-  {title:'Ragdoll Playground',category:'Elite Sandbox',url:'https://www.twoplayergames.org/embed/ragdoll-playground',thumb:'https://www.google.com/s2/favicons?domain=ragdollplayground.com&sz=256',video:''},
-  {title:'Dude Theft Auto',category:'Elite Action',url:'https://www.twoplayergames.org/embed/dude-theft-auto',thumb:'https://www.google.com/s2/favicons?domain=dudetheftauto.com&sz=256',video:''},
-  {title:'Gun Mayhem Redux',category:'Elite Action',url:'https://www.twoplayergames.org/embed/gun-mayhem-redux',thumb:'https://www.google.com/s2/favicons?domain=gunmayhemredux.com&sz=256',video:''},
-  {title:'Castel Wars New Era',category:'Elite Action',url:'https://www.twoplayergames.org/embed/castel-wars-new-era',thumb:'https://www.google.com/s2/favicons?domain=castelwarsnewera.com&sz=256',video:''},
-  {title:'Fireboy and Watergirl in the Forest Temple',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/fireboy-and-watergirl-in-the-forest-temple',thumb:'https://www.google.com/s2/favicons?domain=fireboyandwatergirl.com&sz=256',video:''},
+  {title:'Granny',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny',thumb:'',video:''},
+  {title:'Granny 2',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-2',thumb:'',video:''},
+  {title:'Granny 3',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-3',thumb:'',video:''},
+  {title:'Granny 4',category:'Elite Horror',url:'https://www.twoplayergames.org/embed/granny-4',thumb:'',video:''},
+  {title:'Ragdoll Playground',category:'Elite Sandbox',url:'https://www.twoplayergames.org/embed/ragdoll-playground',thumb:'',video:''},
+  {title:'Dude Theft Auto',category:'Elite Action',url:'https://www.twoplayergames.org/embed/dude-theft-auto',thumb:'',video:''},
+  {title:'Gun Mayhem Redux',category:'Elite Action',url:'https://www.twoplayergames.org/embed/gun-mayhem-redux',thumb:'',video:''},
+  {title:'Castel Wars New Era',category:'Elite Action',url:'https://www.twoplayergames.org/embed/castel-wars-new-era',thumb:'',video:''},
+  {title:'Fireboy and Watergirl in the Forest Temple',category:'Elite Platformer',url:'https://www.twoplayergames.org/embed/fireboy-and-watergirl-in-the-forest-temple',thumb:'',video:''},
 ];
 const MULTI_KEYWORDS=['multiplayer','io','battle','royale','versus','pvp','online','2 player','co-op','coop'];
 const GENRES=['Action','Arcade','Racing','Puzzle','Shooting','Sports','IO Games'];
@@ -952,23 +953,8 @@ function _actualLaunch(url,title,cat){
   if(++gCount%17===0)cleanCache();
   document.getElementById('stage').classList.add('open');
   document.getElementById('game-iframe').src=url;
-  document.getElementById('stage-title').textContent=title;
+  document.getElementById('stage-title').textContent='PLAYING: '+title;
   
-  const stageIcon = document.getElementById('stage-icon');
-  if (stageIcon) {
-    let iconUrl = '';
-    const match = catalog.find(g => g.url === url);
-    if (match && match.thumb && !match.thumb.includes('placehold.co')) {
-      iconUrl = match.thumb;
-    } else {
-      const isElite=getEliteUrlSet().has(url);
-      iconUrl = isElite ? 'https://placehold.co/128x128/0a1a00/32ff0e?text=Elite' : 'https://placehold.co/128x128/111/32ff0e?text=Game';
-    }
-    stageIcon.src = iconUrl;
-    stageIcon.alt = title + ' Icon';
-    stageIcon.style.display = 'block';
-  }
-
   document.body.style.overflow='hidden';
   refreshVoteUI();renderRelated(title,cat);sizeIframe();
   document.getElementById('stage').scrollTop=0;
@@ -1126,10 +1112,19 @@ function renderPopularSection(){
 }
 function renderNewSection(){
   const grid=document.getElementById('new-grid');if(!grid)return;
-  const ns=new Set(NEW_THIS_WEEK.map(t=>t.toLowerCase())),seen=new Set(),ng=[];
-  REQUESTED_GAMES.forEach(g=>{if(!seen.has(g.url)){seen.add(g.url);ng.push(g);}});
+  const now=Date.now();
+  const validNew=NEW_THIS_WEEK.filter(item=>now-new Date(item.added).getTime()<=7*24*60*60*1000);
+  const ns=new Set(validNew.map(t=>t.title.toLowerCase())),seen=new Set(),ng=[];
   catalog.forEach(g=>{if(ns.has((g.title||'').toLowerCase())&&!seen.has(g.url)){seen.add(g.url);ng.push(g);}});
-  grid.innerHTML=ng.slice(0,24).map(g=>makeCard(g,'new')).join('');
+  const header = grid.previousElementSibling;
+  if(ng.length===0){
+    grid.style.display='none';
+    if(header&&header.classList.contains('sec-header'))header.style.display='none';
+  }else{
+    grid.style.display='grid';
+    if(header&&header.classList.contains('sec-header'))header.style.display='flex';
+    grid.innerHTML=ng.slice(0,24).map(g=>makeCard(g,'new')).join('');
+  }
 }
 function renderRequestedSection(){
   const grid=document.getElementById('req-grid');if(!grid)return;

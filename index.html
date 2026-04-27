@@ -374,7 +374,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);margin:0;ove
       <button class="btn btn-dark rounded-pill px-4 fw-bold border-secondary" onclick="closeGame()">
         <i class="bi bi-arrow-left me-2"></i> EXIT
       </button>
-      <span id="stage-title" class="text-white fw-bold small text-uppercase"></span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <img id="stage-icon" src="" style="width:32px;height:32px;border-radius:4px;display:none" alt="Game Icon">
+        <h3 id="stage-title" style="margin:0;font-size:1rem;" class="text-white fw-bold text-uppercase"></h3>
+      </div>
     </div>
     <button class="btn rounded-pill px-4 fw-bold" style="background:var(--brand);color:#000;border:none" onclick="doFullscreen()">
       <i class="bi bi-arrows-fullscreen me-2"></i> FULLSCREEN
@@ -905,7 +908,15 @@ function makeCard(g,badge=''){
   const isElite=getEliteUrlSet().has(g.url)||g.isFeed!==true||g.url.includes('iframe.html');
   if(isElite && !badge) badge='elite';
 
-  const img=g.thumb?g.thumb:(isElite?'https://placehold.co/400x400/0a1a00/32ff0e?text=Elite':'https://placehold.co/400x400/111/32ff0e?text=Game');
+  let img=g.thumb;
+  if(!img && g.url){
+    try {
+      const hostname = new URL(g.url).hostname;
+      if (hostname) img = `https://www.google.com/s2/favicons?domain=${hostname}&sz=256`;
+    } catch(e) {}
+  }
+  if(!img) img=isElite?'https://placehold.co/400x400/0a1a00/32ff0e?text=Elite':'https://placehold.co/400x400/111/32ff0e?text=Game';
+
   const vid=g.video||'';
   const st=(g.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   const su=(g.url||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
@@ -947,7 +958,29 @@ function _actualLaunch(url,title,cat){
   if(++gCount%17===0)cleanCache();
   document.getElementById('stage').classList.add('open');
   document.getElementById('game-iframe').src=url;
-  document.getElementById('stage-title').textContent='PLAYING: '+title;
+  document.getElementById('stage-title').textContent=title;
+  
+  const stageIcon = document.getElementById('stage-icon');
+  if (stageIcon) {
+    let iconUrl = '';
+    const match = catalog.find(g => g.url === url);
+    if (match && match.thumb && !match.thumb.includes('placehold.co')) {
+      iconUrl = match.thumb;
+    } else {
+      try {
+        const hostname = new URL(url).hostname;
+        if (hostname) iconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
+      } catch(e) {}
+    }
+    if (iconUrl) {
+      stageIcon.src = iconUrl;
+      stageIcon.alt = title + ' Icon';
+      stageIcon.style.display = 'block';
+    } else {
+      stageIcon.style.display = 'none';
+    }
+  }
+
   document.body.style.overflow='hidden';
   refreshVoteUI();renderRelated(title,cat);sizeIframe();
   document.getElementById('stage').scrollTop=0;

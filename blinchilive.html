@@ -1293,49 +1293,46 @@ async function loadFeed() {
 
 
 
-    if (!acts || !acts.length) {
-      // Show all friends sorted: online first, then ingame, then offline
-      const sorted = [...(fprofs||[])].sort((a,b) => {
-        const order = {online:0,ingame:1,offline:2};
-        return (order[getStatus(a.last_seen,a.status)]||2) - (order[getStatus(b.last_seen,b.status)]||2);
-      });
-      if (!sorted.length) {
-        el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are active.</div>'; return;
-      }
-      el.innerHTML = sorted.map(p => {
-        const s = getStatus(p.last_seen, p.status);
-        const col = statusColor(p.last_seen, p.status);
-        return `<div class="fi" data-uid="${p.id}">
-          <div style="position:relative">
-            <div class="av">${nameOf(p)[0].toUpperCase()}</div>
-            <span class="feed-pres-dot" style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${col};border:2px solid #000"></span>
-          </div>
-          <div class="fi-text">
-            <div class="fi-name">${esc(nameOf(p))}</div>
-            <div class="fi-desc feed-pres-lbl" style="color:${col}">${statusLabel(p.last_seen, p.status)}</div>
-          </div>
-          <button onclick="openDM('${p.id}','${esc(nameOf(p))}')" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 11px;cursor:pointer;color:#666;display:flex;align-items:center;gap:5px;font-size:.76rem;font-family:var(--font);font-weight:600;transition:all .16s" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'">Chat</button>
-        </div>`;
-      }).join('');
-      return;
+    const actMapFull = {}; (acts||[]).forEach(a => actMapFull[a.user_id] = a);
+
+    const sorted = [...(fprofs||[])].sort((a,b) => {
+      const order = {online:0,ingame:1,offline:2};
+      return (order[getStatus(a.last_seen,a.status)]||2) - (order[getStatus(b.last_seen,b.status)]||2);
+    });
+
+    if (!sorted.length) {
+      el.innerHTML = '<div class="card-s" style="text-align:center;color:#2a2a2a;padding:32px">None of your friends are active.</div>'; return;
     }
-    el.innerHTML = acts.map(a => {
-      const mins = Math.max(0, Math.round((Date.now() - new Date(a.updated_at)) / 60000));
-      const when = mins<1?'just now':mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
-      const init = nameOf(a.profiles)[0].toUpperCase();
-      const fp = fpMap[a.user_id] || a.profiles || {};
-      const col = statusColor(fp.last_seen, fp.status);
-      return `<div class="fi" data-uid="${a.user_id}">
+
+    el.innerHTML = sorted.map(p => {
+      const s = getStatus(p.last_seen, p.status);
+      const col = statusColor(p.last_seen, p.status);
+      const a = actMapFull[p.id];
+      
+      let descHTML;
+      let actionBtn;
+      
+      if (s === 'ingame' && a && a.game_title) {
+        const mins = Math.max(0, Math.round((Date.now() - new Date(a.updated_at)) / 60000));
+        const when = mins<1?'just now':mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
+        descHTML = `Playing <strong style="color:#ccc">${esc(a.game_title)}</strong> · ${when}`;
+        actionBtn = `<a href="index.html" onclick="localStorage.setItem('bl_join_game','${encodeURIComponent(a.game_url||'')}')"
+          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">▶ Play</a>`;
+      } else {
+        descHTML = `<span class="feed-pres-lbl" style="color:${col}">${statusLabel(p.last_seen, p.status)}</span>`;
+        actionBtn = `<button onclick="openDM('${p.id}','${esc(nameOf(p))}')" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 11px;cursor:pointer;color:#666;display:flex;align-items:center;gap:5px;font-size:.76rem;font-family:var(--font);font-weight:600;transition:all .16s" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'">Chat</button>`;
+      }
+
+      return `<div class="fi" data-uid="${p.id}">
         <div style="position:relative">
-          <div class="av">${init}</div>
+          <div class="av">${nameOf(p)[0].toUpperCase()}</div>
           <span class="feed-pres-dot" style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${col};border:2px solid #000"></span>
         </div>
         <div class="fi-text">
-          <div class="fi-name">${esc(nameOf(a.profiles))}</div>
-          <div class="fi-desc">Playing <strong style="color:#ccc">${esc(a.game_title||'')}</strong> · ${when}</div>
+          <div class="fi-name">${esc(nameOf(p))}</div>
+          <div class="fi-desc">${descHTML}</div>
         </div>
-        <a href="index.html" onclick="localStorage.setItem('bl_join_game','${encodeURIComponent(a.game_url||'')}')"
-          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">▶ Play</a>
+        ${actionBtn}
       </div>`;
     }).join('');
   } catch(e) {

@@ -885,7 +885,10 @@ async function onIn(user) {
   // Heartbeat: update last_seen every 15 seconds
   if (window._presenceInterval) clearInterval(window._presenceInterval);
   window._presenceInterval = setInterval(() => {
-    if (U) db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id);
+    if (U) {
+      const st = localStorage.getItem('bl_active_game') ? 'ingame' : 'online';
+      db.from('profiles').update({ last_seen: new Date().toISOString(), status: st }).eq('id', U.id);
+    }
   }, 15000);
 
 
@@ -894,7 +897,8 @@ async function onIn(user) {
   // Instant update on any activity
   const _pingPresence = () => {
     if (!U) return;
-    db.from('profiles').update({ last_seen: new Date().toISOString(), status: 'online' }).eq('id', U.id);
+    const st = localStorage.getItem('bl_active_game') ? 'ingame' : 'online';
+    db.from('profiles').update({ last_seen: new Date().toISOString(), status: st }).eq('id', U.id);
   };
   // Throttle to once per 10s max
   let _lastPing = 0;
@@ -2281,7 +2285,7 @@ async function createGroup() {
 // ═══════════════════════════════════════════════════════════════
 const ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
 let lStream=null, pc=null, callTimer=null, callSecs=0, isMuted=false, isCamOff=false;
-let callType='voice', callPid=null, callPname=null, sigCh=null;
+let callType='voice', callPid=null, callPname=null;
 
 
 
@@ -2302,6 +2306,7 @@ async function startCall(fid, fname, type) {
   // Auto-cancel if no answer in 30s
   window._callTimeout = setTimeout(() => {
     if (pc && $('call-st') && $('call-st').textContent === 'Calling…') {
+      db.from('call_signals').insert({ caller_id: U.id, callee_id: fid, type: 'end', payload: '{}' }).catch(()=>{});
       endCall(); toast('No answer');
     }
   }, 30000);
@@ -2316,43 +2321,23 @@ async function startCall(fid, fname, type) {
 
 
 
-  sigCh = db.channel('call_' + [U.id,fid].sort().join('_'));
   pc.onicecandidate = e => {
-    if (e.candidate && sigCh) sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
+    if (e.candidate) {
+      db.from('call_signals').insert({
+        caller_id: U.id, callee_id: fid, type: 'ice',
+        payload: JSON.stringify(e.candidate)
+      }).catch(()=>{});
+    }
   };
-  sigCh
-    .on('broadcast',{event:'answer'}, async e => {
-      if (e.payload?.from !== fid || !pc) return;
-      try {
-        await pc.setRemoteDescription(new RTCSessionDescription(e.payload.sdp));
-        if(window._callTimeout){clearTimeout(window._callTimeout);window._callTimeout=null;}
-        startCallTimer();
-      } catch(_){}
-    })
-    .on('broadcast',{event:'ice'}, async e => {
-      if (e.payload?.from !== fid || !pc) return;
-      try { await pc.addIceCandidate(new RTCIceCandidate(e.payload.c)); } catch(_){}
-    })
-    .on('broadcast',{event:'end'}, e => { if (e.payload?.from===fid) endCall(); })
-    .on('broadcast',{event:'declined'}, e => {
-      if (e.payload?.from===fid) { endCall(); toast(fname + ' declined the call'); }
-    })
-    .subscribe(async status => {
-      if (status !== 'SUBSCRIBED') return;
-      try {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        // DB row — callee picks this up via postgres_changes if they miss broadcast
-        db.from('call_signals').insert({
-          caller_id: U.id, callee_id: fid, type: 'offer',
-          payload: JSON.stringify(offer), call_type: type, caller_name: nameOf(P)
-        }).catch(()=>{});
-        // Broadcast on shared channel
-        sigCh.send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
-        // Also broadcast on callee's personal channel (faster delivery)
-        db.channel('inc_bcast_'+fid).send({type:'broadcast',event:'offer',payload:{from:U.id,sdp:offer,call_type:type,name:nameOf(P)}});
-      } catch(err) { console.error('offer error:', err); endCall(); }
+  
+  try {
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await db.from('call_signals').insert({
+      caller_id: U.id, callee_id: fid, type: 'offer',
+      payload: JSON.stringify(offer), call_type: type, caller_name: nameOf(P)
     });
+  } catch(err) { console.error('offer error:', err); endCall(); }
 }
 
 
@@ -2375,8 +2360,10 @@ function endCall() {
   if(callTimer)clearInterval(callTimer);
   if(lStream)lStream.getTracks().forEach(t=>t.stop());
   if(pc)pc.close();
-  if(sigCh){sigCh.send({type:'broadcast',event:'end',payload:{from:U?.id}});sigCh.unsubscribe();}
-  lStream=null;pc=null;callTimer=null;sigCh=null;
+  if (callPid && U) {
+    db.from('call_signals').insert({ caller_id: U.id, callee_id: callPid, type: 'end', payload: '{}' }).catch(()=>{});
+  }
+  lStream=null;pc=null;callTimer=null;
   $('call-overlay').classList.remove('show');
   callPid=null;callPname=null;isMuted=false;isCamOff=false;
 }
@@ -2440,20 +2427,29 @@ function _ringOnce() {
 
 function listenCalls() {
   if (!U) return;
-  // DB row listener — catches callers who sent offer before we subscribed
+  // DB row listener — catches all call signals
   db.channel('inc_db_' + U.id)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'call_signals',filter:`callee_id=eq.${U.id}`}, e => {
-      const row=e.new; if(row.type!=='offer'||pc)return;
-      callPid=row.caller_id; callPname=row.caller_name||'Someone'; callType=row.call_type||'voice';
-      try { _showIncomingCall(callPname, callType, JSON.parse(row.payload)); } catch(_){}
-    })
-    .subscribe();
-  // Broadcast listener — fast path (no DB round-trip)
-  db.channel('inc_bcast_' + U.id)
-    .on('broadcast',{event:'offer'}, e => {
-      if (pc || !e.payload) return;
-      callPid=e.payload.from; callPname=e.payload.name||'Someone'; callType=e.payload.call_type||'voice';
-      _showIncomingCall(callPname, callType, e.payload.sdp);
+      const row=e.new; 
+      if (row.type === 'offer') {
+          if (pc) return; // already in call
+          callPid = row.caller_id; callPname = row.caller_name || 'Someone'; callType = row.call_type || 'voice';
+          try { _showIncomingCall(callPname, callType, JSON.parse(row.payload)); } catch(_){}
+      } else if (row.type === 'answer') {
+          if (row.caller_id !== callPid || !pc) return;
+          try {
+            pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(row.payload)));
+            if(window._callTimeout){clearTimeout(window._callTimeout);window._callTimeout=null;}
+            startCallTimer();
+          } catch(_){}
+      } else if (row.type === 'ice') {
+          if (row.caller_id !== callPid || !pc) return;
+          try { pc.addIceCandidate(new RTCIceCandidate(JSON.parse(row.payload))); } catch(_){}
+      } else if (row.type === 'end') {
+          if (row.caller_id === callPid) endCall();
+      } else if (row.type === 'declined') {
+          if (row.caller_id === callPid) { endCall(); toast(callPname + ' declined the call'); }
+      }
     })
     .subscribe();
 }
@@ -2487,33 +2483,31 @@ async function acceptCall() {
 
 
 
-  sigCh = db.channel('call_' + [U.id,callPid].sort().join('_'));
   pc.onicecandidate = e => {
-    if (e.candidate && sigCh) sigCh.send({type:'broadcast',event:'ice',payload:{from:U.id,c:e.candidate}});
+    if (e.candidate) {
+      db.from('call_signals').insert({
+        caller_id: U.id, callee_id: callPid, type: 'ice',
+        payload: JSON.stringify(e.candidate)
+      }).catch(()=>{});
+    }
   };
-  sigCh
-    .on('broadcast',{event:'ice'}, async e => {
-      if (e.payload?.from!==callPid||!pc) return;
-      try { await pc.addIceCandidate(new RTCIceCandidate(e.payload.c)); } catch(_){}
-    })
-    .on('broadcast',{event:'end'}, ()=>endCall())
-    .subscribe(async status => {
-      if (status !== 'SUBSCRIBED') return;
-      try {
-        await pc.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        sigCh.send({type:'broadcast',event:'answer',payload:{from:U.id,sdp:answer}});
-      } catch(err) { console.error('acceptCall error:', err); endCall(); }
+  
+  try {
+    await pc.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await db.from('call_signals').insert({
+      caller_id: U.id, callee_id: callPid, type: 'answer',
+      payload: JSON.stringify(answer)
     });
+  } catch(err) { console.error('acceptCall error:', err); endCall(); }
 }
 function declineCall(){
   $('inc-call').classList.remove('show');
   _stopRingtone();
   // Notify the caller that we declined
   if (callPid && U) {
-    const ch = db.channel('call_' + [U.id,callPid].sort().join('_'));
-    ch.send({type:'broadcast',event:'declined',payload:{from:U.id}}).then(()=>{ try{ch.unsubscribe();}catch(_){} });
+    db.from('call_signals').insert({ caller_id: U.id, callee_id: callPid, type: 'declined', payload: '{}' }).catch(()=>{});
   }
   window._pendingOffer=null; callPid=null; callPname=null;
 }
@@ -2832,10 +2826,12 @@ function showLoader(elId) {
 function getStatus(lastSeen, statusFallback) {
   if (lastSeen) {
     const diff = Date.now() - new Date(lastSeen).getTime();
-    if (diff < 90000)  return 'online';   // < 90s
-    if (diff < 360000) return 'ingame';   // < 6min (active recently)
+    if (diff < 360000) {
+      if (statusFallback === 'ingame') return 'ingame';
+      return 'online';
+    }
   }
-  return statusFallback || 'offline';
+  return 'offline';
 }
 function statusColor(statusOrLastSeen, fallback) {
   const s = typeof statusOrLastSeen === 'string' && statusOrLastSeen.includes('T')

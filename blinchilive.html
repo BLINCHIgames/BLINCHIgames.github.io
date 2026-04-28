@@ -2354,17 +2354,19 @@ function startCallTimer() {
   $('call-st').textContent='Connected'; callSecs=0;
   callTimer=setInterval(()=>{callSecs++;const m=Math.floor(callSecs/60),s=callSecs%60;$('call-tm').textContent=m+':'+(s<10?'0':'')+s;},1000);
 }
-function endCall() {
+function endCall(sendSignal = true) {
   _stopRingtone();
   if(window._callTimeout) { clearTimeout(window._callTimeout); window._callTimeout=null; }
   if(callTimer)clearInterval(callTimer);
   if(lStream)lStream.getTracks().forEach(t=>t.stop());
   if(pc)pc.close();
-  if (callPid && U) {
+  if (sendSignal && callPid && U) {
     db.from('call_signals').insert({ caller_id: U.id, callee_id: callPid, type: 'end', payload: '{}' }).catch(()=>{});
   }
   lStream=null;pc=null;callTimer=null;
   $('call-overlay').classList.remove('show');
+  const inc = $('inc-call'); if(inc) inc.classList.remove('show');
+  window._pendingOffer=null;
   callPid=null;callPname=null;isMuted=false;isCamOff=false;
 }
 function toggleMute() {
@@ -2427,12 +2429,27 @@ function _ringOnce() {
 
 function listenCalls() {
   if (!U) return;
+  try {
+      const pcJson = localStorage.getItem('bl_pending_call');
+      if (pcJson) {
+          const row = JSON.parse(pcJson);
+          localStorage.removeItem('bl_pending_call');
+          if (row && row.type === 'offer' && (Date.now() - (row._ts||0) < 30000)) {
+              if (!pc) {
+                  callPid = row.caller_id; callPname = row.caller_name || 'Someone'; callType = row.call_type || 'voice';
+                  try { _showIncomingCall(callPname, callType, JSON.parse(row.payload)); } catch(_){}
+              }
+          }
+      }
+  } catch(e){}
+
   // DB row listener — catches all call signals
   db.channel('inc_db_' + U.id)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'call_signals',filter:`callee_id=eq.${U.id}`}, e => {
       const row=e.new; 
       if (row.type === 'offer') {
           if (pc) return; // already in call
+          localStorage.removeItem('bl_pending_call');
           callPid = row.caller_id; callPname = row.caller_name || 'Someone'; callType = row.call_type || 'voice';
           try { _showIncomingCall(callPname, callType, JSON.parse(row.payload)); } catch(_){}
       } else if (row.type === 'answer') {
@@ -2446,9 +2463,9 @@ function listenCalls() {
           if (row.caller_id !== callPid || !pc) return;
           try { pc.addIceCandidate(new RTCIceCandidate(JSON.parse(row.payload))); } catch(_){}
       } else if (row.type === 'end') {
-          if (row.caller_id === callPid) endCall();
+          if (row.caller_id === callPid) endCall(false);
       } else if (row.type === 'declined') {
-          if (row.caller_id === callPid) { endCall(); toast(callPname + ' declined the call'); }
+          if (row.caller_id === callPid) { endCall(false); toast(callPname + ' declined the call'); }
       }
     })
     .subscribe();
@@ -2871,17 +2888,5 @@ window.onload = () => {
 
 
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
 </body>
 </html>

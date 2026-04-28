@@ -539,6 +539,47 @@ async function onSignedIn(user){
       }
     })
     .subscribe();
+
+  if(window._callListener) { db.removeChannel(window._callListener); window._callListener = null; }
+  window._callListener = db.channel('index_calls_' + CU.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'call_signals', filter: `callee_id=eq.${CU.id}` }, e => {
+      const row = e.new;
+      if (row.type === 'offer') {
+         const callerName = row.caller_name || 'Someone';
+         localStorage.setItem('bl_pending_call', JSON.stringify({...row, _ts: Date.now()}));
+         showIndexCallNotif(callerName, row.call_type || 'voice');
+         window._currentCallPid = row.caller_id;
+      } else if (row.type === 'end' || row.type === 'declined') {
+         localStorage.removeItem('bl_pending_call');
+         if (window._currentCallPid === row.caller_id) {
+             const t = document.getElementById('index-toast');
+             if (t && t.style.display !== 'none') {
+                 t.style.transform = 'translateY(20px)';
+                 t.style.opacity = '0';
+                 setTimeout(() => { t.style.display = 'none'; }, 300);
+             }
+         }
+      }
+    })
+    .subscribe();
+}
+
+function showIndexCallNotif(callerName, callType) {
+  const t = document.getElementById('index-toast');
+  if(!t) return;
+  document.getElementById('index-toast-title').textContent = callerName + ' is calling…';
+  document.getElementById('index-toast-body').textContent = callType === 'video' ? 'Incoming video call' : 'Incoming voice call';
+  t.style.display = 'block';
+  setTimeout(() => { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 10);
+  t.onclick = () => {
+    window.location.href = 'blinchilive.html';
+  };
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.style.transform = 'translateY(20px)';
+    t.style.opacity = '0';
+    setTimeout(() => { t.style.display = 'none'; }, 300);
+  }, 10000);
 }
 
 function showIndexPushNotif(title, body, convId) {
@@ -559,7 +600,7 @@ function showIndexPushNotif(title, body, convId) {
     setTimeout(() => { t.style.display = 'none'; }, 300);
   }, 6000);
 }
-function onSignedOut(){CU=null;CP=null;updateAuthUI(); if(window._presenceIntervalIndex) clearInterval(window._presenceIntervalIndex);}
+function onSignedOut(){CU=null;CP=null;updateAuthUI(); if(window._presenceIntervalIndex) clearInterval(window._presenceIntervalIndex); if(window._msgListener){db.removeChannel(window._msgListener);window._msgListener=null;} if(window._callListener){db.removeChannel(window._callListener);window._callListener=null;}}
 function updateAuthUI(){
   const so=document.getElementById('chip-signout'),si=document.getElementById('chip-signin');
   if(CP){so.style.display='flex';si.style.display='none';document.getElementById('chip-name').textContent=CP.displayname||CP.username;document.getElementById('chip-coins').textContent=CP.coins||0;}
@@ -601,10 +642,19 @@ async function loadComments(){
   if(!currentGame||!db)return;
   const list=document.getElementById('cp-list');
   list.innerHTML='<div style="text-align:center;color:#333;padding:28px">Loading…</div>';
-  const{data}=await db.from('comments').select('body,created_at,profiles(username,displayname)').eq('game_title',currentGame.title).order('created_at',{ascending:false}).limit(60);
+  const{data}=await db.from('comments').select('user_id,body,created_at').eq('game_title',currentGame.title).order('created_at',{ascending:false}).limit(60);
   if(!data||!data.length){list.innerHTML='<div style="text-align:center;color:#333;padding:36px 0">No comments yet — be first!</div>';document.getElementById('cmt-cnt').textContent='0';return;}
   document.getElementById('cmt-cnt').textContent=data.length;
-  list.innerHTML=data.map(c=>{const name=esc(c.profiles?.displayname||c.profiles?.username||'BlinchiUser');return`<div class="cp-item"><div class="cp-author">${name}</div><div class="cp-body">${esc(c.body)}</div><div class="cp-time">${ago(c.created_at)}</div></div>`;}).join('');
+  
+  const userIds=[...new Set(data.map(c=>c.user_id))];
+  const{data:profs}=await db.from('profiles').select('id,username,displayname').in('id',userIds);
+  const pMap={};if(profs)profs.forEach(p=>pMap[p.id]=p);
+  
+  list.innerHTML=data.map(c=>{
+    const p=pMap[c.user_id];
+    const name=esc(p?.displayname||p?.username||'BlinchiUser');
+    return`<div class="cp-item"><div class="cp-author">${name}</div><div class="cp-body">${esc(c.body)}</div><div class="cp-time">${ago(c.created_at)}</div></div>`;
+  }).join('');
 }
 async function submitComment(){
   if(!CU||!currentGame||!db)return;
@@ -653,6 +703,7 @@ let catalog=[],activeList=[],loaded=0,mode='home',obs=null;
 function lk(t){return parseInt(localStorage.getItem('vl_'+t)||'0',10);}
 function dk(t){return parseInt(localStorage.getItem('vd_'+t)||'0',10);}
 function mv(t){return localStorage.getItem('vm_'+t)||'';}
+// Local storage fallback
 function setVote(title,type){
   const prev=mv(title);if(prev===type)return;
   if(prev==='like')localStorage.setItem('vl_'+title,Math.max(0,lk(title)-1));
@@ -934,14 +985,44 @@ function playCardVid(c){const v=c.querySelector('.card-video'),i=c.querySelector
 function stopCardVid(c){const v=c.querySelector('.card-video'),i=c.querySelector('.card-img');if(!v)return;v.pause();v.currentTime=0;v.style.opacity='0';if(i)i.style.opacity='1';}
 
 // ── Voting ────────────────────────────────────────────────────────────────────
-function vote(type){if(!currentGame)return;setVote(currentGame.title,type);refreshVoteUI();}
-function refreshVoteUI(){
+async function vote(type){
   if(!currentGame)return;
-  const t=currentGame.title,v=mv(t);
-  document.getElementById('like-btn').classList.toggle('active',v==='like');
-  document.getElementById('dis-btn').classList.toggle('active',v==='dislike');
-  document.getElementById('like-cnt').textContent=lk(t);
-  document.getElementById('dis-cnt').textContent=dk(t);
+  if(!CU&&db){openAuth();return;}
+  if(db&&CU){
+    const pb=type==='like'?document.getElementById('like-btn'):document.getElementById('dis-btn');
+    if(pb.classList.contains('active')){
+      await db.from('game_votes').delete().eq('user_id',CU.id).eq('game_title',currentGame.title);
+    }else{
+      await db.from('game_votes').upsert({user_id:CU.id,game_title:currentGame.title,vote_type:type});
+    }
+    refreshVoteUI();
+  }else{
+    setVote(currentGame.title,type);refreshVoteUI();
+  }
+}
+async function refreshVoteUI(){
+  if(!currentGame)return;
+  if(db){
+    const{data:lks}=await db.from('game_votes').select('user_id',{count:'exact'}).eq('game_title',currentGame.title).eq('vote_type','like');
+    const{data:dlk}=await db.from('game_votes').select('user_id',{count:'exact'}).eq('game_title',currentGame.title).eq('vote_type','dislike');
+    document.getElementById('like-cnt').textContent=lks?.length!==undefined?lks.length:(lks?.count||0);
+    document.getElementById('dis-cnt').textContent=dlk?.length!==undefined?dlk.length:(dlk?.count||0);
+    document.getElementById('like-btn').classList.remove('active');
+    document.getElementById('dis-btn').classList.remove('active');
+    if(CU){
+      const{data:mv}=await db.from('game_votes').select('vote_type').eq('game_title',currentGame.title).eq('user_id',CU.id).maybeSingle();
+      if(mv){
+        if(mv.vote_type==='like')document.getElementById('like-btn').classList.add('active');
+        if(mv.vote_type==='dislike')document.getElementById('dis-btn').classList.add('active');
+      }
+    }
+  }else{
+    const t=currentGame.title,v=mv(t);
+    document.getElementById('like-btn').classList.toggle('active',v==='like');
+    document.getElementById('dis-btn').classList.toggle('active',v==='dislike');
+    document.getElementById('like-cnt').textContent=lk(t);
+    document.getElementById('dis-cnt').textContent=dk(t);
+  }
 }
 
 // ── Launch ────────────────────────────────────────────────────────────────────

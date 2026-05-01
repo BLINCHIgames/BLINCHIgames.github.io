@@ -775,6 +775,7 @@ let activeConvType = '';
 let csbMode = 'friends';
 let pendingRequest = null;
 let rtAll = null, rtMsg = null, rtPres = null, presTimer = null;
+let prevTab = 'feed';
 // Per-conversation draft message storage
 const _draftMap = {};
 // Per-conversation read timestamps (convId -> ms timestamp of last open)
@@ -1020,6 +1021,7 @@ async function doSignUp() {
 // TABS
 // ═══════════════════════════════════════════════════════════════
 function blTab(tab) {
+  if (activeTab && activeTab !== tab) prevTab = activeTab;
   // Reset all load-locks so switching tabs always triggers a fresh load
   Object.keys(_loading).forEach(k => { _loading[k] = false; });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -2294,13 +2296,15 @@ async function startCall(fid, fname, type) {
   if (!U || pc) { if(pc) toast('Already in a call'); return; }
   callType=type; callPid=fid; callPname=fname;
   try {
-    lStream = await navigator.mediaDevices.getUserMedia(
+    const stream = await navigator.mediaDevices.getUserMedia(
       type==='video' ? {audio:true,video:true} : {audio:true,video:false}
     );
+    if (!callPid) { // Cancelled during await
+      stream.getTracks().forEach(t => t.stop());
+      return;
+    }
+    lStream = stream;
   } catch(e) { toast('Microphone' + (type==='video'?' / camera':'') + ' access denied'); return; }
-
-
-
 
   showCallUI(fname, 'Calling…', type);
   // Auto-cancel if no answer in 30s
@@ -2310,7 +2314,10 @@ async function startCall(fid, fname, type) {
       endCall(); toast('No answer');
     }
   }, 30000);
+  
   pc = new RTCPeerConnection(ICE);
+  if (!callPid) { pc.close(); pc = null; return; }
+  
   lStream.getTracks().forEach(t => pc.addTrack(t, lStream));
   if (type==='video') { const lv=$('local-vid'); if(lv) lv.srcObject=lStream; }
   pc.ontrack = e => { const rv=$('remote-vid'); if(rv && e.streams[0]) rv.srcObject=e.streams[0]; };
@@ -2318,13 +2325,10 @@ async function startCall(fid, fname, type) {
     if (pc && (pc.connectionState==='failed'||pc.connectionState==='disconnected')) endCall();
   };
 
-
-
-
   pc.onicecandidate = e => {
-    if (e.candidate) {
+    if (e.candidate && callPid) {
       db.from('call_signals').insert({
-        caller_id: U.id, callee_id: fid, type: 'ice',
+        caller_id: U.id, callee_id: callPid, type: 'ice',
         payload: JSON.stringify(e.candidate)
       }).catch(()=>{});
     }
@@ -2332,6 +2336,7 @@ async function startCall(fid, fname, type) {
   
   try {
     const offer = await pc.createOffer();
+    if (!callPid) return;
     await pc.setLocalDescription(offer);
     await db.from('call_signals').insert({
       caller_id: U.id, callee_id: fid, type: 'offer',
@@ -2339,9 +2344,6 @@ async function startCall(fid, fname, type) {
     });
   } catch(err) { console.error('offer error:', err); endCall(); }
 }
-
-
-
 
 function showCallUI(name,status,type) {
   $('call-nm').textContent=name; $('call-st').textContent=status; $('call-tm').textContent='';
@@ -2352,22 +2354,39 @@ function showCallUI(name,status,type) {
 }
 function startCallTimer() {
   $('call-st').textContent='Connected'; callSecs=0;
+  if (callTimer) clearInterval(callTimer);
   callTimer=setInterval(()=>{callSecs++;const m=Math.floor(callSecs/60),s=callSecs%60;$('call-tm').textContent=m+':'+(s<10?'0':'')+s;},1000);
 }
 function endCall(sendSignal = true) {
   _stopRingtone();
-  if(window._callTimeout) { clearTimeout(window._callTimeout); window._callTimeout=null; }
-  if(callTimer)clearInterval(callTimer);
-  if(lStream)lStream.getTracks().forEach(t=>t.stop());
-  if(pc)pc.close();
-  if (sendSignal && callPid && U) {
-    db.from('call_signals').insert({ caller_id: U.id, callee_id: callPid, type: 'end', payload: '{}' }).catch(()=>{});
+  // Hide UI immediately
+  const overlay = $('call-overlay');
+  if (overlay) overlay.classList.remove('show');
+  const inc = $('inc-call');
+  if (inc) inc.classList.remove('show');
+  
+  if (window._callTimeout) { clearTimeout(window._callTimeout); window._callTimeout = null; }
+  if (callTimer) { clearInterval(callTimer); callTimer = null; }
+  
+  const lastPid = callPid;
+  callPid = null; 
+
+  try {
+    if (lStream) {
+      lStream.getTracks().forEach(t => { try { t.stop(); } catch(e){} });
+    }
+    if (pc) {
+      try { pc.close(); } catch(e){}
+    }
+  } catch(e) { console.error('Error during call cleanup:', e); }
+
+  if (sendSignal && lastPid && U) {
+    db.from('call_signals').insert({ caller_id: U.id, callee_id: lastPid, type: 'end', payload: '{}' }).catch(()=>{});
   }
-  lStream=null;pc=null;callTimer=null;
-  $('call-overlay').classList.remove('show');
-  const inc = $('inc-call'); if(inc) inc.classList.remove('show');
-  window._pendingOffer=null;
-  callPid=null;callPname=null;isMuted=false;isCamOff=false;
+
+  lStream = null; pc = null;
+  window._pendingOffer = null;
+  callPname = null; isMuted = false; isCamOff = false;
 }
 function toggleMute() {
   isMuted=!isMuted;

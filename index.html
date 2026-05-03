@@ -636,15 +636,41 @@ async function doSignUp(){
 
 // ── Comments ──────────────────────────────────────────────────────────────────
 let currentGame=null;
-function openComments(){document.getElementById('comments-panel').classList.add('show');document.getElementById('cp-input').style.display=CU?'flex':'none';document.getElementById('cp-login').style.display=CU?'none':'block';loadComments();}
-function closeComments(){document.getElementById('comments-panel').classList.remove('show');}
+let _commentChannel=null;
+function openComments(){
+  document.getElementById('comments-panel').classList.add('show');
+  document.getElementById('cp-input').style.display=CU?'flex':'none';
+  document.getElementById('cp-login').style.display=CU?'none':'block';
+  loadComments();
+  if(db && currentGame){
+    if(_commentChannel) db.removeChannel(_commentChannel);
+    _commentChannel = db.channel('game_comments_' + currentGame.title)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments', filter: `game_title=eq.${currentGame.title}` }, () => {
+        loadComments();
+      })
+      .subscribe();
+  }
+}
+function closeComments(){
+  document.getElementById('comments-panel').classList.remove('show');
+  if(_commentChannel){ db.removeChannel(_commentChannel); _commentChannel=null; }
+}
 async function loadComments(){
   if(!currentGame||!db)return;
   const list=document.getElementById('cp-list');
-  list.innerHTML='<div style="text-align:center;color:#333;padding:28px">Loading…</div>';
+  // Only show loading on first load
+  if(!list.children.length) list.innerHTML='<div style="text-align:center;color:#333;padding:28px">Loading…</div>';
+  
   const{data}=await db.from('comments').select('user_id,body,created_at').eq('game_title',currentGame.title).order('created_at',{ascending:false}).limit(60);
-  if(!data||!data.length){list.innerHTML='<div style="text-align:center;color:#333;padding:36px 0">No comments yet — be first!</div>';document.getElementById('cmt-cnt').textContent='0';return;}
-  document.getElementById('cmt-cnt').textContent=data.length;
+  
+  // Update count
+  const { count } = await db.from('comments').select('*', { count: 'exact', head: true }).eq('game_title', currentGame.title);
+  document.getElementById('cmt-cnt').textContent = count || 0;
+
+  if(!data||!data.length){
+    list.innerHTML='<div style="text-align:center;color:#333;padding:36px 0">No comments yet — be first!</div>';
+    return;
+  }
   
   const userIds=[...new Set(data.map(c=>c.user_id))];
   const{data:profs}=await db.from('profiles').select('id,username,displayname').in('id',userIds);
@@ -659,7 +685,8 @@ async function loadComments(){
 async function submitComment(){
   if(!CU||!currentGame||!db)return;
   const ta=document.getElementById('cp-text'),body=ta.value.trim();if(!body)return;ta.value='';
-  await db.from('comments').insert({user_id:CU.id,game_title:currentGame.title,body});loadComments();
+  await db.from('comments').insert({user_id:CU.id,game_title:currentGame.title,body});
+  // loadComments() will be triggered by Realtime subscription
 }
 
 // ── Catalog ───────────────────────────────────────────────────────────────────
@@ -989,13 +1016,16 @@ async function vote(type){
   if(!currentGame)return;
   if(!CU&&db){openAuth();return;}
   if(db&&CU){
-    const pb=type==='like'?document.getElementById('like-btn'):document.getElementById('dis-btn');
-    if(pb.classList.contains('active')){
-      await db.from('game_votes').delete().eq('user_id',CU.id).eq('game_title',currentGame.title);
-    }else{
-      await db.from('game_votes').upsert({user_id:CU.id,game_title:currentGame.title,vote_type:type});
+    const { data: existing } = await db.from('game_votes').select('vote_type').eq('user_id', CU.id).eq('game_title', currentGame.title).maybeSingle();
+    
+    if(existing && existing.vote_type === type){
+      // Toggle off
+      await db.from('game_votes').delete().eq('user_id', CU.id).eq('game_title', currentGame.title);
+    } else {
+      // Set or change vote
+      await db.from('game_votes').upsert({user_id:CU.id, game_title:currentGame.title, vote_type:type});
     }
-    refreshVoteUI();
+    // refreshVoteUI() will be triggered by Realtime subscription
   }else{
     setVote(currentGame.title,type);refreshVoteUI();
   }
@@ -1003,12 +1033,15 @@ async function vote(type){
 async function refreshVoteUI(){
   if(!currentGame)return;
   if(db){
-    const{data:lks}=await db.from('game_votes').select('user_id',{count:'exact'}).eq('game_title',currentGame.title).eq('vote_type','like');
-    const{data:dlk}=await db.from('game_votes').select('user_id',{count:'exact'}).eq('game_title',currentGame.title).eq('vote_type','dislike');
-    document.getElementById('like-cnt').textContent=lks?.length!==undefined?lks.length:(lks?.count||0);
-    document.getElementById('dis-cnt').textContent=dlk?.length!==undefined?dlk.length:(dlk?.count||0);
+    const{count:lks}=await db.from('game_votes').select('*',{count:'exact', head:true}).eq('game_title',currentGame.title).eq('vote_type','like');
+    const{count:dlk}=await db.from('game_votes').select('*',{count:'exact', head:true}).eq('game_title',currentGame.title).eq('vote_type','dislike');
+    
+    document.getElementById('like-cnt').textContent=lks||0;
+    document.getElementById('dis-cnt').textContent=dlk||0;
+    
     document.getElementById('like-btn').classList.remove('active');
     document.getElementById('dis-btn').classList.remove('active');
+    
     if(CU){
       const{data:mv}=await db.from('game_votes').select('vote_type').eq('game_title',currentGame.title).eq('user_id',CU.id).maybeSingle();
       if(mv){
@@ -1028,6 +1061,7 @@ async function refreshVoteUI(){
 // ── Launch ────────────────────────────────────────────────────────────────────
 let gCount=0;
 
+let _voteChannel=null;
 function _actualLaunch(url,title,cat){
   currentGame={url,title,category:cat};
   trackPlay(title,url,'',cat);
@@ -1039,6 +1073,16 @@ function _actualLaunch(url,title,cat){
   document.body.style.overflow='hidden';
   refreshVoteUI();renderRelated(title,cat);sizeIframe();
   document.getElementById('stage').scrollTop=0;
+  
+  if(db){
+    if(_voteChannel) db.removeChannel(_voteChannel);
+    _voteChannel = db.channel('game_votes_' + title)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'game_votes', filter: `game_title=eq.${title}` }, () => {
+        refreshVoteUI();
+      })
+      .subscribe();
+  }
+
   try{localStorage.setItem('bl_active_game',JSON.stringify({title,url}));}catch(e){}
   broadcastBlinchiActivity(title,url);
 }
@@ -1058,6 +1102,8 @@ function closeGame(){
   const ifr=document.getElementById('game-iframe');ifr.src='about:blank';setTimeout(()=>{ifr.src='';},80);
   document.body.style.overflow='';currentGame=null;
   document.getElementById('rel-grid').innerHTML='';cleanCache();
+  if(_voteChannel){ db.removeChannel(_voteChannel); _voteChannel=null; }
+  if(_commentChannel){ db.removeChannel(_commentChannel); _commentChannel=null; }
   try{localStorage.removeItem('bl_active_game');}catch(e){}
 }
 function cleanCache(){document.querySelectorAll('script[data-ad-injected]').forEach(s=>s.remove());const b=document.body;b.style.display='none';b.offsetHeight;b.style.display='';}

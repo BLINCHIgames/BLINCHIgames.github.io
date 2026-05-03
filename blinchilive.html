@@ -1322,10 +1322,11 @@ async function loadFeed() {
       if (s === 'ingame' && a && a.game_title) {
         const mins = Math.max(0, Math.round((Date.now() - new Date(a.updated_at)) / 60000));
         const when = mins<1?'just now':mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
-        descHTML += ` · Playing <strong style="color:#ccc">${esc(a.game_title)}</strong> · ${when}`;
+        descHTML = `<span class="feed-pres-lbl" style="color:${col}">Playing <strong>${esc(a.game_title)}</strong></span> <span style="font-size:.7rem;color:var(--muted);opacity:.7">· ${when}</span>`;
         actionBtn = `<a href="index.html" onclick="localStorage.setItem('bl_join_game','${encodeURIComponent(a.game_url||'')}')"
-          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">▶ Play that game</a>`;
+          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">▶ Join</a>`;
       } else {
+        descHTML = `<span class="feed-pres-lbl" style="color:${col}">${s === 'offline' ? 'Offline' : 'Online'}</span>`;
         actionBtn = `<button onclick="openDM('${p.id}','${esc(nameOf(p))}')" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 11px;cursor:pointer;color:#666;display:flex;align-items:center;gap:5px;font-size:.76rem;font-family:var(--font);font-weight:600;transition:all .16s" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'">Chat</button>`;
       }
 
@@ -1523,7 +1524,9 @@ async function loadFriends() {
       const fn = esc(nameOf(fp)), init = fn[0].toUpperCase();
       const col = statusColor(fp.last_seen, fp.status);
       let lbl = statusLabel(fp.last_seen, fp.status);
-      if (lbl === 'In a game' && actMap[fp.id]) lbl = 'Playing ' + esc(actMap[fp.id]);
+      // Friends list ONLY shows Online or Offline
+      if (lbl === 'In a game') lbl = 'Online';
+      
       return `<div class="fr-row" data-uid="${fp.id}" onclick="openDM('${fp.id}','${fn}')">
         <div class="av">${init}</div>
         <div class="fr-info">
@@ -2633,36 +2636,41 @@ function updateUserPresenceDOM(profileId, lastSeen, status) {
   const s   = getStatus(lastSeen, status);
 
   const applyUpdates = (finalLbl) => {
-    // 1. Friends list row (presence-dot / presence-lbl classes)
     const row = document.querySelector(`[data-uid="${profileId}"]`);
     if (row) {
       const dot = row.querySelector('.presence-dot');
       const lb  = row.querySelector('.presence-lbl');
       if (dot) dot.style.background = col;
-      if (lb)  { lb.textContent = finalLbl; lb.style.color = col; }
-      // Feed row has feed-pres-dot / feed-pres-lbl
+      if (lb)  { 
+        // Friends list ONLY shows Online or Offline
+        lb.textContent = (s === 'offline') ? 'Offline' : 'Online'; 
+        lb.style.color = col; 
+      }
+      
       const fdot = row.querySelector('.feed-pres-dot');
       const flb  = row.querySelector('.feed-pres-lbl');
       if (fdot) fdot.style.background = col;
-      if (flb)  { flb.textContent = finalLbl; flb.style.color = col; }
+      if (flb)  { 
+        flb.innerHTML = finalLbl; 
+        flb.style.color = col; 
+      }
     }
 
-
-
-
-    // 2. DM sidebar dot (ci_<uid>)
     const ci = document.getElementById('ci_' + profileId);
     if (ci) {
       const dot = ci.querySelector('.ci-pres-dot');
       const sub = ci.querySelector('.ci-sub');
       if (dot) dot.style.background = col;
-      if (sub) { sub.textContent = finalLbl; sub.style.color = col; }  // col is already green/brand/grey
+      if (sub) { 
+        // Sidebar also only Online/Offline
+        sub.textContent = (s === 'offline') ? 'Offline' : 'Online'; 
+        sub.style.color = col; 
+      }
     }
 
-    // 3. Chat header peer-pres (if this conv is with that friend)
     const pres = $('peer-pres');
     if (pres && pres.dataset.fid === profileId) {
-      pres.textContent = s==='online' ? '● Online' : s==='ingame' ? '● ' + finalLbl : '● Offline';
+      pres.textContent = s==='online' ? '● Online' : s==='ingame' ? '● Playing Game' : '● Offline';
       pres.style.color = s !== 'offline' ? col : '';
       pres.className = 'chat-hdr-sub' + (s !== 'offline' ? ' on' : '');
     }
@@ -2670,11 +2678,12 @@ function updateUserPresenceDOM(profileId, lastSeen, status) {
 
   if (s === 'ingame') {
     db.from('activity').select('game_title').eq('user_id', profileId).maybeSingle().then(({data}) => {
-      if (data && data.game_title) lbl = 'In a game · Playing ' + data.game_title;
-      applyUpdates(lbl);
+      let fLabel = 'Online';
+      if (data && data.game_title) fLabel = `Playing <strong>${esc(data.game_title)}</strong>`;
+      applyUpdates(fLabel);
     });
   } else {
-    applyUpdates(lbl);
+    applyUpdates(s === 'offline' ? 'Offline' : 'Online');
   }
 }
 
@@ -2881,9 +2890,8 @@ function statusLabel(statusOrLastSeen, fallback) {
   const s = typeof statusOrLastSeen === 'string' && statusOrLastSeen.includes('T')
     ? getStatus(statusOrLastSeen, fallback)
     : (statusOrLastSeen || 'offline');
-  if (s === 'ingame') return 'In a game';
-  if (s === 'online') return 'Online';
-  return 'Offline';
+  if (s === 'offline') return 'Offline';
+  return 'Online';
 }
 
 

@@ -1315,17 +1315,17 @@ async function loadFeed() {
       const col = statusColor(p.last_seen, p.status);
       const a = actMapFull[p.id];
       
-      let descHTML;
+      const sLabel = statusLabel(p.last_seen, p.status);
+      let descHTML = `<span class="feed-pres-lbl" style="color:${col}">${sLabel}</span>`;
       let actionBtn;
       
       if (s === 'ingame' && a && a.game_title) {
         const mins = Math.max(0, Math.round((Date.now() - new Date(a.updated_at)) / 60000));
         const when = mins<1?'just now':mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
-        descHTML = `Playing <strong style="color:#ccc">${esc(a.game_title)}</strong> · ${when}`;
+        descHTML += ` · Playing <strong style="color:#ccc">${esc(a.game_title)}</strong> · ${when}`;
         actionBtn = `<a href="index.html" onclick="localStorage.setItem('bl_join_game','${encodeURIComponent(a.game_url||'')}')"
-          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">▶ Play</a>`;
+          style="background:var(--brand);color:#000;border:none;border-radius:8px;padding:5px 11px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;text-decoration:none">▶ Play that game</a>`;
       } else {
-        descHTML = `<span class="feed-pres-lbl" style="color:${col}">${statusLabel(p.last_seen, p.status)}</span>`;
         actionBtn = `<button onclick="openDM('${p.id}','${esc(nameOf(p))}')" style="background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 11px;cursor:pointer;color:#666;display:flex;align-items:center;gap:5px;font-size:.76rem;font-family:var(--font);font-weight:600;transition:all .16s" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'">Chat</button>`;
       }
 
@@ -2670,7 +2670,7 @@ function updateUserPresenceDOM(profileId, lastSeen, status) {
 
   if (s === 'ingame') {
     db.from('activity').select('game_title').eq('user_id', profileId).maybeSingle().then(({data}) => {
-      if (data && data.game_title) lbl = 'Playing ' + data.game_title;
+      if (data && data.game_title) lbl = 'In a game · Playing ' + data.game_title;
       applyUpdates(lbl);
     });
   } else {

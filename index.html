@@ -1742,12 +1742,17 @@
       CP = p; updateAuthUI();
 
       if (window._presenceIntervalIndex) clearInterval(window._presenceIntervalIndex);
-      const markIngame = () => { if (CU) db.from('profiles').update({ status: 'ingame', last_seen: new Date().toISOString() }).eq('id', CU.id); };
-      markIngame();
-      window._presenceIntervalIndex = setInterval(markIngame, 15000);
+      const markPresence = () => {
+        if (CU) {
+          const st = currentGame ? 'ingame' : 'online';
+          db.from('profiles').update({ status: st, last_seen: new Date().toISOString() }).eq('id', CU.id);
+        }
+      };
+      markPresence();
+      window._presenceIntervalIndex = setInterval(markPresence, 15000);
 
       let _lastPing = 0;
-      const _throttledPing = () => { const n = Date.now(); if (n - _lastPing > 10000) { _lastPing = n; markIngame(); } };
+      const _throttledPing = () => { const n = Date.now(); if (n - _lastPing > 10000) { _lastPing = n; markPresence(); } };
       ['mousemove', 'keydown', 'click', 'touchstart'].forEach(ev =>
         document.addEventListener(ev, _throttledPing, { passive: true })
       );

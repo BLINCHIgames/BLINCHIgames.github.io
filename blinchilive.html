@@ -135,7 +135,7 @@
   .bubble{padding:8px 12px;border-radius:13px;font-size:.84rem;line-height:1.5;word-break:break-word}
   .msg.me .bubble{background:linear-gradient(135deg,#3dff1a,#22cc08);color:#000;border-radius:18px 18px 4px 18px;font-weight:500;box-shadow:0 2px 12px rgba(50,255,14,.25)}
   .msg.them .bubble{background:rgba(255,255,255,.07);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);color:#e8e8f0;border-radius:18px 18px 18px 4px}
-  .bubble.saved{outline:1px solid rgba(50,255,14,.3)}
+  .bubble.saved{outline:2px solid var(--brand);box-shadow:0 0 10px rgba(50,255,14,.15)}
   .msg-meta{font-size:.66rem;color:#1a1a1a;margin-top:2px;display:flex;align-items:center;gap:4px}
   .msg.me .msg-meta{justify-content:flex-end}
   .sender-name{font-size:.7rem;color:var(--brand);font-weight:700;margin-bottom:2px}
@@ -143,6 +143,7 @@
   .save-btn:hover{opacity:1;color:var(--brand)}
   .msg-media{border-radius:10px;overflow:hidden;max-width:210px;margin-bottom:3px}
   .msg-media img,.msg-media video{width:100%;display:block;border-radius:9px}
+  .msg-media.saved{outline:2px solid var(--brand);box-shadow:0 0 10px rgba(50,255,14,.15);border-radius:10px}
   .eph-bar{background:rgba(249,115,22,.05);border-top:1px solid rgba(249,115,22,.1);padding:5px 12px 5px 16px;font-size:.7rem;color:#c47a3a;flex-shrink:0;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:4px}
   .chat-inp-row{padding:10px 12px;border-top:1px solid var(--glass-border);display:flex;gap:8px;align-items:center;flex-shrink:0;background:rgba(6,6,8,.7)}
   .chat-inp-row input{flex:1;background:#13131a;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:9px 16px;color:#fff;outline:none;font-size:.85rem;font-family:var(--font);transition:border-color .18s}
@@ -862,6 +863,8 @@
     setTimeout(listenCalls, 800);
     // Safe startup — load everything once auth is confirmed
     startApp();
+    cleanupMessages(); // Remove expired messages on login
+    setInterval(cleanupMessages, 300000); // And every 5 minutes
     // Mark online immediately with current timestamp
     await db.from('profiles').update({ status: 'online', last_seen: new Date().toISOString() }).eq('id', U.id);
     window.addEventListener('beforeunload', () => {
@@ -2008,12 +2011,15 @@
       const ephTag = !m.saved && hrs!==null
         ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
         : (m.saved ? '<span class="save-indicator">Saved</span>' : '');
-      const saveBtn = !m.saved && m.body
+      const saveBtn = !m.saved
         ? `<button class="save-btn" onclick="saveMsg('${m.id}')" title="Keep message">Keep</button>` : '';
       let media = '';
-      if (m.media_url) media = m.media_type?.startsWith('video/')
-        ? `<div class="msg-media"><video src="${esc(m.media_url)}" controls></video></div>`
-        : `<div class="msg-media"><img src="${esc(m.media_url)}" loading="lazy" onclick="window.open('${esc(m.media_url)}','_blank')" style="cursor:zoom-in"></div>`;
+      if (m.media_url) {
+        const mediaClass = m.saved ? 'msg-media saved' : 'msg-media';
+        media = m.media_type?.startsWith('video/')
+          ? `<div class="${mediaClass}"><video src="${esc(m.media_url)}" controls></video></div>`
+          : `<div class="${mediaClass}"><img src="${esc(m.media_url)}" loading="lazy" onclick="window.open('${esc(m.media_url)}','_blank')" style="cursor:zoom-in"></div>`;
+      }
       const body = m.body ? `<div class="bubble${m.saved?' saved':''}">${esc(m.body)}</div>` : '';
       const senderName = activeConvType==='group' && !isMe
         ? `<div class="sender-name">${esc(nameOf(m.profiles))}</div>` : '';
@@ -2056,25 +2062,31 @@
     const isMe = msg.sender_id === U.id;
     const senderName = activeConvType === 'group' && !isMe
       ? `<div class="sender-name">${esc(nameOf(prof))}</div>` : '';
-    const body = msg.body ? `<div class="bubble">${esc(msg.body)}</div>` : '';
     let media = '';
-    if (msg.media_url) media = msg.media_type?.startsWith('video/')
-      ? `<div class="msg-media"><video src="${esc(msg.media_url)}" controls></video></div>`
-      : `<div class="msg-media"><img src="${esc(msg.media_url)}" loading="lazy" style="cursor:zoom-in" onclick="window.open('${esc(msg.media_url)}','_blank')"></div>`;
+    if (msg.media_url) {
+      const mediaClass = msg.saved ? 'msg-media saved' : 'msg-media';
+      media = msg.media_type?.startsWith('video/')
+        ? `<div class="${mediaClass}"><video src="${esc(msg.media_url)}" controls></video></div>`
+        : `<div class="${mediaClass}"><img src="${esc(msg.media_url)}" loading="lazy" style="cursor:zoom-in" onclick="window.open('${esc(msg.media_url)}','_blank')"></div>`;
+    }
 
-
-
-
-    const saveBtn = !msg.saved && msg.body
-      ? `<button class="save-btn" onclick="saveMsg('${msg.id}')" title="Keep">Keep</button>` : '';
-
-
-
+    const hrs = msg.expires_at ? Math.max(0, Math.round((new Date(msg.expires_at)-Date.now())/3600000)) : null;
+    const ephTag = !msg.saved && hrs!==null
+      ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
+      : (msg.saved ? '<span class="save-indicator">Saved</span>' : '');
+    const saveBtn = !msg.saved ? `<button class="save-btn" onclick="saveMsg('${msg.id}')" title="Keep">Keep</button>` : '';
 
     const div = document.createElement('div');
     div.className = `msg ${isMe ? 'me' : 'them'}`;
-    div.innerHTML = `${senderName}${media}${body}<div class="msg-meta">${ago(msg.created_at)} ${saveBtn}</div>`;
+    const bubbleClass = msg.saved ? 'bubble saved' : 'bubble';
+    const bodyHtml = msg.body ? `<div class="${bubbleClass}">${esc(msg.body)}</div>` : '';
+    div.innerHTML = `${senderName}${media}${bodyHtml}<div class="msg-meta">${ago(msg.created_at)} ${ephTag} ${saveBtn}</div>`;
     el.appendChild(div);
+
+    // Smart scroll — only jump to bottom if user was already there
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    if (atBottom || isMe) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+  }
 
 
 
@@ -2119,7 +2131,8 @@
     const { error } = await db.from('messages').insert({
       sender_id: U.id,
       conversation_id: activeConversation,
-      body: text
+      body: text,
+      expires_at: new Date(Date.now() + 86400000).toISOString()
     });
 
 
@@ -2203,11 +2216,25 @@
       const { data: ud } = db.storage.from('chat_media').getPublicUrl(path);
       const { error: mi } = await db.from('messages').insert({
         conversation_id: activeConversation, sender_id: U.id,
-        body: null, media_url: ud.publicUrl, media_type: file.type
+        body: null, media_url: ud.publicUrl, media_type: file.type,
+        expires_at: new Date(Date.now() + 86400000).toISOString()
       });
       if (mi) throw mi;
       toast('Media sent');
     } catch(e) { toast('Upload failed — check Storage configuration'); }
+  }
+
+  // ── CLEANUP EXPIRED MESSAGES ──────────────────────────────
+  async function cleanupMessages() {
+    if (!U) return;
+    try {
+      const now = new Date().toISOString();
+      // Delete messages that are past their expiration and not saved
+      await db.from('messages')
+        .delete()
+        .eq('saved', false)
+        .lt('expires_at', now);
+    } catch(e) { console.error('Cleanup error:', e); }
   }
 
 

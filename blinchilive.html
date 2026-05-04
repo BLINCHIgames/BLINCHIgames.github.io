@@ -908,7 +908,7 @@
 
     .msg-meta {
       font-size: .66rem;
-      color: #1a1a1a;
+      color: rgba(255, 255, 255, 0.4);
       margin-top: 2px;
       display: flex;
       align-items: center;
@@ -929,7 +929,8 @@
     .save-btn {
       font-size: .67rem;
       cursor: pointer;
-      opacity: .4;
+      opacity: .6;
+      transition: opacity .2s;
       border: none;
       background: none;
       color: inherit;
@@ -3622,19 +3623,22 @@
 
 
 
-      // Realtime for this conversation
+      // Realtime for this conversation — listen for all changes
       if (rtMsg) { try { rtMsg.unsubscribe(); } catch (e) { } }
       rtMsg = db.channel('rt_conv_' + convId)
         .on('postgres_changes', {
-          event: 'INSERT', schema: 'public', table: 'messages'
+          event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}`
         }, payload => {
-          if (payload.new?.conversation_id !== convId) return;
-          // Append single message — no full reload, no flicker
-          appendMessage(payload.new);
+          if (payload.eventType === 'INSERT') {
+            appendMessage(payload.new);
+          } else if (payload.eventType === 'UPDATE') {
+            updateMessageInUI(payload.new);
+          } else if (payload.eventType === 'DELETE') {
+            const el = document.getElementById('msg_' + payload.old.id);
+            if (el) el.remove();
+          }
         })
-        .subscribe(status => {
-          if (status === 'SUBSCRIBED') console.log('RT ready for conv:', convId);
-        });
+        .subscribe();
 
 
 
@@ -3807,10 +3811,34 @@
     // ═══════════════════════════════════════════════════════════════
     // LOAD + SEND MESSAGES
     // ═══════════════════════════════════════════════════════════════
+    function renderMessageInner(m) {
+      const isMe = m.sender_id === U.id;
+      const prof = window._profCache?.[m.sender_id] || m.profiles || null;
+      const hrs = m.expires_at ? Math.max(0, Math.round((new Date(m.expires_at) - Date.now()) / 3600000)) : null;
+      const ephTag = !m.saved && hrs !== null
+        ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
+        : (m.saved ? '<span class="save-indicator">Saved</span>' : '');
+      const saveBtn = `<button class="save-btn" onclick="toggleSave('${m.id}', ${m.saved})" title="${m.saved ? 'Unkeep' : 'Keep'} message">${m.saved ? 'Unkeep' : 'Keep'}</button>`;
+      
+      let media = '';
+      if (m.media_url) {
+        const mediaClass = m.saved ? 'msg-media saved' : 'msg-media';
+        media = m.media_type?.startsWith('video/')
+          ? `<div class="${mediaClass}"><video src="${esc(m.media_url)}" controls></video></div>`
+          : `<div class="${mediaClass}"><img src="${esc(m.media_url)}" loading="lazy" onclick="window.open('${esc(m.media_url)}','_blank')" style="cursor:zoom-in"></div>`;
+      }
+      
+      const bubbleClass = m.saved ? 'bubble saved' : 'bubble';
+      const bodyHtml = m.body ? `<div class="${bubbleClass}">${esc(m.body)}</div>` : '';
+      const senderName = activeConvType === 'group' && !isMe
+        ? `<div class="sender-name">${esc(nameOf(m.profiles || prof))}</div>` : '';
+        
+      return `${senderName}${media}${bodyHtml}<div class="msg-meta">${ago(m.created_at)} ${ephTag} ${saveBtn}</div>`;
+    }
+
     async function loadMessages(convId) {
       if (!U || !convId) return;
       const el = $('chat-msgs');
-      // Only show loader on first open (no existing messages rendered)
       if (el && !el.querySelector('.msg')) {
         el.innerHTML = '<div class="loading-row"><div class="loader"></div></div>';
       }
@@ -3823,43 +3851,24 @@
         if (el) el.innerHTML = `<div style="color:#444;padding:14px;font-size:.82rem">Could not load: ${error.message}</div>`;
         return;
       }
-      // Batch-fetch profiles for all senders
       const senderIds = [...new Set((data || []).map(m => m.sender_id))];
       let profMap = {};
       if (senderIds.length) {
         const { data: profs } = await db.from('profiles').select('id,username,displayname,status,last_seen').in('id', senderIds);
         (profs || []).forEach(p => { profMap[p.id] = p; });
       }
-      // Attach profiles to messages
-      // Populate shared profile cache
       if (!window._profCache) window._profCache = {};
       Object.assign(window._profCache, profMap);
+      
       const msgs = (data || []).map(m => ({ ...m, profiles: profMap[m.sender_id] || null }));
       if (!msgs.length) {
         el.innerHTML = '<div style="margin:auto;color:#111;font-size:.82rem">No messages yet — start the conversation</div>'; return;
       }
       el.innerHTML = msgs.map(m => {
         const isMe = m.sender_id === U.id;
-        const hrs = m.expires_at ? Math.max(0, Math.round((new Date(m.expires_at) - Date.now()) / 3600000)) : null;
-        const ephTag = !m.saved && hrs !== null
-          ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
-          : (m.saved ? '<span class="save-indicator">Saved</span>' : '');
-        const saveBtn = `<button class="save-btn" onclick="toggleSave('${m.id}', ${m.saved})" title="${m.saved ? 'Unkeep' : 'Keep'} message">${m.saved ? 'Unkeep' : 'Keep'}</button>`;
-        let media = '';
-        if (m.media_url) {
-          const mediaClass = m.saved ? 'msg-media saved' : 'msg-media';
-          media = m.media_type?.startsWith('video/')
-            ? `<div class="${mediaClass}"><video src="${esc(m.media_url)}" controls></video></div>`
-            : `<div class="${mediaClass}"><img src="${esc(m.media_url)}" loading="lazy" onclick="window.open('${esc(m.media_url)}','_blank')" style="cursor:zoom-in"></div>`;
-        }
-        const body = m.body ? `<div class="bubble${m.saved ? ' saved' : ''}">${esc(m.body)}</div>` : '';
-        const senderName = activeConvType === 'group' && !isMe
-          ? `<div class="sender-name">${esc(nameOf(m.profiles))}</div>` : '';
-        return `<div class="msg ${isMe ? 'me' : 'them'}">${senderName}${media}${body}
-        <div class="msg-meta">${ago(m.created_at)} ${ephTag} ${saveBtn}</div>
-      </div>`;
+        return `<div class="msg ${isMe ? 'me' : 'them'}" id="msg_${m.id}">${renderMessageInner(m)}</div>`;
       }).join('');
-      // Smart scroll — only auto-jump if near bottom or first load
+      
       const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
       if (atBottom || el.scrollTop === 0) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }
@@ -3876,48 +3885,30 @@
     async function appendMessage(msg) {
       const el = $('chat-msgs');
       if (!el) return;
+      if (document.getElementById('msg_' + msg.id)) return; // Already exists
 
-
-
-
-      // Fetch sender profile if not cached
       if (!window._profCache) window._profCache = {};
       if (!window._profCache[msg.sender_id]) {
         const { data: p } = await db.from('profiles').select('id,username,displayname,status,last_seen').eq('id', msg.sender_id).maybeSingle();
         if (p) window._profCache[p.id] = p;
       }
-      const prof = window._profCache[msg.sender_id] || null;
-
-
-
-
+      
       const isMe = msg.sender_id === U.id;
-      const senderName = activeConvType === 'group' && !isMe
-        ? `<div class="sender-name">${esc(nameOf(prof))}</div>` : '';
-      let media = '';
-      if (msg.media_url) {
-        const mediaClass = msg.saved ? 'msg-media saved' : 'msg-media';
-        media = msg.media_type?.startsWith('video/')
-          ? `<div class="${mediaClass}"><video src="${esc(msg.media_url)}" controls></video></div>`
-          : `<div class="${mediaClass}"><img src="${esc(msg.media_url)}" loading="lazy" style="cursor:zoom-in" onclick="window.open('${esc(msg.media_url)}','_blank')"></div>`;
-      }
-
-      const hrs = msg.expires_at ? Math.max(0, Math.round((new Date(msg.expires_at) - Date.now()) / 3600000)) : null;
-      const ephTag = !msg.saved && hrs !== null
-        ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
-        : (msg.saved ? '<span class="save-indicator">Saved</span>' : '');
-      const saveBtn = `<button class="save-btn" onclick="toggleSave('${msg.id}', ${msg.saved})" title="${msg.saved ? 'Unkeep' : 'Keep'}">${msg.saved ? 'Unkeep' : 'Keep'}</button>`;
-
       const div = document.createElement('div');
+      div.id = 'msg_' + msg.id;
       div.className = `msg ${isMe ? 'me' : 'them'}`;
-      const bubbleClass = msg.saved ? 'bubble saved' : 'bubble';
-      const bodyHtml = msg.body ? `<div class="${bubbleClass}">${esc(msg.body)}</div>` : '';
-      div.innerHTML = `${senderName}${media}${bodyHtml}<div class="msg-meta">${ago(msg.created_at)} ${ephTag} ${saveBtn}</div>`;
+      div.innerHTML = renderMessageInner(msg);
       el.appendChild(div);
 
-      // Smart scroll — only jump to bottom if user was already there
       const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
       if (atBottom || isMe) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }
+
+    function updateMessageInUI(msg) {
+      const el = document.getElementById('msg_' + msg.id);
+      if (el) {
+        el.innerHTML = renderMessageInner(msg);
+      }
     }
 
     async function sendMsg() {
@@ -4063,10 +4054,25 @@
 
     async function toggleSave(id, isCurrentlySaved) {
       const newState = !isCurrentlySaved;
+      // Optimistic update
+      const el = document.getElementById('msg_' + id);
+      if (el) {
+        // We don't have the full message object here, but we can toggle the UI partially
+        // or just wait for the DB response. Let's wait for DB but skip full reload.
+      }
+      
       const { error } = await db.from('messages').update({ saved: newState }).eq('id', id);
-      if (error) { toast('Update failed — check database permissions'); return; }
+      if (error) { 
+        toast('Update failed — you may only be able to save your own messages depending on group rules'); 
+        console.error('toggleSave error:', error);
+        return; 
+      }
+      
       toast(newState ? 'Message saved' : 'Message unsaved');
-      loadMessages(activeConversation);
+      // No need for loadMessages() because realtime UPDATE listener will handle the UI refresh
+      // If realtime is slow, we could fetch just this message:
+      const { data: updatedMsg } = await db.from('messages').select('*').eq('id', id).maybeSingle();
+      if (updatedMsg) updateMessageInUI(updatedMsg);
     }
 
 

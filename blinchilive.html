@@ -883,7 +883,27 @@
 
     .bubble.saved {
       outline: 2px solid royalblue;
-      box-shadow: 0 0 10px rgba(65, 105, 225, .25)
+      box-shadow: 0 0 15px rgba(65, 105, 225, .3);
+      position: relative
+    }
+
+    .msg.them .bubble.saved {
+      color: #a5c2ff !important;
+      background: rgba(65, 105, 225, .15) !important;
+      border-color: rgba(65, 105, 225, .3)
+    }
+
+    .msg.me .bubble.saved {
+      color: #0038a8 !important
+    }
+
+    .save-indicator {
+      color: royalblue;
+      font-weight: 800;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-left: 4px
     }
 
     .msg-meta {

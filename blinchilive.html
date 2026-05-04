@@ -882,15 +882,16 @@
     }
 
     .bubble.saved {
-      outline: 2px solid royalblue;
-      box-shadow: 0 0 15px rgba(65, 105, 225, .3);
+      outline: 2px solid royalblue !important;
+      outline-offset: -1px;
+      box-shadow: 0 0 15px rgba(65, 105, 225, .4);
       position: relative
     }
 
     .msg.them .bubble.saved {
-      color: #a5c2ff !important;
-      background: rgba(65, 105, 225, .15) !important;
-      border-color: rgba(65, 105, 225, .3)
+      color: #fff !important;
+      background: rgba(65, 105, 225, .2) !important;
+      border-color: royalblue !important;
     }
 
     .msg.me .bubble.saved {
@@ -900,10 +901,18 @@
     .save-indicator {
       color: royalblue;
       font-weight: 800;
-      font-size: .62rem;
+      font-size: .6rem;
       text-transform: uppercase;
-      letter-spacing: .5px;
-      margin-left: 4px
+      letter-spacing: .8px;
+      margin-left: 6px;
+      display: flex;
+      align-items: center;
+      gap: 3px
+    }
+    .save-indicator::before {
+      content: '\F199';
+      font-family: 'bootstrap-icons';
+      font-size: .65rem;
     }
 
     .msg-meta {
@@ -3818,7 +3827,10 @@
       const ephTag = !m.saved && hrs !== null
         ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
         : (m.saved ? '<span class="save-indicator">Saved</span>' : '');
-      const saveBtn = `<button class="save-btn" onclick="toggleSave('${m.id}', ${m.saved})" title="${m.saved ? 'Unkeep' : 'Keep'} message">${m.saved ? 'Unkeep' : 'Keep'}</button>`;
+      
+      const saveBtnIcon = m.saved ? 'bi-bookmark-fill' : 'bi-bookmark';
+      const saveBtnText = m.saved ? 'Unkeep' : 'Keep';
+      const saveBtn = `<button class="save-btn" onclick="toggleSave('${m.id}', ${m.saved})" title="${saveBtnText} message"><i class="bi ${saveBtnIcon}"></i> ${saveBtnText}</button>`;
       
       let media = '';
       if (m.media_url) {
@@ -4063,7 +4075,7 @@
       
       const { error } = await db.from('messages').update({ saved: newState }).eq('id', id);
       if (error) { 
-        toast('Update failed — you may only be able to save your own messages depending on group rules'); 
+        toast('Could not update — check permissions'); 
         console.error('toggleSave error:', error);
         return; 
       }

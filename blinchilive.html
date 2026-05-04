@@ -135,15 +135,15 @@
   .bubble{padding:8px 12px;border-radius:13px;font-size:.84rem;line-height:1.5;word-break:break-word}
   .msg.me .bubble{background:linear-gradient(135deg,#3dff1a,#22cc08);color:#000;border-radius:18px 18px 4px 18px;font-weight:500;box-shadow:0 2px 12px rgba(50,255,14,.25)}
   .msg.them .bubble{background:rgba(255,255,255,.07);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);color:#e8e8f0;border-radius:18px 18px 18px 4px}
-  .bubble.saved{outline:2px solid var(--brand);box-shadow:0 0 10px rgba(50,255,14,.15)}
+  .bubble.saved{outline:2px solid royalblue;box-shadow:0 0 10px rgba(65,105,225,.25)}
   .msg-meta{font-size:.66rem;color:#1a1a1a;margin-top:2px;display:flex;align-items:center;gap:4px}
   .msg.me .msg-meta{justify-content:flex-end}
   .sender-name{font-size:.7rem;color:var(--brand);font-weight:700;margin-bottom:2px}
   .save-btn{font-size:.67rem;cursor:pointer;opacity:.4;border:none;background:none;color:inherit;padding:0}
-  .save-btn:hover{opacity:1;color:var(--brand)}
+  .save-btn:hover{opacity:1;color:royalblue}
   .msg-media{border-radius:10px;overflow:hidden;max-width:210px;margin-bottom:3px}
   .msg-media img,.msg-media video{width:100%;display:block;border-radius:9px}
-  .msg-media.saved{outline:2px solid var(--brand);box-shadow:0 0 10px rgba(50,255,14,.15);border-radius:10px}
+  .msg-media.saved{outline:2px solid royalblue;box-shadow:0 0 10px rgba(65,105,225,.25);border-radius:10px}
   .eph-bar{background:rgba(249,115,22,.05);border-top:1px solid rgba(249,115,22,.1);padding:5px 12px 5px 16px;font-size:.7rem;color:#c47a3a;flex-shrink:0;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:4px}
   .chat-inp-row{padding:10px 12px;border-top:1px solid var(--glass-border);display:flex;gap:8px;align-items:center;flex-shrink:0;background:rgba(6,6,8,.7)}
   .chat-inp-row input{flex:1;background:#13131a;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:9px 16px;color:#fff;outline:none;font-size:.85rem;font-family:var(--font);transition:border-color .18s}
@@ -229,7 +229,7 @@
   .status-dot.online{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
   .status-dot.ingame{background:var(--brand);box-shadow:0 0 6px rgba(50,255,14,.45)}
   .status-dot.offline{background:#333}
-  .save-indicator{display:inline-flex;align-items:center;gap:3px;font-size:.67rem;color:var(--brand);font-weight:600}
+  .save-indicator{display:inline-flex;align-items:center;gap:3px;font-size:.67rem;color:royalblue;font-weight:600}
   /* make the messages tab not have extra padding that creates a box */
   #tab-messages{padding:0!important}
   #tab-messages > .pg-title,#tab-messages > .pg-sub,#tab-messages > div:not(.chat-root):not(#msg-locked):not(#msg-content){padding:0 24px}
@@ -2011,8 +2011,7 @@
       const ephTag = !m.saved && hrs!==null
         ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
         : (m.saved ? '<span class="save-indicator">Saved</span>' : '');
-      const saveBtn = !m.saved
-        ? `<button class="save-btn" onclick="saveMsg('${m.id}')" title="Keep message">Keep</button>` : '';
+      const saveBtn = `<button class="save-btn" onclick="toggleSave('${m.id}', ${m.saved})" title="${m.saved ? 'Unkeep' : 'Keep'} message">${m.saved ? 'Unkeep' : 'Keep'}</button>`;
       let media = '';
       if (m.media_url) {
         const mediaClass = m.saved ? 'msg-media saved' : 'msg-media';
@@ -2074,7 +2073,7 @@
     const ephTag = !msg.saved && hrs!==null
       ? `<span style="color:#888;font-size:.66rem" title="${hrs}h remaining">${hrs}h left</span>`
       : (msg.saved ? '<span class="save-indicator">Saved</span>' : '');
-    const saveBtn = !msg.saved ? `<button class="save-btn" onclick="saveMsg('${msg.id}')" title="Keep">Keep</button>` : '';
+    const saveBtn = `<button class="save-btn" onclick="toggleSave('${msg.id}', ${msg.saved})" title="${msg.saved ? 'Unkeep' : 'Keep'}">${msg.saved ? 'Unkeep' : 'Keep'}</button>`;
 
     const div = document.createElement('div');
     div.className = `msg ${isMe ? 'me' : 'them'}`;
@@ -2240,10 +2239,11 @@
 
 
 
-  async function saveMsg(id) {
-    const { error } = await db.from('messages').update({ saved: true }).eq('id', id);
-    if (error) { toast('Save failed — ensure database migration is applied'); return; }
-    toast('Message saved');
+  async function toggleSave(id, isCurrentlySaved) {
+    const newState = !isCurrentlySaved;
+    const { error } = await db.from('messages').update({ saved: newState }).eq('id', id);
+    if (error) { toast('Update failed — check database permissions'); return; }
+    toast(newState ? 'Message saved' : 'Message unsaved');
     loadMessages(activeConversation);
   }
 

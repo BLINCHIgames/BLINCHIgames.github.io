@@ -495,7 +495,7 @@
             <!-- Complex Grid for features -->
             <div class="charts-grid" style="grid-template-columns: 1fr 1fr 1fr;">
                 <div class="chart-card">
-                    <h3><i class="bi bi-hdd-network"></i> System Health</h3>
+                    <h3><i class="bi bi-hdd-network"></i> Server Health</h3>
                     <div style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;"><span>CPU Usage</span><span>42%</span></div><div style="background:var(--surf); height:6px; border-radius:3px;"><div id="sys-cpu" style="background:var(--brand); height:100%; width:42%; border-radius:3px; transition:width 1s;"></div></div></div>
                     <div style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;"><span>Memory Load</span><span>68%</span></div><div style="background:var(--surf); height:6px; border-radius:3px;"><div id="sys-mem" style="background:#ffcc00; height:100%; width:68%; border-radius:3px; transition:width 1s;"></div></div></div>
                     <div style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;"><span>Storage (1.2TB / 2TB)</span><span>60%</span></div><div style="background:var(--surf); height:6px; border-radius:3px;"><div style="background:#00ccff; height:100%; width:60%; border-radius:3px;"></div></div></div>
@@ -843,6 +843,7 @@
             const { data: profiles } = await db.from('profiles').select('*');
             const online = (profiles || []).filter(p => p.last_seen && (now - new Date(p.last_seen)) < 360000);
             const playing = online.filter(p => p.status === 'ingame');
+            
             document.getElementById('stat-online').textContent = online.length;
             document.getElementById('stat-players').textContent = playing.length;
             engagementChart.data.datasets[0].data = [playing.length, online.length - playing.length];
@@ -867,9 +868,9 @@
             let vQuery = db.from('site_visits').select('*').gte('timestamp', startStr).lte('timestamp', endStr);
             let pQuery = db.from('game_plays_log').select('*').gte('timestamp', startStr).lte('timestamp', endStr);
             if (gameFilt !== 'all') pQuery = pQuery.eq('game_title', gameFilt);
-            const [{ data: visits }, { data: playLog }] = await Promise.all([vQuery, pQuery]);
-            const vCount = new Set((visits || []).map(v => v.user_id || v.id)).size;
-            const pCount = (playLog || []).length;
+            const [{ data: visits }, { data: playLog }] = await Promise.all([vQuery, pQuery]            let vCount = new Set((visits || []).map(v => v.user_id || v.id)).size;
+            let pCount = (playLog || []).length;
+            
             document.getElementById('stat-visits').textContent = vCount;
             document.getElementById('stat-plays').textContent = pCount;
             
@@ -879,21 +880,36 @@
             let mins = pCount > 0 ? Math.floor(pCount * 3.5 / (vCount || 1)) + 5 : 0;
             document.getElementById('stat-session').textContent = mins + 'm ' + Math.floor(Math.random()*60) + 's';
             
-            // Dynamic Devices Chart
-            let mob = 65, desk = 30, tab = 5;
-            if (vCount > 0) { let hash = vCount * 13; mob = 50 + (hash % 30); desk = 100 - mob - 5; }
-            deviceChart.data.datasets[0].data = [mob, desk, tab];
+            // Real Browser Chart
+            let chrome = 0, safari = 0, firefox = 0, other = 0;
+            (visits || []).forEach(v => {
+                let ua = (v.user_agent || v.browser || '').toLowerCase();
+                if (!ua) other++;
+                else if (ua.includes('chrome')) chrome++;
+                else if (ua.includes('safari')) safari++;
+                else if (ua.includes('firefox')) firefox++;
+                else other++;
+            });
+            deviceChart.data.labels = ['Chrome', 'Safari', 'Firefox', 'Other'];
+            deviceChart.data.datasets[0].data = [chrome, safari, firefox, other];
+            deviceChart.data.datasets[0].backgroundColor = ['#32ff0e', '#00ccff', '#ffcc00', '#666666'];
             deviceChart.update();
 
-            // Dynamic Geography
-            const geos = ['United States', 'United Kingdom', 'Germany', 'Canada', 'France', 'Australia', 'Brazil'];
+            // Real Geography
             const geoTable = document.querySelector('#view-dashboard table tbody');
             if (geoTable) {
-                let dist = []; let remain = 100;
-                for(let i=0; i<4; i++) { let share = vCount === 0 ? [45,22,15,10][i] : Math.floor(remain * (0.4 + (Math.random()*0.2))); dist.push({ name: geos[i], share: share }); remain -= share; }
-                dist.push({ name: 'Others', share: remain });
-                dist.sort((a,b) => b.share - a.share);
-                geoTable.innerHTML = dist.map(d => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;">${d.name}</td><td style="text-align:right; color:var(--brand);">${d.share}%</td></tr>`).join('');
+                let geoCounts = {};
+                (visits || []).forEach(v => {
+                    let c = v.country || v.location || 'Unknown';
+                    geoCounts[c] = (geoCounts[c] || 0) + 1;
+                });
+                let total = (visits || []).length;
+                if (total === 0) {
+                     geoTable.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:10px; color:var(--muted);">No geographic data available</td></tr>';
+                } else {
+                    let sorted = Object.entries(geoCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+                    geoTable.innerHTML = sorted.map(d => `<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;">${d[0]}</td><td style="text-align:right; color:var(--brand);">${Math.round((d[1]/total)*100)}%</td></tr>`).join('');
+                }
             }
 
             // Dynamic Support Tickets
@@ -909,21 +925,22 @@
 
             const visitCounts = {};
             (visits || []).forEach(v => { const dateKey = dur === 'today' ? new Date(v.timestamp).getHours() + ':00' : new Date(v.timestamp).toLocaleDateString(); visitCounts[dateKey] = (visitCounts[dateKey] || 0) + 1; });
-            trafficChart.data.labels = Object.keys(visitCounts); trafficChart.data.datasets[0].data = Object.values(visitCounts); trafficChart.update();
+            trafficChart.data.labels = Object.keys(visitCounts); trafficChart.data.datasets[0].data = Object.values(visitCounts);
             if (gameFilt === 'all') {
                 const gCounts = {}; (playLog || []).forEach(p => gCounts[p.game_title] = (gCounts[p.game_title] || 0) + 1);
                 const top = Object.entries(gCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-                gamesChart.data.labels = top.map(x => x[0]); gamesChart.data.datasets[0].data = top.map(x => x[1]); gamesChart.update();
-            } else { gamesChart.data.labels = [gameFilt]; gamesChart.data.datasets[0].data = [(playLog || []).length]; gamesChart.update(); }
+                gamesChart.data.labels = top.map(x => x[0]); gamesChart.data.datasets[0].data = top.map(x => x[1]);
+            } else { gamesChart.data.labels = [gameFilt]; gamesChart.data.datasets[0].data = [(playLog || []).length]; }
+            trafficChart.update(); gamesChart.update();e();
             const { data: activity } = await db.from('activity').select('*'); const actMap = {}; (activity || []).forEach(a => actMap[a.user_id] = a);
             const { data: profiles } = await db.from('profiles').select('*'); const online = (profiles || []).filter(p => p.last_seen && (now - new Date(p.last_seen)) < 360000);
             
             // Dynamic Admins Online
             const adminContainer = document.querySelector('#view-dashboard .bi-shield-check').parentElement.nextElementSibling;
-            if (adminContainer && online) {
+            if (adminContainer && profiles) {
                 const admins = online.filter(p => p.username === 'AdminMon' || p.is_admin);
-                if (admins.length === 0) adminContainer.innerHTML = `<div style="position:relative;" title="AdminMon (Force)"><div style="width:40px; height:40px; background:var(--brand); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#000; font-weight:bold;">A</div><span style="position:absolute; bottom:0; right:0; width:12px; height:12px; background:#32ff0e; border-radius:50%; border:2px solid var(--panel);"></span></div>`;
-                else adminContainer.innerHTML = admins.map(a => `<div style="position:relative;" title="${a.username}"><div style="width:40px; height:40px; background:var(--brand); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#000; font-weight:bold;">${a.username[0].toUpperCase()}</div><span style="position:absolute; bottom:0; right:0; width:12px; height:12px; background:#32ff0e; border-radius:50%; border:2px solid var(--panel);"></span></div>`).join('');
+                if (admins.length === 0) adminContainer.innerHTML = '<div style="color:var(--muted); font-size:0.8rem;">No admins currently active</div>';
+                else adminContainer.innerHTML = admins.map(a => `<div style="position:relative;" title="${a.username}"><div style="width:40px; height:40px; background:var(--brand); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#000; font-weight:bold;">${(a.displayname || a.username)[0].toUpperCase()}</div><span style="position:absolute; bottom:0; right:0; width:12px; height:12px; background:#32ff0e; border-radius:50%; border:2px solid var(--panel);"></span></div>`).join('');
             }
 
             const list = document.getElementById('live-users');

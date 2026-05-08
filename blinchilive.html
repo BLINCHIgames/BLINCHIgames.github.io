@@ -2674,6 +2674,12 @@
       db.auth.onAuthStateChange(async (_, s) => {
         if (s) await onIn(s.user); else onOut();
       });
+
+      // LOG VISIT
+      try {
+        const uid = session?.user?.id || null;
+        await db.from('site_visits').insert({ user_id: uid, path: window.location.pathname, timestamp: new Date().toISOString() });
+      } catch (e) { console.warn('Visit log failed - ensure "site_visits" table exists'); }
     }
 
 
@@ -3647,6 +3653,22 @@
             if (el) el.remove();
           }
         })
+        .on('broadcast', { event: 'screenshot' }, p => {
+          if (p.payload.uid === U.id) return;
+          // Show a special notification or system message in chat
+          const name = p.payload.name || 'Someone';
+          toast(`${name} took a screenshot!`, 5000);
+          
+          // Optionally append a system message to the UI (not saved to DB)
+          const el = $('chat-msgs');
+          if (el) {
+            const div = document.createElement('div');
+            div.style.cssText = 'margin:10px auto;background:rgba(239,68,68,0.1);color:#ef4444;font-size:.7rem;padding:4px 10px;border-radius:20px;font-weight:700;text-align:center;border:1px solid rgba(239,68,68,0.2)';
+            div.innerHTML = `<i class="bi bi-camera-fill"></i> ${esc(name)} took a screenshot of the chat`;
+            el.appendChild(div);
+            el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+          }
+        })
         .subscribe();
 
 
@@ -3830,7 +3852,8 @@
       
       const saveBtnIcon = m.saved ? 'bi-bookmark-fill' : 'bi-bookmark';
       const saveBtnText = m.saved ? 'Unkeep' : 'Keep';
-      const saveBtn = `<button class="save-btn" onclick="toggleSave('${m.id}', ${m.saved})" title="${saveBtnText} message"><i class="bi ${saveBtnIcon}"></i> ${saveBtnText}</button>`;
+      // Restricted: Only show save button if it's my own message
+      const saveBtn = isMe ? `<button class="save-btn" onclick="toggleSave('${m.id}', ${m.saved})" title="${saveBtnText} message"><i class="bi ${saveBtnIcon}"></i> ${saveBtnText}</button>` : '';
       
       let media = '';
       if (m.media_url) {
@@ -4066,11 +4089,12 @@
 
     async function toggleSave(id, isCurrentlySaved) {
       const newState = !isCurrentlySaved;
-      // Optimistic update
-      const el = document.getElementById('msg_' + id);
-      if (el) {
-        // We don't have the full message object here, but we can toggle the UI partially
-        // or just wait for the DB response. Let's wait for DB but skip full reload.
+      
+      // Ownership check for security
+      const { data: msgCheck } = await db.from('messages').select('sender_id').eq('id', id).maybeSingle();
+      if (!msgCheck || msgCheck.sender_id !== U.id) {
+        toast('You can only keep your own messages');
+        return;
       }
       
       const { error } = await db.from('messages').update({ saved: newState }).eq('id', id);
@@ -4081,8 +4105,6 @@
       }
       
       toast(newState ? 'Message saved' : 'Message unsaved');
-      // No need for loadMessages() because realtime UPDATE listener will handle the UI refresh
-      // If realtime is slow, we could fetch just this message:
       const { data: updatedMsg } = await db.from('messages').select('*').eq('id', id).maybeSingle();
       if (updatedMsg) updateMessageInUI(updatedMsg);
     }
@@ -4146,8 +4168,39 @@
       toast('Group created: ' + name);
       loadGroupsTab();
       // Immediately open it in messages
-      openGroupViaTab(conv.id, name, emoji);
+      openGroupViaTab(conv.id, name, '');
     }
+
+
+    // ═══════════════════════════════════════════════════════════════
+    // SCREENSHOT DETECTION & NOTIFICATION
+    // ═══════════════════════════════════════════════════════════════
+    function notifyScreenshot() {
+      if (!activeConversation || !U) return;
+      if (rtMsg) {
+        rtMsg.send({
+          type: 'broadcast',
+          event: 'screenshot',
+          payload: { uid: U.id, name: nameOf(P) }
+        });
+      }
+      toast('Screenshot detected! Recipient has been notified.', 4000);
+    }
+
+    // Global listeners for screenshot attempts
+    window.addEventListener('keydown', e => {
+      if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p')) {
+        notifyScreenshot();
+      }
+    });
+
+    // Detect when user leaves the tab (often used for screenshots or multi-tasking)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && activeConversation) {
+        // Many web-based screenshot tools trigger a focus loss
+        notifyScreenshot();
+      }
+    });
 
 
 
@@ -4773,7 +4826,8 @@
       // Reload page when user switches back to this browser tab, so data is fresh
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-          window.location.reload();
+          // If we weren't in a call, reload for fresh state
+          if (!pc) window.location.reload();
         }
       });
     };

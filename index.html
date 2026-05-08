@@ -2471,16 +2471,35 @@
       if (!r.length) { wrap.style.display = 'none'; return; }
       wrap.style.display = 'block'; grid.innerHTML = r.map(g => makeCard(g, '')).join('');
     }
-    function renderPopularSection() {
+    async function renderPopularSection() {
       const grid = document.getElementById('popular-grid'); if (!grid) return;
-      const counts = getPlayCounts();
-      let sortedPlayed = catalog.filter(g => counts[g.url]).sort((a, b) => (counts[b.url] || 0) - (counts[a.url] || 0));
-      let games = [];
-      let seenP = new Set();
-      for (let g of sortedPlayed) { if (!seenP.has(g.url)) { games.push(g); seenP.add(g.url); } }
-      games = games.slice(0, 5);
-
       const header = grid.previousElementSibling;
+      let games = [];
+
+      try {
+        if (db) {
+          const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+          const { data: plays } = await db.from('game_plays_log').select('game_title').gt('timestamp', weekAgo);
+          if (plays && plays.length > 0) {
+            const counts = {};
+            plays.forEach(p => counts[p.game_title] = (counts[p.game_title] || 0) + 1);
+            const sortedTitles = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(x => x[0].toLowerCase());
+            games = catalog.filter(g => sortedTitles.includes((g.title || '').toLowerCase())).slice(0, 5);
+            // Re-sort games by the actual counts
+            games.sort((a, b) => (counts[b.title] || 0) - (counts[a.title] || 0));
+          }
+        }
+      } catch (e) { console.warn('Popular games global fetch failed, falling back to local'); }
+
+      // Fallback to local counts if global fetch yielded nothing
+      if (games.length === 0) {
+        const counts = getPlayCounts();
+        let sortedPlayed = catalog.filter(g => counts[g.url]).sort((a, b) => (counts[b.url] || 0) - (counts[a.url] || 0));
+        let seenP = new Set();
+        for (let g of sortedPlayed) { if (!seenP.has(g.url)) { games.push(g); seenP.add(g.url); } }
+        games = games.slice(0, 5);
+      }
+
       if (games.length === 0) {
         grid.style.display = 'none';
         if (header && header.classList.contains('sec-header')) header.style.display = 'none';
@@ -2490,7 +2509,11 @@
       grid.style.display = 'grid';
       if (header && header.classList.contains('sec-header')) header.style.display = 'flex';
 
-      grid.innerHTML = games.map((g, i) => { const c = makeCard(g, ''); const noEliteBadge = c.replace('<div class="badge badge-elite">Elite</div>', ''); return noEliteBadge.replace('<div class="thumb">', '<div class="thumb"><div class="rank-badge">#' + (i + 1) + '</div>'); }).join('');
+      grid.innerHTML = games.map((g, i) => { 
+        const c = makeCard(g, ''); 
+        const noEliteBadge = c.replace('<div class="badge badge-elite">Elite</div>', ''); 
+        return noEliteBadge.replace('<div class="thumb">', '<div class="thumb"><div class="rank-badge">#' + (i + 1) + '</div>'); 
+      }).join('');
     }
     function renderNewSection() {
       const grid = document.getElementById('new-grid'); if (!grid) return;

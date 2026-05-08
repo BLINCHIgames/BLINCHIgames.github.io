@@ -1731,6 +1731,12 @@
       const { data: { session } } = await db.auth.getSession();
       if (session) await onSignedIn(session.user);
       db.auth.onAuthStateChange(async (_, s) => { if (s) await onSignedIn(s.user); else onSignedOut(); });
+
+      // LOG VISIT
+      try {
+        const uid = session?.user?.id || null;
+        await db.from('site_visits').insert({ user_id: uid, path: window.location.pathname, timestamp: new Date().toISOString() });
+      } catch (e) { console.warn('Visit log failed - ensure "site_visits" table exists'); }
     }
     async function onSignedIn(user) {
       CU = user;
@@ -2299,6 +2305,15 @@
     function _actualLaunch(url, title, cat) {
       currentGame = { url, title, category: cat };
       trackPlay(title, url, '', cat);
+      if (db) {
+        // LOG GAME START
+        db.from('game_plays_log').insert({ 
+          user_id: CU?.id || null, 
+          game_title: title, 
+          category: cat,
+          timestamp: new Date().toISOString() 
+        }).catch(() => {});
+      }
       if (++gCount % 17 === 0) cleanCache();
       document.getElementById('stage').classList.add('open');
       document.getElementById('game-iframe').src = url;

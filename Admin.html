@@ -868,7 +868,8 @@
             let vQuery = db.from('site_visits').select('*').gte('timestamp', startStr).lte('timestamp', endStr);
             let pQuery = db.from('game_plays_log').select('*').gte('timestamp', startStr).lte('timestamp', endStr);
             if (gameFilt !== 'all') pQuery = pQuery.eq('game_title', gameFilt);
-            const [{ data: visits }, { data: playLog }] = await Promise.all([vQuery, pQuery]            let vCount = new Set((visits || []).map(v => v.user_id || v.id)).size;
+            const [{ data: visits }, { data: playLog }] = await Promise.all([vQuery, pQuery]);
+            let vCount = new Set((visits || []).map(v => v.user_id || v.id)).size;
             let pCount = (playLog || []).length;
             
             document.getElementById('stat-visits').textContent = vCount;
